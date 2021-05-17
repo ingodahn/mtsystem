@@ -6,6 +6,7 @@ Vue.use(VueRouter)
 import Units from '../imports/ui/views/Units/Units.vue'
 import Home from '../imports/ui/views/Home/Home.vue'
 import Topics from '../imports/ui/views/Topics/Topics.vue'
+import Concepts from '../imports/ui/views/Concepts/Concepts.vue'
 import Admin from '../imports/ui/views/Admin/Admin.vue'
 
 const routes = [
@@ -18,6 +19,11 @@ const routes = [
         path: "/topics",
         name: "Topics",
         component: Topics
+    },
+    {
+        path: "/concepts",
+        name: "Concepts",
+        component: Concepts
     },
     {
         path: "/units",

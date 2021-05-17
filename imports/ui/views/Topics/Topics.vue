@@ -2,26 +2,25 @@
     <div class="container">
         <h1>MathTrek Topics</h1>
         <div v-if="mode == 'list'">
-            <div>
-                <v-btn id="btnAll" @click="searchTerm=''">New Search"</v-btn>
-                <v-btn id="btnNew" @click="newTopic">New Topic</v-btn>
-                <v-text-field
-                    label="Search (at least 3 letters):"
-                    hide-details="auto"
-                    v-model="searchTerm"
-                ></v-text-field>
+            <v-btn id="btnNew" @click="newTopic">New Topic</v-btn>
+            <span v-if="currentTopic._id">
+                | <v-btn id="btnUpdate" @click="mode='update'">Update Topic</v-btn>
+            </span>
+            <div data-app>
+            <v-autocomplete
+                label="Select Topic"
+                v-model="currentTopic"
+                hide-details="auto"
+                :items="all"
+                item-text="title"
+                item-value="_id"
+                return-object
+                clearable
+            ></v-autocomplete>
             </div>
-            <div v-if="searchTerm.length > 2">
-                <ul v-if="found.length > 0">
-                    <li class="item"
-                    v-for="item in found" v-bind:key="item._id"
-                    v-on:click="currentTopic=item;mode='select'">
-                        {{ item.title }}
-                    </li>
-                </ul>
-                <div v-else>
-                    No items found.
-                </div>
+            <br/>
+            <div v-if="currentTopic.description">
+                {{ currentTopic.description }}
             </div>
         </div>
         <div v-else>
@@ -39,6 +38,17 @@
                 label="Description:"
                 v-model="currentTopic.description"
             ></v-textarea>
+            <div data-app>
+            <v-autocomplete
+                label="Parent"
+                v-model="currentTopic.parent"
+                hide-details="auto"
+                :items="all"
+                item-text="title"
+                item-value="_id"
+                clearable
+            ></v-autocomplete>
+            </div>
             <v-text-field
                 label="Code (optional)"
                 hide-details="auto"
@@ -61,7 +71,6 @@ export default {
                 code: ""
             },
           mode: "list",
-          searchTerm: ""
         };
     },
     methods: {
@@ -75,6 +84,7 @@ export default {
             this.mode="select";
         },
         saveTopic () {
+            console.log(this.currentTopic);
             this.currentTopic.updatedAt = new Date();
             if (this.currentTopic._id) {
                 UnitsCollection.update(
@@ -110,21 +120,16 @@ export default {
 
     },
     meteor: {
-      found() {
-        if (this.searchTerm.length < 3) return [];
-        return UnitsCollection.find({$and: [
-            {type: "topic"},
-            {title: {$regex: this.searchTerm, $options: 'i'}}
-        ]}).fetch();
+      all() {
+        return UnitsCollection.find(
+            {type: "topic"}
+        ).fetch();
       }
     }
 }
 </script>
 
 <style scoped>
-.v-text-field{
-      width: 400px;
-}
 
 .item:hover {
   background-color: greenyellow;
