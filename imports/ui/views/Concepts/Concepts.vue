@@ -2,10 +2,12 @@
     <div class="container">
         <h1>MathTrek Concepts</h1>
         <div v-if="mode == 'list'">
-            <v-btn id="btnNew" @click="newConcept">New Concept</v-btn>
-            <span v-if="current._id">
-                | <v-btn id="btnUpdate" @click="mode='update'">Update Concept</v-btn>
-            </span>
+            <template v-if="currentUser">
+                <v-btn id="btnNew" @click="newConcept">New Concept</v-btn>
+                <span v-if="current._id">
+                    | <v-btn id="btnUpdate" @click="updateConcept">Update Concept</v-btn>
+                </span>
+            </template>
             <div data-app>
             <v-autocomplete
                 label="Select Concept"
@@ -23,7 +25,7 @@
             <div v-if="current.see">
                 <a :href="current.see" target="_blank">Read more</a>
             </div>
-            <v-list v-if="current._id && current.below">
+            <v-list v-if="current._id && currentSuperConcepts.length">
                 <v-subheader>Subconcept of</v-subheader>
                 <v-list-item-group>
                     <v-list-item v-for="(item,index) in currentSuperConcepts" 
@@ -37,7 +39,7 @@
                 </v-list-item-group>
             </v-list>
 
-            <v-list v-if="current._id && currentSub.length">
+            <v-list v-if="current._id && currentSubConcepts.length">
                 <v-subheader>Superconcept of</v-subheader>
                 <v-list-item-group>
                     <v-list-item v-for="(item,index) in currentSubConcepts" 
@@ -53,7 +55,7 @@
         </div>
         <div v-else>
             <h2>Edit Concept</h2>
-            <v-btn @click="mode='list'">Cancel</v-btn> | 
+            <v-btn @click="closeConceptUpdate">Cancel</v-btn> | 
             <v-btn @click="saveConcept">Save</v-btn> | 
             <v-btn v-if = "current._id" @click="deleteConcept">Delete</v-btn>
             <v-text-field
@@ -69,7 +71,7 @@
             <div data-app>
             <v-autocomplete
                 label="Subconcept of"
-                v-model="current.below"
+                v-model="currentBelow"
                 hide-details="auto"
                 :items="all"
                 item-text="title"
@@ -102,8 +104,13 @@ export default {
                 below: [],
                 see: ""
             },
-          mode: "list",
+            currentBelow: [],
+            currentAbove: [],
+            mode: "list",
         };
+    },
+    components: {
+
     },
     methods: {
         newConcept () {
@@ -113,26 +120,63 @@ export default {
                 description: "",
                 see: ""
             };
+            this.currentBelow=[];
+            this.currentAbove=[];
             this.mode="select";
         },
+        updateConcept() {
+            this.currentBelow=this.getCurrentIsBelow.map(e => e._id);
+            this.mode='update';
+        },
         saveConcept () {
-            console.log(this.current);
             this.current.updatedAt = new Date();
             if (this.current._id) {
-                UnitsCollection.update(
-                    {_id: this.current._id},
-                    {
-                    $set: this.current
-                    }
-                )
+                Meteor.call('updateItem',this.current);
+                Meteor.call('deleteItem',{
+                    type: "relation",
+                    name: "isBelow",
+                    source: this.current._id
+                });
+                this.currentBelow.forEach(id => {
+                    Meteor.call('insertItem',{
+                        type: "relation",
+                        name: "isBelow",
+                        source: this.current._id,
+                        target: id
+                    });
+                });
             } else  {
-                UnitsCollection.insert(this.current);
+                const currentBelow=this.currentBelow;
+                Meteor.call('insertItem',this.current, function(error,result) {
+                    if (error) {
+                        console.log("Insert Error: "+error.msg)
+                    } else {
+                        currentBelow.forEach(id => {
+                            Meteor.call('insertItem',{
+                                type: "relation",
+                                name: "isBelow",
+                                source: result,
+                                target: id
+                            });
+                        });
+                    }
+                });
             }
             this.closeConceptUpdate ();
         },
         deleteConcept () {
             if (this.current._id) {
-                UnitsCollection.remove(this.current._id);
+                Meteor.call('deleteItem',{
+                    type: "relation",
+                    target: this.current._id
+                });
+                Meteor.call('deleteItem',{
+                    type: "relation",
+                    source: this.current._id
+                });
+                Meteor.call('deleteItem',{
+                    _id: this.current._id
+                });
             } else {
                 alert("Not yet in database, cannot delete.");
             }
@@ -143,60 +187,58 @@ export default {
                 type: "concept",
                 title: "",
                 description: "",
-                below: [],
                 see: ""
             };
             this.mode="list";
+            this.currentBelow=[];
+            this.currentAbove=[];
         },
         setCurrentBelow (i) {
-            this.current = this.currentSuper[i];
+            this.current = this.getCurrentIsBelow[i];
         },
         setCurrentAbove (i) {
-            this.current = this.currentSub[i];
+            this.current = this.getCurrentIsAbove[i];
         }
     },
     computed: {
         // Concepts of which the current concept is a superconcept
-        currentSuper () {
-            return UnitsCollection.find(
-                {
-                    type: "concept",
-                    _id: {$in: this.current.below}}
-            ).fetch();
+        currentSubConcepts () {
+            return this.getCurrentIsAbove.map(c => c.title);
+        },
+        getCurrentIsAbove () {
+            const rds = UnitsCollection.find({
+                type: 'relation',
+                name: 'isBelow',
+                target: this.current._id
+            }).fetch().map(d => d.source);
+            this.currentAbove=rds;
+            rs=UnitsCollection.find({_id: {$in: rds}}).fetch();
+            return rs;
         },
         currentSuperConcepts () {
-            
-            return this.getCurrentSupers.map(c => c.title);
+            return this.getCurrentIsBelow.map(c => c.title);
         },
-        getCurrentSupers () {
+         // Concepts of which the current concept is a subconcept
+        getCurrentIsBelow () {
             const rds = UnitsCollection.find({
                 type: 'relation',
                 name: 'isBelow',
                 source: this.current._id
             }).fetch().map(d => d.target);
-            rs=UnitsCollection.find({_id: {$in: rds}});
-            console.log(rs);
+            this.currentBelow=rds;
+            rs=UnitsCollection.find({_id: {$in: rds}}).fetch();
             return rs;
         },
-        // Concepts of which the current concept is a subconcept
-        currentSub () {
-            return UnitsCollection.find(
-                {
-                    type: "concept",
-                    below: this.current._id
-                }
-            ).fetch();
-        },
-        currentSubConcepts () {
-            return this.currentSub.map(c => c.title);
-        }
     },
     meteor: {
-      all() {
+        all() {
         return UnitsCollection.find(
             {type: "concept"}
         ).fetch();
-      }
+        },
+        currentUser() {
+            return Meteor.user();
+        }
     }
 }
 </script>

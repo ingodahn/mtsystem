@@ -4,6 +4,7 @@
         <p>This is the admin page</p>
         <v-btn @click="setField('type','unit')">Set field</v-btn>
         <v-btn @click="makeRelation('concept','below','isBelow')">Make Relation</v-btn>
+        <v-btn @click="makeExport()">Export</v-btn>
     </div>
 </template>
 
@@ -39,6 +40,12 @@ export default {
                     })
                 }
             })
+        },
+        makeExport() {
+            const allDocs=UnitsCollection.find({}).fetch();
+            var expString=JSON.stringify(allDocs);
+            uriContent = "data:application/octet-stream," + encodeURIComponent(expString);
+            newWindow = window.open(uriContent, 'neuesDokument');
         }
     },
     meteor: {

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.14.0",
+    "bcrypt": "^5.0.1",
     "meteor-node-stubs": "^1.0.1",
     "v-markdown": "^1.0.2",
     "vue": "^2.6.12",

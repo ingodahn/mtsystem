@@ -22,6 +22,9 @@
     },
     methods: {},
     meteor: {
+      currentUser() {
+        return Meteor.user();
+      }
     }
   };
 </script>
