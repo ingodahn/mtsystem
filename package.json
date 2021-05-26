@@ -14,6 +14,7 @@
     "v-markdown": "^1.0.2",
     "vue": "^2.6.12",
     "vue-meteor-tracker": "^2.0.0-beta.5",
+    "vue-mindmap": "0.0.4",
     "vue-router": "^3.5.1",
     "vuetify": "^2.4.11"
   },

@@ -1,7 +1,14 @@
 <template>
     <div class="container">
         <h1>MathTrek Concepts</h1>
+        <template v-if="mode == 'map'">
+            <v-btn @click="closeConceptUpdate">Back</v-btn>
+            <ConceptMap :cid="current._id"></ConceptMap>
+        </template>
         <div v-if="mode == 'list'">
+            <template v-if="current._id">
+                <v-btn id="btnMap" @click="mode='map'">Concept Map</v-btn>
+            </template>
             <template v-if="currentUser">
                 <v-btn id="btnNew" @click="newConcept">New Concept</v-btn>
                 <span v-if="current._id">
@@ -93,6 +100,7 @@
 
 <script>
 import { UnitsCollection } from "../../../api/UnitsCollection";
+import ConceptMap from "../../components/ConceptMap.vue";
 
 export default {
     data() {
@@ -110,7 +118,7 @@ export default {
         };
     },
     components: {
-
+        ConceptMap
     },
     methods: {
         newConcept () {
