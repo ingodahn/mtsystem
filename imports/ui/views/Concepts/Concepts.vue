@@ -5,7 +5,7 @@
             <!--
             <v-btn @click="closeConceptUpdate">Back</v-btn>
             -->
-            <ConceptMap :cmap="conceptMap()"></ConceptMap>
+            <ConceptMap :cmap="conceptMap(2,2)" v-on:nodeclicked="setCurrent"></ConceptMap>
         </template>
         <div v-if="mode == 'list'">
             <template v-if="current._id">
@@ -62,7 +62,7 @@
                 </v-list-item-group>
             </v-list>
         </div>
-        <div v-else>
+        <div v-if="mode == 'update'">
             <h2>Edit Concept</h2>
             <v-btn @click="closeConceptUpdate">Cancel</v-btn> | 
             <v-btn @click="saveConcept">Save</v-btn> | 
@@ -209,16 +209,71 @@ export default {
         setCurrentAbove (i) {
             this.current = this.getCurrentIsAbove[i];
         },
-        conceptMap () {
+        getDownNodes (down) {
+            let id=0, newNodeIds=[this.current._id],nodeIds=[this.current._id],linkIds=[];
+            while (id < down) {
+               let  nextNodeIds=[];
+               UnitsCollection.find({
+                    type: 'relation', 
+                    name: 'isBelow', 
+                    target: {$in: newNodeIds}
+                }).fetch().forEach(c => {
+                    nextNodeIds.push(c.source);
+                    linkIds.push(c);
+                })
+                nodeIds=nodeIds.concat(nextNodeIds);
+                newNodeIds=nextNodeIds;
+                id++;
+            }
+            return({nodes: nodeIds, links: linkIds})
+        },
+        getUpNodes (up) {
+            let id=0, newNodeIds=[this.current._id],nodeIds=[this.current._id],linkIds=[];
+            while (id < up) {
+               let  nextNodeIds=[];
+               UnitsCollection.find({
+                    type: 'relation', 
+                    name: 'isBelow', 
+                    source: {$in: newNodeIds}
+                }).fetch().forEach(c => {
+                    nextNodeIds.push(c.target);
+                    linkIds.push(c);
+                })
+                nodeIds=nodeIds.concat(nextNodeIds);
+                newNodeIds=nextNodeIds;
+                id++;
+            }
+            return({nodes: nodeIds, links: linkIds})
+        },
+        conceptMap (down,up) {
             var it = {}, nodes=[], links = [];
             UnitsCollection.find({type: 'concept'}).fetch().forEach(c => {
                 it[c._id]=c.title;
-                nodes.push({"id": c.title});
             });
-            UnitsCollection.find({type: 'relation'}).fetch().forEach(r => {
-                links.push({"source": it[r.source], "target": it[r.target]});
+            const downNodes=this.getDownNodes(down);
+            const downNodeIds=downNodes.nodes, downLinkIds=downNodes.links;
+            const upNodes=this.getUpNodes(up);
+            const upNodeIds=upNodes.nodes, upLinkIds=upNodes.links;
+            downNodeIds.forEach(c => {
+                let group=(c == this.current._id)?2:1;
+                nodes.push({"id": c, "title": it[c], "group": group});
             });
+            downLinkIds.forEach(r => {
+                links.push({source: r.target,target: r.source})
+            });
+            upNodeIds.forEach(c => {
+                let group=(c == this.current._id)?2:1;
+                nodes.push({"id": c, "title": it[c], "group": group});
+            });
+            upLinkIds.forEach(r => {
+                links.push({source: r.target,target: r.source})
+            });
+            nodes.shift();
             return {"nodes": nodes, "links": links};
+        },
+        setCurrent(node) {
+            this.current=UnitsCollection.findOne({_id: node.id});
+            this.mode="list";
         }
     },
     computed: {

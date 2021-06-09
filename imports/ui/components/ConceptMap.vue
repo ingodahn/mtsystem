@@ -10,6 +10,11 @@
 	  props: ['cmap'],
 	  computed: {
 	  },
+	  methods: {
+		  nodeClicked(node) {
+			  this.$emit('nodeclicked',node);
+		  }
+	  },
 	  mounted() {
 		  
 		const Graph = ForceGraph()
@@ -18,11 +23,15 @@
 			.linkDirectionalArrowLength(6)
 			.nodeId('id')
 			.nodeAutoColorBy('group')
-			.dagMode('radialout')
-			.dagLevelDistance(50)
-			//.d3Force('link')
+			.dagMode('td')
+			.dagLevelDistance(30)
+			.onNodeDragEnd(node => {
+				node.fx = node.x;
+				node.fy = node.y;
+			})
+			.onNodeClick(node => this.nodeClicked(node))
 			.nodeCanvasObject((node, ctx, globalScale) => {
-			const label = node.id;
+			const label = node.title;
 			const fontSize = 12/globalScale;
 			ctx.font = `${fontSize}px Sans-Serif`;
 			const textWidth = ctx.measureText(label).width;
