@@ -2,8 +2,10 @@
     <div class="container">
         <h1>MathTrek Concepts</h1>
         <template v-if="mode == 'map'">
+            <!--
             <v-btn @click="closeConceptUpdate">Back</v-btn>
-            <ConceptMap :cid="current._id"></ConceptMap>
+            -->
+            <ConceptMap :cmap="conceptMap()"></ConceptMap>
         </template>
         <div v-if="mode == 'list'">
             <template v-if="current._id">
@@ -206,6 +208,17 @@ export default {
         },
         setCurrentAbove (i) {
             this.current = this.getCurrentIsAbove[i];
+        },
+        conceptMap () {
+            var it = {}, nodes=[], links = [];
+            UnitsCollection.find({type: 'concept'}).fetch().forEach(c => {
+                it[c._id]=c.title;
+                nodes.push({"id": c.title});
+            });
+            UnitsCollection.find({type: 'relation'}).fetch().forEach(r => {
+                links.push({"source": it[r.source], "target": it[r.target]});
+            });
+            return {"nodes": nodes, "links": links};
         }
     },
     computed: {
@@ -246,7 +259,7 @@ export default {
         },
         currentUser() {
             return Meteor.user();
-        }
+        },
     }
 }
 </script>

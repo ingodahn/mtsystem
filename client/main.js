@@ -1,11 +1,8 @@
 import Vue from 'vue'
 import router from './routes';
 import VueMeteorTracker from 'vue-meteor-tracker';
-import Mindmap from 'vue-mindmap';
-import 'vue-mindmap/dist/vue-mindmap.css';
 
 Vue.use(VueMeteorTracker);
-Vue.use(Mindmap);
 
 import Vuetify from 'vuetify'; 
 import 'vuetify/dist/vuetify.min.css';
