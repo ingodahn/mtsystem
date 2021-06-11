@@ -15,6 +15,12 @@ Meteor.startup(() => {
       password: SEED_PASSWORD,
     });
   }
+  if (!Accounts.findUserByUsername('editor')) {
+    Accounts.createUser({
+      username: 'editor',
+      password: 'mt-edit',
+    });
+  }
   if (UnitsCollection.find().count() === 0) {
     [
       'A Bird\'s View on Derivatives',

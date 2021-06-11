@@ -1,22 +1,21 @@
 <template>
     <div class="container">
         <h1>MathTrek Concepts</h1>
-        <template v-if="mode == 'map'">
-            <!--
-            <v-btn @click="closeConceptUpdate">Back</v-btn>
-            -->
+        <span v-if="mode == 'map'">
+            <h3>Concepts close to the concept of {{ current.title }}</h3>
+            <p>Click concepts for details</p>
             <ConceptMap :cmap="conceptMap(2,2)" v-on:nodeclicked="setCurrent"></ConceptMap>
-        </template>
+        </span>
         <div v-if="mode == 'list'">
-            <template v-if="current._id">
+            <span v-if="current._id">
                 <v-btn id="btnMap" @click="mode='map'">Concept Map</v-btn>
-            </template>
-            <template v-if="currentUser">
+            </span>
+            <span v-if="currentUser">
                 <v-btn id="btnNew" @click="newConcept">New Concept</v-btn>
                 <span v-if="current._id">
                     | <v-btn id="btnUpdate" @click="updateConcept">Update Concept</v-btn>
                 </span>
-            </template>
+            </span>
             <div data-app>
             <v-autocomplete
                 label="Select Concept"
@@ -132,7 +131,7 @@ export default {
             };
             this.currentBelow=[];
             this.currentAbove=[];
-            this.mode="select";
+            this.mode="update";
         },
         updateConcept() {
             this.currentBelow=this.getCurrentIsBelow.map(e => e._id);

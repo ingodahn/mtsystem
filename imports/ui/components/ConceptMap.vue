@@ -16,7 +16,17 @@
 		  }
 	  },
 	  mounted() {
-		  
+		  const Graph = ForceGraph()
+		  (document.getElementById('graph'))
+		  .graphData(this.cmap)
+		  .linkDirectionalArrowLength(6)
+		  .nodeRelSize(6)
+		  .nodeId('id')
+		  .nodeAutoColorBy('group')
+		  .nodeLabel(node => `${node.title}`)
+		  .onNodeClick(node => this.nodeClicked(node))
+		  ;
+		/*  
 		const Graph = ForceGraph()
 		(document.getElementById('graph'))
 			.graphData(this.cmap)
@@ -52,6 +62,7 @@
 			const bckgDimensions = node.__bckgDimensions;
 			bckgDimensions && ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions);
 		});
+		*/
 	},
   }
   
