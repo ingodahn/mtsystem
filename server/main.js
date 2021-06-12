@@ -6,7 +6,7 @@ import '/imports/api/methods/UnitsCollectionMethods';
 const insertUnit = unitTitle => UnitsCollection.insert({ title: unitTitle });
 
 const SEED_USERNAME = 'dahn';
-const SEED_PASSWORD = 'legHorn';
+const SEED_PASSWORD = 'leg1Horn';
  
 Meteor.startup(() => {
   if (!Accounts.findUserByUsername(SEED_USERNAME)) {
@@ -21,6 +21,7 @@ Meteor.startup(() => {
       password: 'mt-edit',
     });
   }
+  /*
   if (UnitsCollection.find().count() === 0) {
     [
       'A Bird\'s View on Derivatives',
@@ -32,4 +33,5 @@ Meteor.startup(() => {
       'At Most One Approximating Affine Function'
     ].forEach(insertUnit)
   }
+  */
 });

@@ -1,12 +1,16 @@
 <template>
     <div class="container">
         <h1>MathTrek System</h1>
-        <template v-if="currentUser">
+        <p>
+            Login is only required to edit content. 
+            To view content, click on the <b>CONCEPTS</b> button.
+        </p>
+        <div v-if="currentUser">
             <p>You are logged in into the MathTrek System as user {{ currentUser.username }}.</p>
-            <v-btn @click="logout">
+            <v-btn v-on:click="logout">
                 Logout {{currentUser.username}} 🚪
             </v-btn>
-        </template>
+        </div>
         <template v-else>
             <LoginForm/>
         </template>
@@ -19,13 +23,16 @@ export default {
     components: {
         LoginForm
     },
+    methods: {
+        logout() {
+            Meteor.logout();
+        }
+    },
     meteor: {
         currentUser() {
             return Meteor.user();
         },
-        logout() {
-            Meteor.logout();
-        }
+        
     }
 }
 

@@ -5,11 +5,13 @@
         <v-btn @click="setField('type','unit')">Set field</v-btn>
         <v-btn @click="makeRelation('concept','below','isBelow')">Make Relation</v-btn>
         <v-btn @click="makeExport()">Export</v-btn>
+        <v-btn @click="makeImport()">Import</v-btn>
     </div>
 </template>
 
 <script>
 import { UnitsCollection } from "../../../api/UnitsCollection";
+import { mtdata } from "./mtData.js";
 import Vue from 'vue'
 export default {
     methods: {
@@ -46,6 +48,12 @@ export default {
             var expString=JSON.stringify(allDocs);
             uriContent = "data:application/octet-stream," + encodeURIComponent(expString);
             newWindow = window.open(uriContent, 'neuesDokument');
+        },
+        makeImport () {
+            console.log(mtdata[0]);
+            mtdata.forEach(document => {
+                Meteor.call('insertItem',document);
+            })
         }
     },
     meteor: {
