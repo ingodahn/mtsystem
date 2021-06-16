@@ -4,7 +4,7 @@
         <span v-if="mode == 'map'">
             <h3>Concepts close to the concept of {{ current.title }}</h3>
             <p>Click concepts for details</p>
-            <ConceptMap :cmap="conceptMap(2,2)" v-on:nodeclicked="setCurrent"></ConceptMap>
+            <ConceptMap :cmap="neighbourhood(2)" v-on:nodeclicked="setCurrent"></ConceptMap>
         </span>
         <div v-if="mode == 'list'">
             <span v-if="current._id">
@@ -243,6 +243,44 @@ export default {
                 id++;
             }
             return({nodes: nodeIds, links: linkIds})
+        },
+        neighbourhood(d) {
+            var it = {}, nodes=[], links = [];
+            UnitsCollection.find({type: 'concept'}).fetch().forEach(c => {
+                it[c._id]=c.title;
+            });
+            let id=0, newNodeIds=[this.current._id],nodeIds=[this.current._id],linkIds=[];
+            while (id < d) {
+                let  nextNodeIds=[];
+                UnitsCollection.find({
+                    type: 'relation', 
+                    name: 'isBelow', 
+                    source: {$in: newNodeIds}
+                }).fetch().forEach(c => {
+                    nextNodeIds.push(c.target);
+                    linkIds.push(c);
+                });
+                UnitsCollection.find({
+                    type: 'relation', 
+                    name: 'isBelow', 
+                    target: {$in: newNodeIds}
+                }).fetch().forEach(c => {
+                    nextNodeIds.push(c.source);
+                    linkIds.push(c);
+                });
+                let nextNodeReduced=[...new Set(nextNodeIds)].filter(item => (! nodeIds.includes(item)));
+                nodeIds=nodeIds.concat(nextNodeReduced);
+                newNodeIds=[...nextNodeReduced];
+                id++;
+            }
+            nodeIds.forEach(c => {
+                let group=(c == this.current._id)?2:1;
+                nodes.push({"id": c, "title": it[c], "group": group});
+            });
+            linkIds.forEach(r => {
+                links.push({source: r.source, target: r.target})
+            });
+            return {"nodes": nodes, "links": links};
         },
         conceptMap (down,up) {
             var it = {}, nodes=[], links = [];

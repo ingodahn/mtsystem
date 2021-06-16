@@ -13,6 +13,7 @@
     "meteor-node-stubs": "^1.0.1",
     "v-markdown": "^1.0.2",
     "vue": "^2.6.12",
+    "vue-cytoscape": "^1.0.8",
     "vue-meteor-tracker": "^2.0.0-beta.5",
     "vue-router": "^3.5.1",
     "vuetify": "^2.5.1"

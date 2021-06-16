@@ -21,6 +21,15 @@ Meteor.startup(() => {
       password: 'mt-edit',
     });
   }
+  ['ingo','paul','dietrich','erik','ambjoern'].forEach(name => {
+    if (!Accounts.findUserByUsername(name)) {
+      Accounts.createUser({
+        username: name,
+        password: 'my-ship',
+      });
+    }
+  })
+  
   /*
   if (UnitsCollection.find().count() === 0) {
     [
