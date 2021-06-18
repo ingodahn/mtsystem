@@ -3,19 +3,35 @@
         <h1>MathTrek Concepts</h1>
         <span v-if="mode == 'map'">
             <h3>Concepts close to the concept of {{ current.title }}</h3>
-            <p>Click concepts for details</p>
+            <p v-if="currentUser">Color distinguishes 
+                <span style="background-color:green; color: white;">concepts I know</span> from 
+                <span style="background-color:yellow">concepts I am exploring</span> and
+                <span style="background-color:red; color: white;">concepts I find interesting</span>. 
+            </p>
+            <p>The concept of <em>{{ current.title }}</em> is shown in black. Arrows point to superconcepts. Click concepts for details</p>
             <ConceptMap :cmap="neighbourhood(2)" v-on:nodeclicked="setCurrent"></ConceptMap>
         </span>
         <div v-if="mode == 'list'">
-            <span v-if="current._id">
-                <v-btn id="btnMap" @click="mode='map'">Concept Map</v-btn>
-            </span>
-            <span v-if="currentUser">
-                <v-btn id="btnNew" @click="newConcept">New Concept</v-btn>
-                <span v-if="current._id">
-                    | <v-btn id="btnUpdate" @click="updateConcept">Update Concept</v-btn>
-                </span>
-            </span>
+            <v-container>
+                <v-row>
+                    <v-col>
+                        <span v-if="current && current._id">
+                            <v-btn id="btnMap" @click="mode='map'">Concept Map</v-btn>
+                            <v-btn id="noteButton" @click="toggleNote">{{ noteButtonLabel }}</v-btn>
+                        </span>
+                        <span v-if="isEditor">
+                            <v-btn id="btnNew" @click="newConcept">New Concept</v-btn>
+                            <span v-if="current && current._id">
+                                | <v-btn id="btnUpdate" @click="updateConcept">Update Concept</v-btn>
+                            </span>
+                        </span>
+                    </v-col>
+                    <v-col>
+                        <UserNotes v-if="currentUser && current && current._id && showNotes" :title="current.title" :currentNote="currentNote"></UserNotes>
+                    </v-col>
+                </v-row>
+            </v-container>
+            
             <div data-app>
             <v-autocomplete
                 label="Select Concept"
@@ -29,6 +45,7 @@
             ></v-autocomplete>
             </div>
             <br/>
+            <div v-if="current">
             <div v-if="current.description" v-html="current.description"></div>
             <div v-if="current.see">
                 <a :href="current.see" target="_blank">Read more</a>
@@ -60,6 +77,7 @@
                     </v-list-item>
                 </v-list-item-group>
             </v-list>
+            </div>
         </div>
         <div v-if="mode == 'update'">
             <h2>Edit Concept</h2>
@@ -102,6 +120,7 @@
 <script>
 import { UnitsCollection } from "../../../api/UnitsCollection";
 import ConceptMap from "../../components/ConceptMap.vue";
+import UserNotes from "../../components/UserNotes.vue";
 
 export default {
     data() {
@@ -116,10 +135,13 @@ export default {
             currentBelow: [],
             currentAbove: [],
             mode: "list",
+            showNotes: true,
+            noteButtonLabel: "Hide My Notes"
         };
     },
     components: {
-        ConceptMap
+        ConceptMap,
+        UserNotes
     },
     methods: {
         newConcept () {
@@ -273,9 +295,27 @@ export default {
                 newNodeIds=[...nextNodeReduced];
                 id++;
             }
+            let nodeStatus={};
+            if (this.currentUser) {
+                UnitsCollection.find({type: 'note',
+                    item: {$in: nodeIds},
+                    userId: this.currentUser._id
+                    }).fetch().forEach(n => {
+                        nodeStatus[n.item]=n.status;
+                    });
+            }
+            
             nodeIds.forEach(c => {
-                let group=(c == this.current._id)?2:1;
-                nodes.push({"id": c, "title": it[c], "group": group});
+                let color="lightblue";
+                switch (nodeStatus[c]) {
+                    case "100": color="green"; break;
+                    case "2": color="yellow"; break;
+                    case "150": color="red"; break;
+                    default: color="lightblue";
+                }
+                if (c == this.current._id) color="black";
+                if (nodeStatus[c]) group=nodeStatus[c];
+                nodes.push({"id": c, "title": it[c], "color": color});
             });
             linkIds.forEach(r => {
                 links.push({source: r.source, target: r.target})
@@ -311,6 +351,16 @@ export default {
         setCurrent(node) {
             this.current=UnitsCollection.findOne({_id: node.id});
             this.mode="list";
+            console.log(this.currentNote());
+        },
+        toggleNote () {
+            if (this.showNotes) {
+                this.showNotes = false;
+                this.noteButtonLabel = "Show My Notes"
+            } else {
+                this.showNotes = true;
+                this.noteButtonLabel="Hide My Notes";
+            }
         }
     },
     computed: {
@@ -342,6 +392,26 @@ export default {
             rs=UnitsCollection.find({_id: {$in: rds}}).fetch();
             return rs;
         },
+        currentNote() {
+            if (this.current._id) {
+                let currentNote = UnitsCollection.findOne({
+                    type: 'note',
+                    item: this.current._id,
+                    userId: this.currentUser._id
+                });
+                if (currentNote) return currentNote;
+                else {
+                    return {
+                        type: 'note',
+                        item: this.current._id,
+                        userId: this.currentUser._id,
+                        status: "0",
+                        note: ""
+                    };
+                }
+            }
+            
+        }
     },
     meteor: {
         all() {
@@ -352,6 +422,14 @@ export default {
         currentUser() {
             return Meteor.user();
         },
+        isEditor() {
+            if (Meteor.user()) {
+                const name=Meteor.user().username;
+                return ( name == 'editor' || name == 'dahn');
+            }
+            return false;
+            
+        }
     }
 }
 </script>

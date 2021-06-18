@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
 import { UnitsCollection } from '/imports/api/UnitsCollection';
 import '/imports/api/methods/UnitsCollectionMethods';
+import '/imports/api/publications/MtPublications';
 
 const insertUnit = unitTitle => UnitsCollection.insert({ title: unitTitle });
 

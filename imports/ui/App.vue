@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <div class="loading" v-if="!$subReady.units">Loading...</div>
     <v-btn to="/">Home</v-btn>
     <v-btn to="/topics" v-if="currentUser && currentUser.username == 'dahn'">Topics</v-btn>
     <v-btn to="/concepts">Concepts</v-btn>
@@ -22,6 +23,10 @@
     },
     methods: {},
     meteor: {
+      $subscribe: {
+        'units': [],
+        'notes': []
+      },
       currentUser() {
         return Meteor.user();
       }
