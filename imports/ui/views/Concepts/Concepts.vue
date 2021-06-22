@@ -46,37 +46,37 @@
             </div>
             <br/>
             <div v-if="current">
-            <div v-if="current.description" v-html="current.description"></div>
-            <div v-if="current.see">
-                <a :href="current.see" target="_blank">Read more</a>
-            </div>
-            <v-list v-if="current._id && currentSuperConcepts.length">
-                <v-subheader>Subconcept of</v-subheader>
-                <v-list-item-group>
-                    <v-list-item v-for="(item,index) in currentSuperConcepts" 
-                    :key="index" @click="setCurrentBelow(index)">
-                        
-                        <v-list-item-content>
-                            <v-list-item-title v-text="item"></v-list-item-title>
-                        </v-list-item-content>
+                <show-math-doc v-if="current.description " :content="current.description"></show-math-doc>
+                <div v-if="current.see">
+                    <a :href="current.see" target="_blank">Read more</a>
+                </div>
+                <v-list v-if="current._id && currentSuperConcepts.length">
+                    <v-subheader>{{ current.title }} is a kind of:</v-subheader>
+                    <v-list-item-group>
+                        <v-list-item v-for="(item,index) in currentSuperConcepts" 
+                        :key="index" @click="setCurrentBelow(index)">
                             
-                    </v-list-item>
-                </v-list-item-group>
-            </v-list>
+                            <v-list-item-content>
+                                <v-list-item-title v-text="item"></v-list-item-title>
+                            </v-list-item-content>
+                                
+                        </v-list-item>
+                    </v-list-item-group>
+                </v-list>
 
-            <v-list v-if="current._id && currentSubConcepts.length">
-                <v-subheader>Superconcept of</v-subheader>
-                <v-list-item-group>
-                    <v-list-item v-for="(item,index) in currentSubConcepts" 
-                    :key="index" @click="setCurrentAbove(index)">
-                        
-                        <v-list-item-content>
-                            <v-list-item-title v-text="item"></v-list-item-title>
-                        </v-list-item-content>
+                <v-list v-if="current._id && currentSubConcepts.length">
+                    <v-subheader>{{ current.title }} is an abstraction of:</v-subheader>
+                    <v-list-item-group>
+                        <v-list-item v-for="(item,index) in currentSubConcepts" 
+                        :key="index" @click="setCurrentAbove(index)">
                             
-                    </v-list-item>
-                </v-list-item-group>
-            </v-list>
+                            <v-list-item-content>
+                                <v-list-item-title v-text="item"></v-list-item-title>
+                            </v-list-item-content>
+                                
+                        </v-list-item>
+                    </v-list-item-group>
+                </v-list>
             </div>
         </div>
         <div v-if="mode == 'update'">
@@ -120,6 +120,7 @@
 <script>
 import { UnitsCollection } from "../../../api/UnitsCollection";
 import ConceptMap from "../../components/ConceptMap.vue";
+import ShowMathDoc from "../../components/ShowMathDoc.vue";
 import UserNotes from "../../components/UserNotes.vue";
 
 export default {
@@ -141,8 +142,10 @@ export default {
     },
     components: {
         ConceptMap,
+        ShowMathDoc,
         UserNotes
     },
+    
     methods: {
         newConcept () {
             this.current= {
