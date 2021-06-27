@@ -3,12 +3,13 @@
         <h1>MathTrek Concepts</h1>
         <span v-if="mode == 'map'">
             <h3>Concepts close to the concept of {{ current.title }}</h3>
+            <p>Click node for details. Drag nodes to pin</p>
             <p v-if="currentUser">Color distinguishes 
                 <span style="background-color:green; color: white;">concepts I know</span> from 
                 <span style="background-color:yellow">concepts I am exploring</span> and
                 <span style="background-color:red; color: white;">concepts I find interesting</span>. 
             </p>
-            <p>The concept of <em>{{ current.title }}</em> is shown in black. Arrows point to superconcepts. Click concepts for details</p>
+            <p>The concept of <em>{{ current.title }}</em> is shown in black. Arrows point to superconcepts.</p>
             <ConceptMap :cmap="neighbourhood(2)" v-on:nodeclicked="setCurrent"></ConceptMap>
         </span>
         <div v-if="mode == 'list'">
@@ -32,7 +33,7 @@
                 </v-row>
             </v-container>
             
-            <div data-app>
+            <div class="select" data-app>
             <v-autocomplete
                 label="Select Concept"
                 v-model="current"
@@ -46,7 +47,7 @@
             </div>
             <br/>
             <div v-if="current">
-                <show-math-doc v-if="current.description " :content="current.description"></show-math-doc>
+                <show-math-doc :key="current.description" v-if="current.description " :content="current.description"></show-math-doc>
                 <div v-if="current.see">
                     <a :href="current.see" target="_blank">Read more</a>
                 </div>
@@ -229,6 +230,7 @@ export default {
         },
         setCurrentBelow (i) {
             this.current = this.getCurrentIsBelow[i];
+            
         },
         setCurrentAbove (i) {
             this.current = this.getCurrentIsAbove[i];
@@ -325,6 +327,7 @@ export default {
             });
             return {"nodes": nodes, "links": links};
         },
+        /*
         conceptMap (down,up) {
             var it = {}, nodes=[], links = [];
             UnitsCollection.find({type: 'concept'}).fetch().forEach(c => {
@@ -351,10 +354,10 @@ export default {
             nodes.shift();
             return {"nodes": nodes, "links": links};
         },
+        */
         setCurrent(node) {
             this.current=UnitsCollection.findOne({_id: node.id});
             this.mode="list";
-            console.log(this.currentNote());
         },
         toggleNote () {
             if (this.showNotes) {
@@ -414,7 +417,7 @@ export default {
                 }
             }
             
-        }
+        },
     },
     meteor: {
         all() {
@@ -438,6 +441,10 @@ export default {
 </script>
 
 <style scoped>
+.select {
+    max-width: 800px;
+    z-index: 1;
+}
 div >>> p {
     margin-bottom: 0.5em;
 }
