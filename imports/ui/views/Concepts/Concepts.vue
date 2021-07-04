@@ -51,6 +51,18 @@
                 <div v-if="current.see">
                     <a :href="current.see" target="_blank">Read more</a>
                 </div>
+                <v-list>
+                    <v-subheader>Relations between concepts:</v-subheader>
+                    <v-list-item-group>
+                        <v-list-item v-for="r in relations" :key="r.id">
+                            <v-list-item-content>
+                                <v-list-item-title>Concept 1 <b>{{ r.name }}</b> Concept 2</v-list-item-title>
+                                <v-list-item-subtitle>Inverse: Concept 2 <b>{{ r.inverse }}</b> Concept 1</v-list-item-subtitle>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list-item-group>
+                </v-list>
+                <!-- Relation -->
                 <v-list v-if="current._id && currentSuperConcepts.length">
                     <v-subheader>{{ current.title }} is a kind of:</v-subheader>
                     <v-list-item-group>
@@ -78,6 +90,7 @@
                         </v-list-item>
                     </v-list-item-group>
                 </v-list>
+                <!-- End Relation -->
             </div>
         </div>
         <div v-if="mode == 'update'">
@@ -137,6 +150,7 @@ export default {
             currentBelow: [],
             currentAbove: [],
             mode: "list",
+            relations: [{id: 'isBelow', name: 'is a kind of', inverse: 'is an abstraction of'}],
             showNotes: true,
             noteButtonLabel: "Hide My Notes"
         };
@@ -327,34 +341,7 @@ export default {
             });
             return {"nodes": nodes, "links": links};
         },
-        /*
-        conceptMap (down,up) {
-            var it = {}, nodes=[], links = [];
-            UnitsCollection.find({type: 'concept'}).fetch().forEach(c => {
-                it[c._id]=c.title;
-            });
-            const downNodes=this.getDownNodes(down);
-            const downNodeIds=downNodes.nodes, downLinkIds=downNodes.links;
-            const upNodes=this.getUpNodes(up);
-            const upNodeIds=upNodes.nodes, upLinkIds=upNodes.links;
-            downNodeIds.forEach(c => {
-                let group=(c == this.current._id)?2:1;
-                nodes.push({"id": c, "title": it[c], "group": group});
-            });
-            downLinkIds.forEach(r => {
-                links.push({source: r.target,target: r.source})
-            });
-            upNodeIds.forEach(c => {
-                let group=(c == this.current._id)?2:1;
-                nodes.push({"id": c, "title": it[c], "group": group});
-            });
-            upLinkIds.forEach(r => {
-                links.push({source: r.target,target: r.source})
-            });
-            nodes.shift();
-            return {"nodes": nodes, "links": links};
-        },
-        */
+        
         setCurrent(node) {
             this.current=UnitsCollection.findOne({_id: node.id});
             this.mode="list";
