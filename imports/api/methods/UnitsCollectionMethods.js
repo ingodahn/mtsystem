@@ -36,7 +36,7 @@ Meteor.methods({
         }
     },
     deleteItem(pattern) {
-        if (! Object) {
+        if (! pattern instanceof Object) {
             throw new Meteor.Error('Delete: Pattern is not an object');
         }
         if (!this.userId) {

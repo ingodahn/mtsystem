@@ -10,7 +10,7 @@
                 <span style="background-color:red; color: white;">concepts I find interesting</span>. 
             </p>
             <p>The concept of <em>{{ current.title }}</em> is shown in black. Arrows point to superconcepts.</p>
-            <ConceptMap :cmap="neighbourhood(2)" v-on:nodeclicked="setCurrent"></ConceptMap>
+            <ConceptMap :cmap="neighbourhood(2)" v-on:nodeclicked="mapCurrent"></ConceptMap>
         </span>
         <div v-if="mode == 'list'">
             <v-container>
@@ -51,6 +51,14 @@
                 <div v-if="current.see">
                     <a :href="current.see" target="_blank">Read more</a>
                 </div>
+                <div v-if="relations.length ==1">
+                    <h2>Relation between concepts:</h2>
+                    <p><b>Relation:</b> Concept 1 <b>{{ relations[0].name}}</b> Concept 2</p>
+                    <p><b>Inverse:</b> Concept 2 <b>{{ relations[0].inverse}}</b> Concept 1</p>
+                    
+                    <relation v-if="current._id" :id="current._id" :relation="relations[0]" type="Concept" v-on:selected="setCurrent"></relation>
+                </div>
+                <!--
                 <v-list>
                     <v-subheader>Relations between concepts:</v-subheader>
                     <v-list-item-group>
@@ -62,7 +70,10 @@
                         </v-list-item>
                     </v-list-item-group>
                 </v-list>
-                <!-- Relation -->
+                -->
+                
+                
+                <!-- Relation
                 <v-list v-if="current._id && currentSuperConcepts.length">
                     <v-subheader>{{ current.title }} is a kind of:</v-subheader>
                     <v-list-item-group>
@@ -90,7 +101,7 @@
                         </v-list-item>
                     </v-list-item-group>
                 </v-list>
-                <!-- End Relation -->
+                End Relation -->
             </div>
         </div>
         <div v-if="mode == 'update'">
@@ -133,6 +144,7 @@
 
 <script>
 import { UnitsCollection } from "../../../api/UnitsCollection";
+import Relation from "../../components/Relation.vue";
 import ConceptMap from "../../components/ConceptMap.vue";
 import ShowMathDoc from "../../components/ShowMathDoc.vue";
 import UserNotes from "../../components/UserNotes.vue";
@@ -150,12 +162,20 @@ export default {
             currentBelow: [],
             currentAbove: [],
             mode: "list",
-            relations: [{id: 'isBelow', name: 'is a kind of', inverse: 'is an abstraction of'}],
+            relations: [
+                {
+                    id: 'isBelow', 
+                    name: 'is a kind of', 
+                    inverse: 'is an abstraction of',
+                    description: "Every SOURCE can be interpreted as an instance of TARGET in a canonic way."
+                }
+            ],
             showNotes: true,
             noteButtonLabel: "Hide My Notes"
         };
     },
     components: {
+        Relation,
         ConceptMap,
         ShowMathDoc,
         UserNotes
@@ -224,6 +244,10 @@ export default {
                     source: this.current._id
                 });
                 Meteor.call('deleteItem',{
+                    type: "note",
+                    item: this.current._id
+                });
+                Meteor.call('deleteItem',{
                     _id: this.current._id
                 });
             } else {
@@ -249,42 +273,7 @@ export default {
         setCurrentAbove (i) {
             this.current = this.getCurrentIsAbove[i];
         },
-        getDownNodes (down) {
-            let id=0, newNodeIds=[this.current._id],nodeIds=[this.current._id],linkIds=[];
-            while (id < down) {
-               let  nextNodeIds=[];
-               UnitsCollection.find({
-                    type: 'relation', 
-                    name: 'isBelow', 
-                    target: {$in: newNodeIds}
-                }).fetch().forEach(c => {
-                    nextNodeIds.push(c.source);
-                    linkIds.push(c);
-                })
-                nodeIds=nodeIds.concat(nextNodeIds);
-                newNodeIds=nextNodeIds;
-                id++;
-            }
-            return({nodes: nodeIds, links: linkIds})
-        },
-        getUpNodes (up) {
-            let id=0, newNodeIds=[this.current._id],nodeIds=[this.current._id],linkIds=[];
-            while (id < up) {
-               let  nextNodeIds=[];
-               UnitsCollection.find({
-                    type: 'relation', 
-                    name: 'isBelow', 
-                    source: {$in: newNodeIds}
-                }).fetch().forEach(c => {
-                    nextNodeIds.push(c.target);
-                    linkIds.push(c);
-                })
-                nodeIds=nodeIds.concat(nextNodeIds);
-                newNodeIds=nextNodeIds;
-                id++;
-            }
-            return({nodes: nodeIds, links: linkIds})
-        },
+        
         neighbourhood(d) {
             var it = {}, nodes=[], links = [];
             UnitsCollection.find({type: 'concept'}).fetch().forEach(c => {
@@ -343,7 +332,11 @@ export default {
         },
         
         setCurrent(node) {
-            this.current=UnitsCollection.findOne({_id: node.id});
+            this.current = node;
+            this.mode="list";
+        },
+        mapCurrent(mapNode) {
+            this.current=UnitsCollection.findOne({_id: mapNode.id});
             this.mode="list";
         },
         toggleNote () {
@@ -354,7 +347,20 @@ export default {
                 this.showNotes = true;
                 this.noteButtonLabel="Hide My Notes";
             }
-        }
+        },
+        getCurrentNodeIsAbove (relation) {
+            const rds = UnitsCollection.find({
+                type: 'relation',
+                name: relation,
+                target: this.current._id
+            }).fetch().map(d => d.source);
+            this.currentAbove=rds;
+            rs=UnitsCollection.find({_id: {$in: rds}}).fetch();
+            return rs;
+        },
+        currentSubNodes (relation) {
+            return this.getCurrentNodeIsAbove(relation).map(c => c.title);
+        },
     },
     computed: {
         // Concepts of which the current concept is a superconcept
