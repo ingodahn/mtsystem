@@ -167,7 +167,7 @@ export default {
                     id: 'isBelow', 
                     name: 'is a kind of', 
                     inverse: 'is an abstraction of',
-                    description: "Every SOURCE can be interpreted as an instance of TARGET in a canonic way."
+                    description: "Every SOURCE can be interpreted as an instance of TARGET in a canonical way."
                 }
             ],
             showNotes: true,

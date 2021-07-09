@@ -51,13 +51,29 @@
                 <div v-if="current.see">
                     <a :href="current.see" target="_blank">Read more</a>
                 </div>
+                <!-- Relations -->
                 <div v-if="relations.length ==1">
                     <h2>Relation between concepts:</h2>
                     <p><b>Relation:</b> Concept 1 <b>{{ relations[0].name}}</b> Concept 2</p>
                     <p><b>Inverse:</b> Concept 2 <b>{{ relations[0].inverse}}</b> Concept 1</p>
                     
-                    <relation v-if="current._id" :id="current._id" :relation="relations[0]" type="Concept" v-on:selected="setCurrent"></relation>
+                    <relation v-if="current._id" :id="current._id" :relation="relations[0]" type="topic" mode="list" v-on:selected="setCurrent"></relation>
                 </div> 
+                
+                <div v-else>
+                    <div data-app>
+                        <v-select
+                            :items="relations"
+                            label="Select relation:"
+                            item-text="name"
+                            item-value="id"
+                            v-model="currentRelation"
+                        >
+                    </v-select>
+                    </div>
+                    <relation v-if="current._id" :id="current._id" :relation="id2relation(currentRelation)" type="topic" mode="list" v-on:selected="setCurrent"></relation>
+                </div>
+                <!-- End Relations -->
             </div>
         </div>
         <div v-if="mode == 'update'">
@@ -75,20 +91,29 @@
                 label="Description:"
                 v-model="current.description"
             ></v-textarea>
-            <div data-app>
-            <v-autocomplete
-                label="Subtopic of"
-                v-model="currentBelow"
-                hide-details="auto"
-                :items="all"
-                item-text="title"
-                item-value="_id"
-                clearable
-                deletable-chips
-                multiple
-                small-chips
-            ></v-autocomplete>
-            </div>
+            <!-- Relations -->
+                <div v-if="relations.length ==1">
+                    <h2>Relation between concepts:</h2>
+                    <p><b>Relation:</b> Concept 1 <b>{{ relations[0].name}}</b> Concept 2</p>
+                    <p><b>Inverse:</b> Concept 2 <b>{{ relations[0].inverse}}</b> Concept 1</p>
+                    
+                    <relation :key="currentRelation" v-if="current._id" :id="current._id" :relation="relations[0]" type="topic" mode="update" v-on:setTarget="setTarget"></relation>
+                </div> 
+                <div v-else>
+                    <div data-app>
+                        <v-select
+                            :items="relations"
+                            label="Select relation:"
+                            item-text="name"
+                            item-value="id"
+                            v-model="currentRelation"
+                        >
+                    </v-select>
+                    </div>
+                    <relation :key="currentRelation" v-if="current._id" :id="current._id" :relation="id2relation(currentRelation)" :targetsSet="targetsSet(currentRelation)" type="topic" mode="update" v-on:setTarget="setTarget"></relation>
+                </div>
+                <!-- End Relations -->
+            
             <v-text-field
                 label="See:"
                 hide-details="auto"
@@ -124,8 +149,16 @@ export default {
                     name: 'is a subtopic of', 
                     inverse: 'is a supertopic of',
                     description: "Every complete description of TARGET must contain a complete description of SOURCE."
+                },
+                {
+                    id: 'requires',
+                    name: 'requires knowledge from',
+                    inverse: 'is used in topic',
+                    description: "Learning about some content in SOURCE require some knowledge from topic TARGET"
                 }
             ],
+            currentRelation: 'isBelow',
+            updateRelations: {},
             showNotes: true,
             noteButtonLabel: "Hide My Notes"
         };
@@ -157,37 +190,43 @@ export default {
             this.current.updatedAt = new Date();
             if (this.current._id) {
                 Meteor.call('updateItem',this.current);
-                Meteor.call('deleteItem',{
-                    type: "relation",
-                    name: "isBelow",
-                    source: this.current._id
-                });
-                this.currentBelow.forEach(id => {
-                    Meteor.call('insertItem',{
+                Object.getOwnPropertyNames(this.updateRelations).forEach(rid => {
+                        Meteor.call('deleteItem',{
                         type: "relation",
-                        name: "isBelow",
-                        source: this.current._id,
-                        target: id
+                        name: rid,
+                        source: this.current._id
                     });
-                });
+                    this.updateRelations[rid].forEach(tid => {
+                        Meteor.call('insertItem',{
+                            type: "relation",
+                            name: rid,
+                            source: this.current._id,
+                            target: tid
+                        });
+                    })
+                })
             } else  {
-                const currentBelow=this.currentBelow;
                 Meteor.call('insertItem',this.current, function(error,result) {
                     if (error) {
                         console.log("Insert Error: "+error.msg)
                     } else {
-                        currentBelow.forEach(id => {
-                            Meteor.call('insertItem',{
+                        Object.getOwnPropertyNames(this.updateRelations).forEach(rid => {
+                            this.updateRelations[rid].forEach(tid => {
+                                Meteor.call('insertItem',{
                                 type: "relation",
-                                name: "isBelow",
+                                name: rid,
                                 source: result,
-                                target: id
+                                target: tid
                             });
-                        });
+                            })
+                            
+                        })
                     }
                 });
             }
             this.closeTopicUpdate ();
+            
+           console.log(this.updateRelations);
         },
         deleteTopic () {
             if (this.current._id) {
@@ -240,7 +279,7 @@ export default {
                 let  nextNodeIds=[];
                 UnitsCollection.find({
                     type: 'relation', 
-                    name: 'isBelow', 
+                    name: this.currentRelation, 
                     source: {$in: newNodeIds}
                 }).fetch().forEach(c => {
                     nextNodeIds.push(c.target);
@@ -248,7 +287,7 @@ export default {
                 });
                 UnitsCollection.find({
                     type: 'relation', 
-                    name: 'isBelow', 
+                    name: this.currentRelation, 
                     target: {$in: newNodeIds}
                 }).fetch().forEach(c => {
                     nextNodeIds.push(c.source);
@@ -317,6 +356,17 @@ export default {
         currentSubNodes (relation) {
             return this.getCurrentNodeIsAbove(relation).map(c => c.title);
         },
+        id2relation (id) {
+            return this.relations.find(e => e.id == id)
+        },
+        setTarget (relationId,targets) {
+            console.log(relationId);
+            this.updateRelations[relationId]=targets;
+        },
+        targetsSet(relationId) {
+        if (this.updateRelations.hasOwnProperty(relationId)) return this.updateRelations[relationId];
+        return false;
+        }
     },
     computed: {
         // Concepts of which the current concept is a superconcept
