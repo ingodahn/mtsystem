@@ -56,7 +56,7 @@
                     <p><b>Relation:</b> Concept 1 <b>{{ relations[0].name}}</b> Concept 2</p>
                     <p><b>Inverse:</b> Concept 2 <b>{{ relations[0].inverse}}</b> Concept 1</p>
                     
-                    <relation v-if="current._id" :id="current._id" :relation="relations[0]" type="Concept" v-on:selected="setCurrent"></relation>
+                    <relation v-if="current._id" :id="current._id" :relation="relations[0]" type="Concept" v-on:selected="setCurrent" :mode="mode"></relation>
                 </div>
                 <!--
                 <v-list>

@@ -58,7 +58,6 @@ export default {
     props: ['relation', 'id', 'type','mode','targetsSet'],
     watch: {
         targets: function (t) {
-            console.log(t);
             this.$emit('setTarget',this.relation.id,t);
             }
     },
@@ -71,7 +70,7 @@ export default {
                 target: this.id
             }).fetch().map(d => d.source);
             this.currentAbove=rds;
-            rs=UnitsCollection.find({_id: {$in: rds}}).fetch();
+            rs=UnitsCollection.find({_id: {$in: rds}},{sort: { title: 1}}).fetch();
             return rs;
         },
         // Concepts of which the current node is a source
@@ -82,8 +81,7 @@ export default {
                 source: this.id
             }).fetch().map(d => d.target);
             this.currentBelow=rds;
-            rs=UnitsCollection.find({_id: {$in: rds}}).fetch();
-            console.log(rs);
+            rs=UnitsCollection.find({_id: {$in: rds}},{sort: { title: 1}}).fetch();
             return rs;
         },
         getRelationDescription (relation) {
@@ -94,29 +92,29 @@ export default {
             return "\""+source+" "+relation.name+" "+target+"\" means: "+relation.description.replaceAll('SOURCE',source).replaceAll('TARGET',target);
         },
         selected (doc) {
-            //console.log(doc);
             this.$emit('selected',doc);
         },
         getTargets () {
-            console.log('getTargets called');
             if (this.targetsSet) return this.targetsSet;
+            if (! this.id) return [];
             return this.getCurrentNodeIsSource(this.relation.id).map(e => e._id)
         }
     },
      
     computed: {
         current () {
+            if (!this.id) {
+                return {title: "This"};
+            }
             return UnitsCollection.findOne({_id: this.id});
         },
         targetUpdated () {
-            console.log('updated');
             this.$emit('setTarget',this.type,this.targets);
             return this.targets;
         }
     },
     meteor: {
         all() {
-            console.log(this.type);
         return UnitsCollection.find(
             {type: this.type}
         ).fetch();

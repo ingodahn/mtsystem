@@ -110,7 +110,7 @@
                         >
                     </v-select>
                     </div>
-                    <relation :key="currentRelation" v-if="current._id" :id="current._id" :relation="id2relation(currentRelation)" :targetsSet="targetsSet(currentRelation)" type="topic" mode="update" v-on:setTarget="setTarget"></relation>
+                    <relation :key="currentRelation" :id="getCurrentId" :relation="id2relation(currentRelation)" :targetsSet="targetsSet(currentRelation)" type="topic" mode="update" v-on:setTarget="setTarget"></relation>
                 </div>
                 <!-- End Relations -->
             
@@ -190,12 +190,12 @@ export default {
             this.current.updatedAt = new Date();
             if (this.current._id) {
                 Meteor.call('updateItem',this.current);
-                Object.getOwnPropertyNames(this.updateRelations).forEach(rid => {
-                        Meteor.call('deleteItem',{
-                        type: "relation",
-                        name: rid,
-                        source: this.current._id
-                    });
+                Object.keys(this.updateRelations).forEach(rid => {
+                    Meteor.call('deleteItem',{
+                    type: "relation",
+                    name: rid,
+                    source: this.current._id
+                });
                     this.updateRelations[rid].forEach(tid => {
                         Meteor.call('insertItem',{
                             type: "relation",
@@ -206,27 +206,26 @@ export default {
                     })
                 })
             } else  {
-                Meteor.call('insertItem',this.current, function(error,result) {
+               let updateRel = this.updateRelations;
+               Meteor.call('insertItem',this.current, function(error,result) {
                     if (error) {
                         console.log("Insert Error: "+error.msg)
-                    } else {
-                        Object.getOwnPropertyNames(this.updateRelations).forEach(rid => {
-                            this.updateRelations[rid].forEach(tid => {
+                    } else { 
+                        Object.keys(updateRel).forEach(rid => {
+                        updateRel[rid].forEach(tid => {
                                 Meteor.call('insertItem',{
                                 type: "relation",
                                 name: rid,
                                 source: result,
                                 target: tid
                             });
-                            })
-                            
                         })
-                    }
-                });
+                        
+                    })
+                     }
+               })
             }
             this.closeTopicUpdate ();
-            
-           console.log(this.updateRelations);
         },
         deleteTopic () {
             if (this.current._id) {
@@ -260,6 +259,7 @@ export default {
             this.mode="list";
             this.currentBelow=[];
             this.currentAbove=[];
+            this.updateRelations={};
         },
         setCurrentBelow (i) {
             this.current = this.getCurrentIsBelow[i];
@@ -325,7 +325,6 @@ export default {
             });
             return {"nodes": nodes, "links": links};
         },
-        
         setCurrent(node) {
             this.current = node;
             this.mode="list";
@@ -350,7 +349,7 @@ export default {
                 target: this.current._id
             }).fetch().map(d => d.source);
             this.currentAbove=rds;
-            rs=UnitsCollection.find({_id: {$in: rds}}).fetch();
+            rs=UnitsCollection.find({_id: {$in: rds},}).fetch();
             return rs;
         },
         currentSubNodes (relation) {
@@ -360,7 +359,6 @@ export default {
             return this.relations.find(e => e.id == id)
         },
         setTarget (relationId,targets) {
-            console.log(relationId);
             this.updateRelations[relationId]=targets;
         },
         targetsSet(relationId) {
@@ -369,6 +367,9 @@ export default {
         }
     },
     computed: {
+        getCurrentId () {
+            return (this.current._id)?this.current._id:false;
+        },
         // Concepts of which the current concept is a superconcept
         currentSubTopics () {
             return this.getCurrentIsAbove.map(c => c.title);
@@ -380,7 +381,7 @@ export default {
                 target: this.current._id
             }).fetch().map(d => d.source);
             this.currentAbove=rds;
-            rs=UnitsCollection.find({_id: {$in: rds}}).fetch();
+            rs=UnitsCollection.find({_id: {$in: rds}},{sort: { title: 1}}).fetch();
             return rs;
         },
         currentSuperTopics () {
@@ -394,7 +395,7 @@ export default {
                 source: this.current._id
             }).fetch().map(d => d.target);
             this.currentBelow=rds;
-            rs=UnitsCollection.find({_id: {$in: rds}}).fetch();
+            rs=UnitsCollection.find({_id: {$in: rds}},{sort: { title: 1}}).fetch();
             return rs;
         },
         currentNote() {
@@ -421,7 +422,7 @@ export default {
     meteor: {
         all() {
         return UnitsCollection.find(
-            {type: "topic"}
+            {type: "topic"},{sort: { title: 1}}
         ).fetch();
         },
         currentUser() {
