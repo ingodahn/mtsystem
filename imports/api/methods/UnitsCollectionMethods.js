@@ -6,7 +6,7 @@ Meteor.methods({
         if (!this.userId) {
             throw new Meteor.Error('Insert not authorized');
         }
-        const pattern = Match.ObjectIncluding({ type: Match.OneOf("relation","concept","unit","topic","note")});
+        const pattern = Match.ObjectIncluding({ type: Match.OneOf("relation","concept","unit","topic","subject","note")});
         var myTest=Match.test(item,pattern);
         if (myTest) {
             var newId=UnitsCollection.insert(item);
@@ -21,7 +21,7 @@ Meteor.methods({
         }
         const pattern = Match.ObjectIncluding({ 
             _id: String, 
-            type: Match.OneOf("relation","concept","unit","topic","note")
+            type: Match.OneOf("relation","concept","unit","topic","subject","note")
         });
         var myTest=Match.test(item,pattern);
         if (myTest) {
@@ -34,6 +34,13 @@ Meteor.methods({
         } else {
             throw new Meteor.Error("Update: Illegal Pattern");
         }
+    },
+    topic2subject() {
+        UnitsCollection.update(
+            {type: 'topic'},
+            {$set: {type: 'subject'}},
+            {multi: true}
+        )
     },
     deleteItem(pattern) {
         if (! pattern instanceof Object) {

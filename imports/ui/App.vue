@@ -2,7 +2,10 @@
   <div class="container">
     <div class="loading" v-if="!$subReady.units">Loading...</div>
     <v-btn to="/">Home</v-btn>
+    <v-btn to="/subject">Subjects</v-btn>
+    <!--
     <v-btn to="/topics">Topics</v-btn>
+    -->
     <v-btn to="/concepts">Concepts</v-btn>
     <v-btn to="/units" v-if="currentUser && currentUser.username == 'dahn'">Units</v-btn>
     <v-btn to="/admin" v-if="currentUser && currentUser.username == 'dahn'">Tools</v-btn>
