@@ -1,7 +1,14 @@
 <template>
     <div class="container">
-        <p> {{ getRelationDescription(relation) }}</p>
-        <div v-if="mode == 'list'">
+        <v-expansion-panels accordion>
+                            <v-expansion-panel>
+                                <v-expansion-panel-header>Info</v-expansion-panel-header>
+                                <v-expansion-panel-content>
+        <p v-html="getRelationDescription(relation)"></p>
+                                </v-expansion-panel-content>
+                            </v-expansion-panel>
+        </v-expansion-panels>
+        <div v-if="mode == 'list' && current.title">
             <v-list v-if="getCurrentNodeIsSource(relation.id).length">
                 <v-subheader>{{ current.title }} {{ relation.name }}:</v-subheader>
                 <v-list-item-group>
@@ -58,6 +65,7 @@ export default {
     props: ['relation', 'id', 'type','mode','targetsSet'],
     watch: {
         targets: function (t) {
+            console.log(t);
             this.$emit('setTarget',this.relation.id,t);
             }
     },
@@ -86,10 +94,12 @@ export default {
         },
         getRelationDescription (relation) {
             let ctype=this.type.charAt(0).toUpperCase()+this.type.substring(1);
-            let source = (this.current.title.length)?this.current.title:ctype+' 1';
+            //let source = (this.current.title.length)?this.current.title:ctype+' 1';
+            let source = ctype+' 1';
             let target = ctype+' 2';
-
-            return "\""+source+" "+relation.name+" "+target+"\" means: "+relation.description.replaceAll('SOURCE',source).replaceAll('TARGET',target);
+            let desc="<b>Relation</b> "+source+" <b>"+relation.name+"</b> "+target+"</p><p><b>Means:</b> "+relation.description.replaceAll('SOURCE',source).replaceAll('TARGET',target)+"</p>";
+            desc += "<p><b>Inverse:</b> "+target+" <b>"+relation.inverse+"</b> "+source;
+            return desc;
         },
         selected (doc) {
             this.$emit('selected',doc);
@@ -103,9 +113,11 @@ export default {
      
     computed: {
         current () {
+            
             if (!this.id) {
-                return {title: "This"};
+                return {title: ""};
             }
+            
             return UnitsCollection.findOne({_id: this.id});
         },
         targetUpdated () {

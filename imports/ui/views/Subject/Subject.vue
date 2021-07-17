@@ -1,6 +1,5 @@
 <template>
     <div class="container">
-        <h1>MathTrek Subjects</h1>
         <node :key="type" :type="type" :relations="relations" :leadRelation="leadRelation"></node>
     </div>
 </template>
@@ -14,15 +13,15 @@ export default {
             relations: [
                 {
                     id: 'isBelow', 
-                    name: 'is narrower than', 
-                    inverse: 'is a wider than',
+                    name: 'is a part of', 
+                    inverse: 'has a part',
                     description: "Every complete description of TARGET must contain a complete description of SOURCE."
                 },
                 {
                     id: 'requires',
                     name: 'requires knowledge from',
                     inverse: 'is used in topic',
-                    description: "Learning about some content in SOURCE require some knowledge from topic TARGET"
+                    description: "Learning about some content in SOURCE requires some knowledge from topic TARGET"
                 }
             ],
             leadRelation: 'isBelow',

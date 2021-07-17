@@ -2,8 +2,10 @@
     <div class="container">
         <h1>MathTrek System</h1>
         <p>
-            Login is only required to edit content. 
-            To view content, click on the <b>CONCEPTS</b> button.
+            Login is only required to add personal notes or to edit content. 
+        </p>
+        <p>
+            To view content, click one of the buttons above.
         </p>
         <div v-if="currentUser">
             <p>You are logged in into the MathTrek System as user {{ currentUser.username }}.</p>

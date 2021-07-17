@@ -1,9 +1,153 @@
 <template>
     <div class="container">
+        <v-container>
+            <v-layout row>
+                <v-flex xs12 md4>
+                    <h1>MathTrek {{ type }}s:</h1>
+                </v-flex>
+                <v-flex xs12 md4>
+                    <selector :key="getCurrentId" :type="type" :currentId="getCurrentId" v-on:selected="mapCurrent"></selector>
+                    <br/>
+                </v-flex>
+                <v-flex xs12 md8>
+                    <span name="editorMenu" v-if="isEditor">
+                        <v-btn color="success" id="btnNew" @click="newNode">New {{ type }}</v-btn>
+                        <span v-if="current && current._id">
+                            <v-btn color="warning" id="btnUpdate" @click="updateNode">Update {{ type }}</v-btn>
+                            <v-btn color="error" id="btnUpdate" @click="deleteNode">Delete {{ type }}</v-btn>
+                        </span>
+                    </span>
+                </v-flex>
+                <v-flex xs12 md8  class="pr-7" v-if="mode == 'list'">
+                    <div v-if="current && current._id">
+                        <h2>{{ current.title }}</h2>
+                        <show-math-doc :key="current.description" v-if="current.description " :content="current.description"></show-math-doc>
+                        <div v-if="current.readMore">
+                            <v-btn v-if="! showMore" @click="showMore=true">Read more...</v-btn>
+                            <show-math-doc :key="current.readMore" v-if="showMore" :content="current.readMore"></show-math-doc>
+                            <v-btn v-if="showMore" @click="showMore=false">Show less</v-btn>
+                        </div>
+                        <div v-if="current.see">
+                            <a :href="current.see" target="_blank">See also</a>
+                        </div>
+                        
+                    </div>
+                    <div v-else>
+                        <h3>All {{ nrNodes }} {{ type }}s and the relation <em>{{ id2relation(currentRelation).name }}</em></h3>
+                        <p>Click node for details. Drag nodes to pin</p>
+                        <p v-if="currentUser">Color distinguishes 
+                            <span style="background-color:green; color: white;">{{ type }}s I know</span> from 
+                            <span style="background-color:yellow">{{ type }}s I am exploring</span> and
+                            <span style="background-color:red; color: white;">{{ type }}s I find interesting</span>. 
+                        </p>
+                        <p>The {{ type }}s, that have been updated in the last 
+                            <select v-model="newNodes">
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>7</option>
+                                <option>14</option>
+                                <option>30</option>
+                            </select>      
+                        days, are marked with an <span style="border:solid orange; padding: 1px;">orange ring</span>.
+                        </p>
+                        <ConceptMap :key="newNodes+currentRelation+nrNodes" :cmap="allNodes" v-on:nodeclicked="mapCurrent"></ConceptMap>
+                    </div>
+                </v-flex>
+                <v-flex xs12 md8  class="pr-7" v-if="mode == 'update'">
+                    <h2>Edit {{ type }}</h2>
+                    <v-btn color="warning" @click="closeNodeUpdate">Cancel</v-btn>
+                    <v-btn color="accent" @click="saveNode">Save</v-btn>
+                    <v-text-field
+                        label="Title"
+                        hide-details="auto"
+                        v-model="current.title"
+                    ></v-text-field>
+                    <v-textarea
+                        outlined
+                        label="Description:"
+                        v-model="current.description"
+                    ></v-textarea>
+                    <v-textarea
+                        outlined
+                        label="Show more:"
+                        v-model="current.readMore"
+                    ></v-textarea>
+                    <v-text-field
+                        label="See:"
+                        hide-details="auto"
+                        v-model="current.see"
+                    ></v-text-field>
+                </v-flex>
+                <v-flex xs12 md4>
+                    <v-btn-toggle v-model="sidebar">
+                        <v-btn color="primary">Relation</v-btn>
+                        <v-btn color="primary" v-if="current && current._id && mode == 'list'">Map</v-btn>
+                        <v-btn color="primary" v-if="currentUser && current && current._id">Note</v-btn>
+                    </v-btn-toggle>
+                    <div v-if="sidebar==0">
+                        <!--
+                        <div v-if="relations.length ==1">
+                        <p><b>Relation:</b> Concept 1 <b>{{ relations[0].name}}</b> Concept 2</p>
+                        <p><b>Inverse:</b> Concept 2 <b>{{ relations[0].inverse}}</b> Concept 1</p>
+                        
+                        <relation v-if="current._id" :id="current._id" :relation="relations[0]" :type="type" :mode="mode" v-on:selected="setCurrent" :targetsSet="targetsSet(currentRelation)"></relation>
+                        </div> 
+                        -->
+                        <div v-if="relations.length > 1">
+                            <div data-app>
+                                <v-select
+                                    :items="relations"
+                                    label="Select relation:"
+                                    item-text="name"
+                                    item-value="id"
+                                    v-model="currentRelation"
+                                >
+                            </v-select>
+                            </div>
+                        </div>
+                        <relation :key="getCurrentId+mode" :id="getCurrentId" :relation="id2relation(currentRelation)" :type="type" :mode="mode" v-on:setTarget="setTarget" v-on:selected="setCurrent" :targetsSet="targetsSet(currentRelation)"></relation>
+                    </div>
+                    <UserNotes v-if="currentUser && current && current._id && sidebar==2" :title="current.title" :currentNote="currentNote" :key="current._id"></UserNotes>
+                    <div v-if="currentUser && current && current._id && sidebar==1">
+                        <v-expansion-panels accordion>
+                            <v-expansion-panel>
+                                <v-expansion-panel-header>Info</v-expansion-panel-header>
+                                <v-expansion-panel-content>
+                                    <h3>Environment of {{ type }} <em>{{ current.title }}</em> w.r.t. relation <em>{{ id2relation(currentRelation).name }}</em></h3>
+                                    <p>Click node for details. Drag nodes to pin</p>
+                                    <p v-if="currentUser">Color distinguishes 
+                                        <span style="background-color:green; color: white;">{{ type }}s I know</span> from 
+                                        <span style="background-color:yellow">{{ type }}s I am exploring</span> and
+                                        <span style="background-color:red; color: white;">{{ type }}s I find interesting</span>. 
+                                    </p>
+                                    <p>The {{ type }} <em>{{ current.title }}</em> is shown in black.</p>
+                                    <p>The {{ type }}s, that have been updated in the last 
+                                            <select color="primary" v-model="newNodes">
+                                                <option>1</option>
+                                                <option>2</option>
+                                                <option>3</option>
+                                                <option>7</option>
+                                                <option>14</option>
+                                                <option>30</option>
+                                            </select>      
+                                        days, are marked with an <span style="border:solid orange; padding: 1px;">orange ring</span>.
+                                    </p>
+                                </v-expansion-panel-content>
+                            </v-expansion-panel>
+                        </v-expansion-panels>
+                        
+                        <ConceptMap :key="current._id" :cmap="neighbourhood(2)" v-on:nodeclicked="mapCurrent"></ConceptMap>
+                    </div>
+                </v-flex>
+            </v-layout>
+        </v-container>
         <!-- Menu -->
         <div v-if="mode == 'list'">
+            <!--
             <v-container>
                 <v-row>
+                    
                     <v-col>
                         <span v-if="current && current._id">
                             <v-btn id="btnMap" @click="mode='map'">{{ type }} Map</v-btn>
@@ -16,12 +160,14 @@
                             </span>
                         </span>
                     </v-col>
+                    
                     <v-col>
                         <UserNotes v-if="currentUser && current && current._id && showNotes" :title="current.title" :currentNote="currentNote" :key="current._id"></UserNotes>
                     </v-col>
                 </v-row>
             </v-container>
-            <!-- Select node -->
+            -->
+            <!-- Select node 
             <div class="select" data-app>
             <v-autocomplete
                 :label="selectLabel"
@@ -34,7 +180,10 @@
                 clearable
             ></v-autocomplete>
             </div>
+            -->
+            
             <div v-if="!current._id">
+                <!--
                  <h3>All {{ type }}s and the relation <em>{{ id2relation(currentRelation).name }}</em></h3>
                 <p>Click node for details. Drag nodes to pin</p>
                 <p v-if="currentUser">Color distinguishes 
@@ -56,6 +205,8 @@
                 <ConceptMap :key="newNodes" :cmap="neighbourhood(99)" v-on:nodeclicked="mapCurrent"></ConceptMap>
             </div>
             <div v-if="current">
+                -->
+                <!--
                 <show-math-doc :key="current.description" v-if="current.description " :content="current.description"></show-math-doc>
                 <div v-if="current.readMore">
                     <v-btn v-if="! showMore" @click="showMore=true">Read more...</v-btn>
@@ -65,7 +216,8 @@
                 <div v-if="current.see">
                     <a :href="current.see" target="_blank">See also</a>
                 </div>
-                <!-- Relations -->
+                -->
+                <!-- Relations 
                 <div v-if="relations.length ==1">
                     <h2>Relation between concepts:</h2>
                     <p><b>Relation:</b> Concept 1 <b>{{ relations[0].name}}</b> Concept 2</p>
@@ -87,9 +239,10 @@
                     </div>
                     <relation v-if="current._id" :id="current._id" :relation="id2relation(currentRelation)" :type="type" mode="list" v-on:selected="setCurrent"></relation>
                 </div>
-                <!-- End Relations -->
+                 End Relations -->
             </div>
         </div>
+        <!--
         <div v-if="mode == 'update'">
             <h2>Edit Topic</h2>
             <v-btn @click="closeNodeUpdate">Cancel</v-btn>
@@ -107,10 +260,11 @@
             ></v-textarea>
             <v-textarea
                 outlined
-                label="Read more:"
+                label="Show more:"
                 v-model="current.readMore"
             ></v-textarea>
-            <!-- Relations -->
+            
+            Relations 
                 <div v-if="relations.length ==1">
                     <h2>Relation between {{ type }}s:</h2>
                     <relation :key="currentRelation" v-if="current._id" :id="current._id" :relation="relations[0]" :type="type" mode="update" v-on:setTarget="setTarget"></relation>
@@ -128,7 +282,7 @@
                     </div>
                     <relation :key="currentRelation" :id="getCurrentId" :relation="id2relation(currentRelation)" :targetsSet="targetsSet(currentRelation)" :type="type" mode="update" v-on:setTarget="setTarget"></relation>
                 </div>
-                <!-- End Relations -->
+                End Relations
             
             <v-text-field
                 label="See:"
@@ -136,6 +290,7 @@
                 v-model="current.see"
             ></v-text-field>
         </div>
+        -->
         <!-- Map -->
         <span v-if="mode == 'map'">
             <h3>Environment of {{ type }} <em>{{ current.title }}</em> w.r.t. relation <em>{{ id2relation(currentRelation).name }}</em></h3>
@@ -164,10 +319,12 @@
 
 <script>
 import { UnitsCollection } from "../../api/UnitsCollection";
+import { Session } from "meteor/session";
 import Relation from "./Relation.vue";
 import ConceptMap from "./ConceptMap.vue";
 import ShowMathDoc from "./ShowMathDoc.vue";
 import UserNotes from "./UserNotes.vue";
+import Selector from "./Selector.vue";
 export default {
     data () {
         return {
@@ -183,7 +340,9 @@ export default {
             newNodes: "7",
             noteButtonLabel: "Hide My Notes",
             currentRelation: this.leadRelation,
-            updateRelations: {}
+            updateRelations: {},
+            sidebar: 0,
+            nrNodes: 100
         }
     },
     props: ['type','relations','leadRelation'],
@@ -191,7 +350,11 @@ export default {
         Relation,
         ConceptMap,
         ShowMathDoc,
-        UserNotes
+        UserNotes,
+        Selector
+    },
+    watch: {
+
     },
     methods: {
         newNode () {
@@ -209,8 +372,10 @@ export default {
             this.mode='update';
         },
         saveNode () {
+            var myId=false;
             this.current.updatedAt = new Date();
             if (this.current._id) {
+                myId=this.current._id;
                 Meteor.call('updateItem',this.current);
                 Object.keys(this.updateRelations).forEach(rid => {
                     Meteor.call('deleteItem',{
@@ -226,28 +391,41 @@ export default {
                             target: tid
                         });
                     })
-                })
+                });
+                console.log('A');
+                console.log(myId);
             } else  {
                let updateRel = this.updateRelations;
+               console.log(updateRel);
                Meteor.call('insertItem',this.current, function(error,result) {
                     if (error) {
                         console.log("Insert Error: "+error.msg)
-                    } else { 
+                    } else {
+                        Session.set('myId',result);
+                        console.log('X');
+                        console.log(Session.get('myId'));
                         Object.keys(updateRel).forEach(rid => {
-                        updateRel[rid].forEach(tid => {
-                                Meteor.call('insertItem',{
-                                type: "relation",
-                                name: rid,
-                                source: result,
-                                target: tid
-                            });
+                            updateRel[rid].forEach(tid => {
+                                    Meteor.call('insertItem',{
+                                    type: "relation",
+                                    name: rid,
+                                    source: result,
+                                    target: tid
+                                });
+                            })
                         })
-                        
-                    })
                      }
-               })
+                     
+               });
+               
+               this.nrNodes = this.nrNodes+1;
+               console.log('B');
+               console.log(Session.get('myId'));
             }
-            this.closeNodeUpdate ();
+            //this.closeNodeUpdate ();
+            this.mapCurrent(myId);
+            console.log('C');
+            console.log(myId);
         },
         deleteNode () {
             if (this.current._id) {
@@ -266,10 +444,12 @@ export default {
                 Meteor.call('deleteItem',{
                     _id: this.current._id
                 });
+                //this.nrNodes--;
             } else {
                 alert("Not yet in database, cannot delete.");
             }
-            this.closeNodeUpdate ();
+            //this.closeNodeUpdate ();
+            this.mapCurrent(false);
         },
         closeNodeUpdate () {
             this.current= {
@@ -284,6 +464,28 @@ export default {
         },
         setCurrent(node) {
             this.current = node;
+            this.mode="list";
+        },
+    
+        mapCurrent(mapNode) {
+            console.log('mapCurrent '+mapNode);
+            if (mapNode) {
+                this.current=UnitsCollection.findOne({_id: mapNode});
+                if (this.isEditor) {
+                    this.relations.forEach(r => {
+                        this.updateRelations[r.id] = UnitsCollection.find({type: 'relation', source: mapNode}).fetch().map(e => e.target);
+                    })
+                }
+            }
+            else {
+                    this.current={
+                    title: "",
+                    description: "",
+                    readMore: "",
+                    see: ""
+                },
+                this.updateRelations={};
+            }
             this.mode="list";
         },
         id2relation (id) {
@@ -305,13 +507,12 @@ export default {
                 this.noteButtonLabel="Hide My Notes";
             }
         },
+        
         neighbourhood(d) {
-            console.log(this.current);
             var it = {}, nodes=[], links = [];
             UnitsCollection.find({type: this.type}).fetch().forEach(c => {
                 it[c._id]=c.title;
             });
-            console.log(it);
             const cid=(this.current._id)?this.current._id:this.all[0]._id;
             let id=0, newNodeIds=[cid],nodeIds=[cid],linkIds=[];
             while (id < d) {
@@ -359,7 +560,6 @@ export default {
                 let updated=new Date(UnitsCollection.findOne({_id: c}).updatedAt).getTime();
                 //let today = new Date()
                 let isNew = (updated && updated > back)?true:false;
-                console.log(updated);
                 if (c == this.current._id) color="black";
                 if (nodeStatus[c]) group=nodeStatus[c];
                 nodes.push({"id": c, "title": it[c], "color": color, "isNew": isNew});
@@ -369,10 +569,7 @@ export default {
             });
             return {"nodes": nodes, "links": links};
         },
-        mapCurrent(mapNode) {
-            this.current=UnitsCollection.findOne({_id: mapNode.id});
-            this.mode="list";
-        },
+        
         setTarget (relationId,targets) {
             this.updateRelations[relationId]=targets;
         },
@@ -382,11 +579,65 @@ export default {
         }
     },
     computed: {
+        allNodes () {
+            console.log('running allNodes');
+            if (this.nrNodes) {
+            var it = {}, nodeIds = []
+            //UnitsCollection.find({type: this.type}).fetch().forEach(c => {
+            this.all.forEach(c => {
+                it[c._id]=c.title;
+                nodeIds.push(c._id);
+            });
+            let nodeStatus={};
+            if (this.currentUser) {
+                UnitsCollection.find({type: 'note',
+                    item: {$in: nodeIds},
+                    userId: this.currentUser._id
+                }).fetch().forEach(n => {
+                    nodeStatus[n.item]=n.status;
+                });
+            }
+           
+            let linkRels =UnitsCollection.find({
+                type: 'relation', 
+                name: this.currentRelation, 
+                //Same-Type-Links only!
+                source: {$in: nodeIds}
+            }).fetch();
+            
+            let links = [],nodes = [];
+            nodeIds.forEach(c => {
+                let color="lightblue";
+                const back = new Date().getTime()-parseInt(this.newNodes)*24*60*60*1000;
+                switch (nodeStatus[c]) {
+                    case "100": color="green"; break;
+                    case "2": color="yellow"; break;
+                    case "150": color="red"; break;
+                    default: color="lightblue";
+                }
+                let updated=new Date(UnitsCollection.findOne({_id: c}).updatedAt).getTime();
+                //let today = new Date()
+                let isNew = (updated && updated > back)?true:false;
+                if (nodeStatus[c]) group=nodeStatus[c];
+                nodes.push({"id": c, "title": it[c], "color": color, "isNew": isNew});
+            });
+            
+            linkRels.forEach(r => {
+                links.push({source: r.source, target: r.target})
+            });
+            console.log({"nodes": nodes, "links": links});
+            return {"nodes": nodes, "links": links};
+           
+           } else {
+                return {};
+            }
+            
+        },
         selectLabel () {
             return "Select "+this.type+':';
         },
         getCurrentId () {
-            return (this.current._id)?this.current._id:false;
+            return (this.current._id)?this.current._id:'';
         },
         currentNote() {
             if (this.current._id) {
@@ -412,9 +663,11 @@ export default {
     meteor: {
         all() {
             let myType = this.type;
-            return UnitsCollection.find(
+            let allFound = UnitsCollection.find(
                 {type: myType},{sort: { title: 1}}
             ).fetch();
+            this.nrNodes=allFound.length;
+            return allFound;
         },
         currentUser() {
             return Meteor.user();
@@ -432,9 +685,6 @@ export default {
 </script>
 
 <style scoped>
-button {
-    margin: 0.5em
-}
 .v-select {
   width: auto; 
   min-width: 10em;

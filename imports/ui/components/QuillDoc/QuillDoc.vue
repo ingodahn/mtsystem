@@ -26,7 +26,7 @@ export default {
                     const quillOptions = {
                         modules: {
                             formula: true,
-                            toolbar: [["video", "bold", "italic", "underline", "link", "formula"]]
+                            toolbar: [["bold", "italic", "underline", "link", "image","video","formula"]]
                         },
                         placeholder:
                             "Type text here, or click on the formula button to enter math.",

@@ -1,5 +1,5 @@
 <template>
-<div class="container">
+<div class="container" ref="conti">
 	<div id="graph"></div>
 </div>
 </template>
@@ -12,7 +12,7 @@
 	  },
 	  methods: {
 		  nodeClicked(node) {
-			  this.$emit('nodeclicked',node);
+			  this.$emit('nodeclicked',node.id);
 		  }
 	  },
 	  mounted() {
@@ -29,8 +29,9 @@
 		  
 		  //.dagMode('bu')
 		  //.dagLevelDistance(50)
-		  .width(600)
-		  .height(800)
+		  //.width(400)
+		  .width(this.$refs.conti.clientWidth)
+		  .height(Math.max(this.$refs.conti.clientHeight,800))
 		  .nodeCanvasObjectMode(node => (node.isNew)?'before':undefined)
 		  .nodeCanvasObject((node, ctx) => {
         // add ring just for highlighted nodes

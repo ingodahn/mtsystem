@@ -5,11 +5,34 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "pwa-chrome",
+            "name": "Attach to meteor",
+            "type": "node",
+            "request": "attach",
+            "port": 9229
+        },
+        {
+            "type": "chrome",
             "request": "launch",
-            "name": "Launch Chrome against localhost",
+            "name": "Meteor: Chrome",
             "url": "http://localhost:3000",
-            "webRoot": "${workspaceFolder}"
+            "webRoot": "${workspaceFolder}",
+            "outputCapture": "std",
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Meteor: Node",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "debug"],
+            "outputCapture": "std",
+            "port": 9229,
+            "timeout": 30000
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Meteor: All",
+            "configurations": ["Meteor: Node", "Meteor: Chrome"]
         }
     ]
 }

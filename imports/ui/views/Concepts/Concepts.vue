@@ -1,6 +1,5 @@
 <template>
     <div class="container">
-        <h1>MathTrek Concepts</h1>
         <node :key="type" :type="type" :relations="relations" :leadRelation="leadRelation"></node>
     </div>
 </template>

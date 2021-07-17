@@ -1,9 +1,8 @@
 <template>
     <div class="container">
-        <h2>Select</h2>
         <div class="select" data-app>
             <v-autocomplete
-                :label="label"
+                :label="selectLabel"
                 v-model="selectedId"
                 hide-details="auto"
                 :items="all"
@@ -25,28 +24,28 @@ export default {
             items: []
         }
     },
-    props: ['type','currentId','label'],
+    props: ['type','currentId'],
 
     mounted () {
     },
 
     watch: {
         selectedId: function () {
-            console.log(this.selectedId);
-            //let cid=this.selectedId;
-            //this.items.sort(function(x,y){ return x._id == cid ? -1 : y._id == cid ? 1 : 0; });
-            this.$emit('selected',this.selectedId);
+            if (this.selectedId) this.$emit('selected',this.selectedId);
+            else this.$emit('selected','')
         }
     },
 
     computed: {
-        
+        selectLabel () {
+            return "Select "+this.type+':';
+        },
     },
 
     meteor: {
         all() {
         return UnitsCollection.find(
-            {type: this.type}
+            {type: this.type},{sort: { title: 1}}
         ).fetch();
         },
     }
