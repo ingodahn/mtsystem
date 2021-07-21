@@ -3,7 +3,7 @@
         <v-container>
             <v-layout row>
                 <v-flex xs12 md4>
-                    <h1>MathTrek {{ type }}s:</h1>
+                    <h1>MathTrek {{ type }}s: {{ getCurrentId }}</h1>
                 </v-flex>
                 <v-flex xs12 md4>
                     <selector :key="getCurrentId" :type="type" :currentId="getCurrentId" v-on:selected="mapCurrent"></selector>
@@ -12,14 +12,14 @@
                 <v-flex xs12 md8>
                     <span name="editorMenu" v-if="isEditor">
                         <v-btn color="success" id="btnNew" @click="newNode">New {{ type }}</v-btn>
-                        <span v-if="current && current._id">
+                        <span v-if="current && getCurrentId">
                             <v-btn color="warning" id="btnUpdate" @click="updateNode">Update {{ type }}</v-btn>
                             <v-btn color="error" id="btnUpdate" @click="deleteNode">Delete {{ type }}</v-btn>
                         </span>
                     </span>
                 </v-flex>
                 <v-flex xs12 md8  class="pr-7" v-if="mode == 'list'">
-                    <div v-if="current && current._id">
+                    <div v-if="current && getCurrentId">
                         <h2>{{ current.title }}</h2>
                         <show-math-doc :key="current.description" v-if="current.description " :content="current.description"></show-math-doc>
                         <div v-if="current.readMore">
@@ -320,11 +320,13 @@
 <script>
 import { UnitsCollection } from "../../api/UnitsCollection";
 import { Session } from "meteor/session";
+import { Tracker } from 'meteor/tracker';
 import Relation from "./Relation.vue";
 import ConceptMap from "./ConceptMap.vue";
 import ShowMathDoc from "./ShowMathDoc.vue";
 import UserNotes from "./UserNotes.vue";
 import Selector from "./Selector.vue";
+Tracker.autorun(() => this.getCurrentId);
 export default {
     data () {
         return {
@@ -353,6 +355,8 @@ export default {
         UserNotes,
         Selector
     },
+    mounted () {
+    },
     watch: {
 
     },
@@ -372,7 +376,7 @@ export default {
             this.mode='update';
         },
         saveNode () {
-            var myId=false;
+            var myCurrent=this.current;
             this.current.updatedAt = new Date();
             if (this.current._id) {
                 myId=this.current._id;
@@ -392,18 +396,12 @@ export default {
                         });
                     })
                 });
-                console.log('A');
-                console.log(myId);
             } else  {
                let updateRel = this.updateRelations;
-               console.log(updateRel);
                Meteor.call('insertItem',this.current, function(error,result) {
                     if (error) {
                         console.log("Insert Error: "+error.msg)
                     } else {
-                        Session.set('myId',result);
-                        console.log('X');
-                        console.log(Session.get('myId'));
                         Object.keys(updateRel).forEach(rid => {
                             updateRel[rid].forEach(tid => {
                                     Meteor.call('insertItem',{
@@ -413,19 +411,17 @@ export default {
                                     target: tid
                                 });
                             })
-                        })
+                        });
+                        myCurrent._id=result;
                      }
                      
                });
                
                this.nrNodes = this.nrNodes+1;
-               console.log('B');
-               console.log(Session.get('myId'));
             }
             //this.closeNodeUpdate ();
-            this.mapCurrent(myId);
-            console.log('C');
-            console.log(myId);
+            //this.mapCurrent(myId);
+            this.mode="list";
         },
         deleteNode () {
             if (this.current._id) {
@@ -468,7 +464,6 @@ export default {
         },
     
         mapCurrent(mapNode) {
-            console.log('mapCurrent '+mapNode);
             if (mapNode) {
                 this.current=UnitsCollection.findOne({_id: mapNode});
                 if (this.isEditor) {
@@ -580,7 +575,6 @@ export default {
     },
     computed: {
         allNodes () {
-            console.log('running allNodes');
             if (this.nrNodes) {
             var it = {}, nodeIds = []
             //UnitsCollection.find({type: this.type}).fetch().forEach(c => {
@@ -625,7 +619,6 @@ export default {
             linkRels.forEach(r => {
                 links.push({source: r.source, target: r.target})
             });
-            console.log({"nodes": nodes, "links": links});
             return {"nodes": nodes, "links": links};
            
            } else {
@@ -636,9 +629,11 @@ export default {
         selectLabel () {
             return "Select "+this.type+':';
         },
+        
         getCurrentId () {
             return (this.current._id)?this.current._id:'';
         },
+       
         currentNote() {
             if (this.current._id) {
                 let currentNote = UnitsCollection.findOne({

@@ -1,12 +1,12 @@
 <template>
     <div class="container">
         <v-expansion-panels accordion>
-                            <v-expansion-panel>
-                                <v-expansion-panel-header>Info</v-expansion-panel-header>
-                                <v-expansion-panel-content>
-        <p v-html="getRelationDescription(relation)"></p>
-                                </v-expansion-panel-content>
-                            </v-expansion-panel>
+            <v-expansion-panel>
+                <v-expansion-panel-header>Info</v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <p v-html="getRelationDescription(relation)"></p>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
         </v-expansion-panels>
         <div v-if="mode == 'list' && current.title">
             <v-list v-if="getCurrentNodeIsSource(relation.id).length">
@@ -65,7 +65,6 @@ export default {
     props: ['relation', 'id', 'type','mode','targetsSet'],
     watch: {
         targets: function (t) {
-            console.log(t);
             this.$emit('setTarget',this.relation.id,t);
             }
     },
@@ -102,7 +101,8 @@ export default {
             return desc;
         },
         selected (doc) {
-            this.$emit('selected',doc);
+            //this.$emit('selected',doc);
+            this.$emit('selectedId',doc._id);
         },
         getTargets () {
             if (this.targetsSet) return this.targetsSet;
@@ -128,7 +128,8 @@ export default {
     meteor: {
         all() {
         return UnitsCollection.find(
-            {type: this.type}
+            {type: this.type},
+            {sort: { title: 1}}
         ).fetch();
         },
     }

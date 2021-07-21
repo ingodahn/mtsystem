@@ -17,10 +17,7 @@ export default {
         makeQuill (content) {
             let givenOptions={
                 displayHistory: true,
-                //operators=this.operators;
             };
-//console.log(this.content);
-//            if (typeof this.content =="string") this.contentString=this.content;
             (function($, Quill) {
                 $(document).ready(() => {
                     const quillOptions = {
@@ -35,9 +32,6 @@ export default {
 
                     const enableMathQuillFormulaAuthoring = window.mathquill4quill();
                     const quill = new Quill("#editor", quillOptions);
-                    //console.log(options);
-                    //enableMathQuillFormulaAuthoring(quill, options);
-                    //console.log(givenOptions);
                     enableMathQuillFormulaAuthoring(quill, givenOptions);
                     if (typeof content == "string") quill.setText(content);
                     else quill.setContents(content)

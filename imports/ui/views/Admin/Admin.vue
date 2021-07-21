@@ -16,14 +16,6 @@ export default {
     methods: {
         changeType() {
             Meteor.call('topic2subject');
-            /*
-            let olds=UnitsCollection.find({type: oldType}).fetch();
-            olds.forEach(node => {
-                node.type=newType;
-                console.log(node);
-                Meteor.call('updateItem',node);
-            });
-            */
         },
         makeExport() {
             const allDocs=UnitsCollection.find({}).fetch();
@@ -34,7 +26,6 @@ export default {
         makeImport () {
              Meteor.call('deleteItem',{
                 });
-            console.log(mtdata[0]);
             mtdata.forEach(document => {
                 Meteor.call('insertItem',document);
             })

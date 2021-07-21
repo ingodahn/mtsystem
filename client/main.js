@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import router from './routes';
 import VueMeteorTracker from 'vue-meteor-tracker';
+import '/imports/api/methods/UnitsCollectionMethods';
 
 Vue.use(VueMeteorTracker);
 
@@ -17,6 +18,10 @@ import App from '../imports/ui/App.vue'
 
 // for Vuetify 2.x you also need:
 const vuetify = new Vuetify({});
+/*
+import { Template } from 'meteor/templating';
+Template.registerHelper('gCurrentId', function () { return Session.get('currentId') });
+*/
 
 Meteor.startup(() => {
   new Vue({

@@ -3,7 +3,7 @@ import VueRouter from 'vue-router'
 
 Vue.use(VueRouter)
 
-import Units from '../imports/ui/views/Units/Units.vue'
+import Units from '../imports/ui/views/Units/Unit.vue'
 import Home from '../imports/ui/views/Home/Home.vue'
 import Topics from '../imports/ui/views/Topics/Topics.vue'
 import Subject from '../imports/ui/views/Subject/Subject.vue'

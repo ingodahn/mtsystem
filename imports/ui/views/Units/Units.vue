@@ -14,7 +14,6 @@
         mode="list"
       />
       </li>
-      <p>Mode: {{ mode }}</p>
     </ul>
     </div>
     <div v-else>
