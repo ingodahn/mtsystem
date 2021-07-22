@@ -1,7 +1,5 @@
 <template>
-    <div class="container">
-        <node :key="type" :type="type" :relations="relations" :leadRelation="leadRelation"></node>
-    </div>
+        <node :key="type" :type="type" :relations="relations"></node>
 </template>
 
 <script>
@@ -18,7 +16,6 @@ export default {
                     description: "Every SOURCE can be interpreted as an instance of TARGET in a canonical way."
                 }
             ],
-            leadRelation: 'isBelow',
         }
     },
     components: { node },

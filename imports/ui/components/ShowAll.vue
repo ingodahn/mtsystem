@@ -1,7 +1,7 @@
 <template>
- 
+ <v-container>
     <v-row>
-        <v-flex xs12 md8>
+        <v-col xs="12" md="8">
             <h3>All {{ type }}s and the relation <em>{{ id2relation(currentRelation).name }}</em></h3>
                 <p>Click node for details. Drag nodes to pin</p>
                 <p v-if="currentUser">Color distinguishes 
@@ -21,12 +21,12 @@
                 days, are marked with an <span style="border:solid orange; padding: 1px;">orange ring</span>.
                 </p>
                 <ConceptMap :cmap="allNodes" v-on:nodeclicked="mapCurrent"></ConceptMap>
-        </v-flex>
-        <v-flex xs12 md4>
+        </v-col>
+        <v-col xs="12" md="4">
             <sidebar currentId='' title='' :type="type" :relations="relations" mode="list"></sidebar>
-        </v-flex>
+        </v-col>
     </v-row>
-        
+ </v-container>
 </template>
 
 <script>

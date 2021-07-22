@@ -2,7 +2,6 @@
     <div class="container">
         <h1>MathTrek System Administration</h1>
         <p>This is the admin page</p>
-        <v-btn @click="changeType">topic2subject</v-btn>
         <v-btn @click="makeExport()">Export</v-btn>
         <v-btn @click="makeImport()">Replace Collection</v-btn>
     </div>
@@ -14,9 +13,6 @@ import { mtdata } from "./mtData.js";
 import Vue from 'vue'
 export default {
     methods: {
-        changeType() {
-            Meteor.call('topic2subject');
-        },
         makeExport() {
             const allDocs=UnitsCollection.find({}).fetch();
             var expString="export const mtdata = " + JSON.stringify(allDocs)+';';

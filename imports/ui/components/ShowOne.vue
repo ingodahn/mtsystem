@@ -1,8 +1,8 @@
 <template>
     <v-container>
-        <v-layout row>
+        
             <v-row>
-                <v-flex xs12 md8>
+                <v-col xs="12" md="8">
                     <h2> {{ current.title }}</h2>
                         <show-math-doc :key="current.description" v-if="current.description " :content="current.description"></show-math-doc>
                         <div v-if="current.readMore">
@@ -13,12 +13,12 @@
                         <div v-if="current.see">
                             <a :href="current.see" target="_blank">See also</a>
                         </div>
-                </v-flex>
-                <v-flex xs12 md4>
+                </v-col>
+                <v-col xs="12" md="4">
                     <sidebar :currentId="currentId" :title="current.title" :type="type" :relations="relations" mode="list" v-on:setNode="setNode"></sidebar>
-                </v-flex>
+                </v-col>
             </v-row>
-        </v-layout>
+        
     </v-container>
 </template>
 

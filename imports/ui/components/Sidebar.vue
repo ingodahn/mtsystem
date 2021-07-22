@@ -1,7 +1,7 @@
 <template>
     <v-container>
-            <v-layout row>
-                <v-flex>
+            <v-row>
+                <v-col>
                     <v-btn-toggle v-model="sidebar">
                         <v-btn color="primary">Relation</v-btn>
                         <v-btn color="primary" v-if="currentId && mode == 'list'">Map</v-btn>
@@ -53,8 +53,8 @@
                         
                         <ConceptMap :key="currentId" :cmap="neighbourhood(2)" v-on:nodeclicked="setNode"></ConceptMap>
                     </div>
-                </v-flex>
-            </v-layout>
+                </v-col>
+            </v-row>
     </v-container>
 </template>
 

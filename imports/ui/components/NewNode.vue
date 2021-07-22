@@ -2,7 +2,7 @@
     <v-container>
         <v-layout row>
             <v-row>
-                <v-flex xs12 md8>
+                <v-col xs="12" md="8">
                     <v-btn color="warning" @click="cancel">Cancel</v-btn>
                     <v-btn color="accent" @click="save">Save</v-btn>
                     <v-text-field
@@ -25,10 +25,10 @@
                         hide-details="auto"
                         v-model="current.see"
                     ></v-text-field>
-                </v-flex>
-                <v-flex xs12 md4>
+                </v-col>
+                <v-col xs="12" md="4">
                     <sidebar currentId="" :type="type" :title="current.title" :relations="relations" mode="update" v-on:updatedRelations="updatedRelations"></sidebar>
-                </v-flex>
+                </v-col>
             </v-row>
         </v-layout>
     </v-container>

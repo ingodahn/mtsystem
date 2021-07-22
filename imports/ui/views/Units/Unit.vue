@@ -1,11 +1,9 @@
 <template>
-    <div class="container">
-        <node :key="type" :type="type" :relations="relations"></node>
-    </div>
+    <node :key="type" :type="type" :relations="relations"></node>
 </template>
 
 <script>
-import node from "../../components/NodeX.vue"
+import node from "../../components/Node.vue"
 export default {
     data () {
         return {
@@ -20,8 +18,8 @@ export default {
                 {
                     id: 'requiresxx',
                     name: 'requires knowledge from',
-                    inverse: 'is used in topic',
-                    description: "Learning about some content in SOURCE requires some knowledge from topic TARGET"
+                    inverse: 'is used in unit',
+                    description: "Learning about some content in SOURCE requires some knowledge from unit TARGET"
                 }
             ],
         }
