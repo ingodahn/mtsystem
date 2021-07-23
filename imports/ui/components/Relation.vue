@@ -53,6 +53,7 @@
 </template>
 
 <script>
+import { Session } from "meteor/session";
 import { UnitsCollection } from "../../api/UnitsCollection";
 
 export default {

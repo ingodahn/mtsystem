@@ -27,7 +27,7 @@
                     ></v-text-field>
                 </v-col>
                 <v-col xs="12" md="4">
-                    <sidebar :currentId="currentId" title="current.title" :type="type" :relations="relations" mode="update" v-on:updatedRelations="updatedRelations"></sidebar>
+                    <sidebar :currentId="currentId" title="current.title" :type="type" :relations="relations" mode="update" v-on:updatedRelations="updatedRelations" :session="session"></sidebar>
                 </v-col>
             </v-row>
         
@@ -39,7 +39,7 @@ import { UnitsCollection } from '../../api/UnitsCollection';
 import Sidebar from "./Sidebar.vue";
 
 export default {
-    props: ['currentId','relations','type'],
+    props: ['currentId','relations','type','session'],
     data () {
         return {
             current: {
@@ -48,7 +48,7 @@ export default {
                 readMore: '',
                 see: ''
             },
-            currentRelation: this.relations[0].id,
+            //currentRelation: this.relations[0].id,
             updateRelations: {}
         }
     },
@@ -99,6 +99,11 @@ export default {
 
             return "\""+source+" "+relation.name+" "+target+"\" means: "+relation.description.replaceAll('SOURCE',source).replaceAll('TARGET',target);
         },
+    },
+    computed: {
+        currentRelation () {
+            return this.session.relation;
+        }
     }
 }
 </script>

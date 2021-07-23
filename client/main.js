@@ -14,7 +14,7 @@ Vue.use(Vuetify); // this is all you need for Vuetify 1.x
 
 import '../imports/ui/plugins'
 
-import App from '../imports/ui/App.vue'
+import App from '../imports/ui/App.vue';
 
 // for Vuetify 2.x you also need:
 const vuetify = new Vuetify({});

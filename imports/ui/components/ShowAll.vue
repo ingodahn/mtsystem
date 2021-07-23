@@ -3,6 +3,9 @@
     <v-row>
         <v-col xs="12" md="8">
             <h3>All {{ type }}s and the relation <em>{{ id2relation(currentRelation).name }}</em></h3>
+            
+            <p>SessionRelation: {{ session.relation }} </p>
+            
                 <p>Click node for details. Drag nodes to pin</p>
                 <p v-if="currentUser">Color distinguishes 
                     <span style="background-color:green; color: white;">{{ type }}s I know</span> from 
@@ -10,7 +13,7 @@
                     <span style="background-color:red; color: white;">{{ type }}s I find interesting</span>. 
                 </p>
                 <p>The {{ type }}s, that have been updated in the last 
-                    <select v-model="newNodes">
+                    <select v-model="session.newNodes">
                         <option>1</option>
                         <option>2</option>
                         <option>3</option>
@@ -20,26 +23,29 @@
                     </select>      
                 days, are marked with an <span style="border:solid orange; padding: 1px;">orange ring</span>.
                 </p>
-                <ConceptMap :cmap="allNodes" v-on:nodeclicked="mapCurrent"></ConceptMap>
+                <ConceptMap :key="currentRelation+newNodes" :cmap="allNodes" v-on:nodeclicked="mapCurrent"></ConceptMap>
         </v-col>
         <v-col xs="12" md="4">
-            <sidebar currentId='' title='' :type="type" :relations="relations" mode="list"></sidebar>
+            <sidebar currentId='' title='' :type="type" :relations="relations" mode="list" :session="session"></sidebar>
         </v-col>
     </v-row>
  </v-container>
 </template>
 
 <script>
+import { Session } from "meteor/session";
 import { UnitsCollection } from "../../api/UnitsCollection";
 import ConceptMap from "./ConceptMap.vue";
 import Sidebar from "./Sidebar.vue";
 
+
 export default {
-    props: ['type','relations'],
+    props: ['type','relations','session'],
     data () {
         return {
-            newNodes: 7,
-            currentRelation: this.relations[0].id,
+            //newNodes: 7,
+            //currentRelation: this.relations[0].id,
+            // sessionRelation: 'not set'
         }
     },
     components: {
@@ -47,6 +53,7 @@ export default {
         Sidebar
     },
     mounted () {
+        
     },
     methods: {
         id2relation (id) {
@@ -64,6 +71,7 @@ export default {
         }
     },
     computed: {
+        
         allNodes () {
             var it = {}, nodeIds = []
             UnitsCollection.find({type: this.type}).fetch().forEach(c => {
@@ -99,7 +107,6 @@ export default {
                     default: color="lightblue";
                 }
                 let updated=new Date(UnitsCollection.findOne({_id: c}).updatedAt).getTime();
-                //let today = new Date()
                 let isNew = (updated && updated > back)?true:false;
                 if (nodeStatus[c]) group=nodeStatus[c];
                 nodes.push({"id": c, "title": it[c], "color": color, "isNew": isNew});
@@ -110,6 +117,12 @@ export default {
             });
             return {"nodes": nodes, "links": links};
         },
+        currentRelation () {
+            return this.session.relation;
+        },
+        newNodes () {
+            return this.session.newNodes;
+        }
     },
     meteor: {
         currentUser() {

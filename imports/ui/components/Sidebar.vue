@@ -2,6 +2,7 @@
     <v-container>
             <v-row>
                 <v-col>
+                   
                     <v-btn-toggle v-model="sidebar">
                         <v-btn color="primary">Relation</v-btn>
                         <v-btn color="primary" v-if="currentId && mode == 'list'">Map</v-btn>
@@ -15,7 +16,7 @@
                                     label="Select relation:"
                                     item-text="name"
                                     item-value="id"
-                                    v-model="currentRelation"
+                                    v-model="session.relation"
                                 >
                             </v-select>
                             </div>
@@ -37,7 +38,7 @@
                                     </p>
                                     <p>The {{ type }} <em>{{ title }}</em> is shown in black.</p>
                                     <p>The {{ type }}s, that have been updated in the last 
-                                            <select color="primary" v-model="newNodes">
+                                            <select color="primary" v-model="session.newNodes">
                                                 <option>1</option>
                                                 <option>2</option>
                                                 <option>3</option>
@@ -51,7 +52,7 @@
                             </v-expansion-panel>
                         </v-expansion-panels>
                         
-                        <ConceptMap :key="currentId" :cmap="neighbourhood(2)" v-on:nodeclicked="setNode"></ConceptMap>
+                        <ConceptMap :key="currentId+currentRelation+newNodes" :cmap="neighbourhood(2)" v-on:nodeclicked="setNode"></ConceptMap>
                     </div>
                 </v-col>
             </v-row>
@@ -59,6 +60,7 @@
 </template>
 
 <script>
+import { Session } from "meteor/session";
 import { UnitsCollection } from "../../api/UnitsCollection";
 import UserNotes from "./UserNotes.vue";
 import ConceptMap from "./ConceptMap.vue";
@@ -68,19 +70,16 @@ export default {
     data () {
         return {
             sidebar: 0,
-            currentRelation: this.relations[0].id,
-            newNodes: 7,
             updateRelations: {},
         }
     },
-    props: ['currentId','type','title','relations','mode'],
+    props: ['currentId','type','title','relations','mode', 'session'],
     components: {
         UserNotes,
         ConceptMap,
         Relation
     },
-    watch: {
-    },
+    
     methods: {
         id2relation (id) {
             return this.relations.find(e => e.id == id)
@@ -184,6 +183,12 @@ export default {
                 }
             }
         },
+        currentRelation () {
+            return this.session.relation;
+        },
+        newNodes () {
+            return this.session.newNodes;
+        }
     },
     meteor: {
         currentUser() {

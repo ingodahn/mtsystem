@@ -27,7 +27,7 @@
                     ></v-text-field>
                 </v-col>
                 <v-col xs="12" md="4">
-                    <sidebar currentId="" :type="type" :title="current.title" :relations="relations" mode="update" v-on:updatedRelations="updatedRelations"></sidebar>
+                    <sidebar currentId="" :type="type" :title="current.title" :relations="relations" mode="update" v-on:updatedRelations="updatedRelations" :session="session"></sidebar>
                 </v-col>
             </v-row>
         </v-layout>
@@ -39,7 +39,7 @@ import { UnitsCollection } from '../../api/UnitsCollection';
 import { Random } from 'meteor/random';
 import Sidebar from "./Sidebar.vue";
 export default {
-    props: ['type','relations'],
+    props: ['type','relations','session'],
     data () {
         return {
             current: {

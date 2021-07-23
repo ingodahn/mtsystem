@@ -21,10 +21,10 @@
             
                 <v-row>
                 <v-col xs="12">
-                    <show-all :key="changed" v-if="mode=='all'" :type="type" :relations="relations" v-on:nodeselected="nodeSelected" v-on:relationselected="relationSelected"></show-all>
-                    <show-one :key="currentId" v-if="mode=='single'" :currentId="currentId" :type="type" :relations="relations" v-on:setNode="nodeSelected" v-on:relationselected="relationSelected"></show-one>
-                    <new-node v-if="mode=='new'" :type="type" :relations="relations" v-on:new="setNode"></new-node>
-                    <update-node v-if="mode=='update'" :currentId="currentId" v-on:update="updatedNode" :relations="relations" :type="type"></update-node>
+                    <show-all :key="changed" v-if="mode=='all'" :type="type" :relations="relations" v-on:nodeselected="nodeSelected" v-on:relationselected="relationSelected" :session="session"></show-all>
+                    <show-one :key="currentId" v-if="mode=='single'" :currentId="currentId" :type="type" :relations="relations" v-on:setNode="nodeSelected" v-on:relationselected="relationSelected" :session="session"></show-one>
+                    <new-node v-if="mode=='new'" :type="type" :relations="relations" v-on:new="setNode" :session="session"></new-node>
+                    <update-node v-if="mode=='update'" :currentId="currentId" v-on:update="updatedNode" :relations="relations" :type="type" :session="session"></update-node>
                 </v-col>
                 </v-row>
             
@@ -44,6 +44,13 @@ export default {
             currentId: '',
             mode: "all",
             changed: 0,
+            //currentRelation: this.relations[0].id,
+            session: {
+                type: this.type,
+                relation: this.relations[0].id,
+                id: this.currentId,
+                newNodes: 7
+            }
         }
     },
     props: ['type','relations'],
@@ -112,7 +119,11 @@ export default {
             this.mode="all";
         }
     },
-    computed: {},
+    computed: {
+        currentRelation () {
+            return this.session.relation;
+        }
+    },
     meteor: {
         isEditor() {
             if (Meteor.user()) {
