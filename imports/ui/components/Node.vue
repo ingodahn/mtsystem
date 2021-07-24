@@ -12,7 +12,7 @@
                 </v-col>
                 <v-col xs="12" md="8" name="editorMenu" v-if="isEditor">
                         <v-btn v-if="mode=='all'" color="success" id="btnNew" @click="newNode">New {{ type }}</v-btn>
-                        <span v-if="currentId">
+                        <span v-if="currentId && mode != 'update'">
                             <v-btn color="warning" id="btnUpdate" @click="updateNode">Update {{ type }}</v-btn>
                             <v-btn color="error" id="btnUpdate" @click="deleteNode">Delete {{ type }}</v-btn>
                         </span>

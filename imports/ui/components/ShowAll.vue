@@ -2,28 +2,25 @@
  <v-container>
     <v-row>
         <v-col xs="12" md="8">
-            <h3>All {{ type }}s and the relation <em>{{ id2relation(currentRelation).name }}</em></h3>
-            
-            <p>SessionRelation: {{ session.relation }} </p>
-            
-                <p>Click node for details. Drag nodes to pin</p>
-                <p v-if="currentUser">Color distinguishes 
-                    <span style="background-color:green; color: white;">{{ type }}s I know</span> from 
-                    <span style="background-color:yellow">{{ type }}s I am exploring</span> and
-                    <span style="background-color:red; color: white;">{{ type }}s I find interesting</span>. 
-                </p>
-                <p>The {{ type }}s, that have been updated in the last 
-                    <select v-model="session.newNodes">
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                        <option>7</option>
-                        <option>14</option>
-                        <option>30</option>
-                    </select>      
-                days, are marked with an <span style="border:solid orange; padding: 1px;">orange ring</span>.
-                </p>
-                <ConceptMap :key="currentRelation+newNodes" :cmap="allNodes" v-on:nodeclicked="mapCurrent"></ConceptMap>
+            <h3>All {{ type }}s and the relation <em>{{ id2relation(currentRelation).name }}</em></h3>            
+            <p>Click node for details. Drag nodes to pin</p>
+            <p v-if="currentUser">Color distinguishes 
+                <span style="background-color:green; color: white;">{{ type }}s I know</span> from 
+                <span style="background-color:yellow">{{ type }}s I am exploring</span> and
+                <span style="background-color:red; color: white;">{{ type }}s I find interesting</span>. 
+            </p>
+            <p>The {{ type }}s, that have been updated in the last 
+                <select v-model="session.newNodes">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>7</option>
+                    <option>14</option>
+                    <option>30</option>
+                </select>      
+            days, are marked with an <span style="border:solid orange; padding: 1px;">orange ring</span>.
+            </p>
+            <ConceptMap :key="currentRelation+newNodes" :cmap="allNodes" v-on:nodeclicked="mapCurrent"></ConceptMap>
         </v-col>
         <v-col xs="12" md="4">
             <sidebar currentId='' title='' :type="type" :relations="relations" mode="list" :session="session"></sidebar>
