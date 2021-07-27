@@ -1,13 +1,25 @@
 <template>
+<div>
+
 <div class="container" ref="conti">
 	<div id="graph"></div>
 </div>
+</div>
+
 </template>
 
   <script>
   import { UnitsCollection } from "../../api/UnitsCollection";
   export default {
-	  props: ['cmap'],
+	  props: ['cmap','orientation'],
+	  data () {
+		  return {
+			  
+		  }
+	  },
+	  watch: {
+		  
+	  },
 	  computed: {
 	  },
 	  methods: {
@@ -27,7 +39,7 @@
 		  .nodeLabel(node => `${node.title}`)
 		  .nodeRelSize(NODE_R)
 		  
-		  //.dagMode('bu')
+		  .dagMode(this.orientation)
 		  //.dagLevelDistance(50)
 		  //.width(400)
 		  .width(this.$refs.conti.clientWidth)
@@ -40,22 +52,20 @@
         ctx.fillStyle = 'orange';
         ctx.fill();
       })
-		  //.d3Force('collision', d3.forceCollide(node => Math.sqrt(100 / (node.level + 1)) * NODE_REL_SIZE))
-		  //.d3Force('collision', d3.forceCollide(node => Math.sqrt(100 / (node.level + 1)) * 20))
-		  //.d3Force('charge', d3.forceManyBody(strength))
-		  //.d3Force('charge', strength)
-      	  //.d3VelocityDecay(0.3)
 		  .onNodeDragEnd(node => {
 				node.fx = node.x;
 				node.fy = node.y;
 			})
 		  .onNodeClick(node => this.nodeClicked(node))
 		  ;
+		  // ms to cool down
+		  Graph.cooldownTime(2000);
+		  // Zoom to fit
+		  Graph.d3Force('center', null);
+
+		  // fit to canvas when engine stops
+		  Graph.onEngineStop(() => Graph.zoomToFit(500));
 	},
   }
-  /*
-  function strength(n) {
-			return -300;
-			}
-			*/
+			
   </script>

@@ -20,7 +20,20 @@
                 </select>      
             days, are marked with an <span style="border:solid orange; padding: 1px;">orange ring</span>.
             </p>
-            <ConceptMap :key="currentRelation+newNodes" :cmap="allNodes" v-on:nodeclicked="mapCurrent"></ConceptMap>
+            <v-row xs="12" md="8" align="center">
+                <v-col
+                    class="d-flex"
+                    cols="12"
+                    sm="6"
+                >
+                    <v-select
+                    :items="orientations"
+                    label="Orientation"
+                    v-model="orientation"
+                    ></v-select>
+                </v-col>
+            </v-row>
+            <ConceptMap :key="currentRelation+newNodes+orientation" :cmap="allNodes" v-on:nodeclicked="mapCurrent" :orientation="orientation"></ConceptMap>
         </v-col>
         <v-col xs="12" md="4">
             <sidebar currentId='' title='' :type="type" :relations="relations" mode="list" :session="session"></sidebar>
@@ -40,9 +53,16 @@ export default {
     props: ['type','relations','session'],
     data () {
         return {
-            //newNodes: 7,
-            //currentRelation: this.relations[0].id,
-            // sessionRelation: 'not set'
+            orientations: [
+                {text: 'None', value: null},
+			  	{text: 'Bottom up', value: 'bu'} ,
+                {text: 'Top down', value: 'td'},
+				{text: 'Left-right', value: 'lr'},
+				{text: 'Right-left', value:'rl'},
+				{text: 'Out', value: 'radialout'} ,
+				{text: 'In', value: 'radialin'} 
+			],
+            orientation: 'td'
         }
     },
     components: {
