@@ -62,7 +62,7 @@ export default {
 				{text: 'Out', value: 'radialout'} ,
 				{text: 'In', value: 'radialin'} 
 			],
-            orientation: 'td'
+            orientation: null
         }
     },
     components: {
