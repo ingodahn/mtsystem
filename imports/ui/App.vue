@@ -5,6 +5,8 @@
       <v-btn color="primary" to="/">Home</v-btn>
       <v-btn color="primary" to="/subject">Subjects</v-btn>
       <v-btn color="primary" to="/concepts">Concepts</v-btn>
+      <v-btn color="primary" to="/theorem">Theorems</v-btn>
+      <v-btn color="primary" to="/question">Questions</v-btn>
       <v-btn color="primary" to="/units" v-if="currentUser && currentUser.username == 'dahn'">Units</v-btn>
       <v-btn color="primary" to="/admin" v-if="currentUser && currentUser.username == 'dahn'">Tools</v-btn>
       &nbsp;

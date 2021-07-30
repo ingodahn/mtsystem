@@ -44,9 +44,9 @@ export default {
 
     meteor: {
         all() {
-        return UnitsCollection.find(
-            {type: this.type},{sort: { title: 1}}
-        ).fetch();
+            return UnitsCollection.find(
+                {type: this.type},{sort: { title: 1}}
+            ).fetch();
         },
     }
 }

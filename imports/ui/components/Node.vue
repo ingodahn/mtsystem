@@ -24,6 +24,7 @@
                     <show-all :key="changed" v-if="mode=='all'" :type="type" :relations="relations" v-on:nodeselected="nodeSelected" v-on:relationselected="relationSelected" :session="session"></show-all>
                     <show-one :key="currentId" v-if="mode=='single'" :currentId="currentId" :type="type" :relations="relations" v-on:setNode="nodeSelected" v-on:relationselected="relationSelected" :session="session"></show-one>
                     <new-node v-if="mode=='new'" :type="type" :relations="relations" v-on:new="setNode" :session="session"></new-node>
+                    <!-- TODO: Do we need :key="currentId" to clean up chaged relations? -->
                     <update-node v-if="mode=='update'" :currentId="currentId" v-on:update="updatedNode" :relations="relations" :type="type" :session="session"></update-node>
                 </v-col>
                 </v-row>
@@ -43,8 +44,8 @@ export default {
         return {
             currentId: '',
             mode: "all",
+            //TODO: Do we need changed?
             changed: 0,
-            //currentRelation: this.relations[0].id,
             session: {
                 type: this.type,
                 relation: this.relations[0].id,
@@ -95,6 +96,7 @@ export default {
             this.mode="update";
         },
         updatedNode (id) {
+            // TODO: Shouldn't this just do nothing?
             if (id) {
                 this.currentId=id;
                 this.mode="single";
