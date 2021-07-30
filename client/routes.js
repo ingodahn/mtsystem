@@ -7,6 +7,8 @@ import Units from '../imports/ui/views/Units/Unit.vue'
 import Home from '../imports/ui/views/Home/Home.vue'
 import Subject from '../imports/ui/views/Subject/Subject.vue'
 import Concepts from '../imports/ui/views/Concepts/Concepts.vue'
+import Theorem from '../imports/ui/views/Theorem/Theorem.vue'
+import Question from '../imports/ui/views/Question/Question.vue'
 import Admin from '../imports/ui/views/Admin/Admin.vue'
 
 const routes = [
@@ -25,7 +27,16 @@ const routes = [
         name: "Concepts",
         component: Concepts
     },
-    
+    {
+        path: "/question",
+        name: "Question",
+        component: Question
+    },
+    {
+        path: "/theorem",
+        name: "Theorem",
+        component: Theorem
+    },
     {
         path: "/units",
         name: "Units",
