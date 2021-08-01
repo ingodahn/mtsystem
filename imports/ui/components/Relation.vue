@@ -108,6 +108,7 @@ export default {
         getTargets () {
             if (this.targetsSet) return this.targetsSet;
             if (! this.id) return [];
+            console.log(this.relation);
             return this.getCurrentNodeIsSource(this.relation.id).map(e => e._id)
         }
     },
@@ -129,7 +130,7 @@ export default {
     meteor: {
         all() {
         return UnitsCollection.find(
-            {type: this.type},
+            {type: this.relation.targetType},
             {sort: { title: 1}}
         ).fetch();
         },

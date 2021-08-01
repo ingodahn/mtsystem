@@ -7,10 +7,13 @@ Vue.use(VueMeteorTracker);
 
 import Vuetify from 'vuetify'; 
 import 'vuetify/dist/vuetify.min.css';
-import VMarkdown from 'v-markdown/src';
+//import VMarkdown from 'v-markdown/src';
  
-Vue.use(VMarkdown);
+//Vue.use(VMarkdown);
 Vue.use(Vuetify); // this is all you need for Vuetify 1.x
+
+//import VueSession from 'vue-session'
+//Vue.use(VueSession)
 
 import '../imports/ui/plugins'
 

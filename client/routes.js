@@ -10,6 +10,7 @@ import Concepts from '../imports/ui/views/Concepts/Concepts.vue'
 import Theorem from '../imports/ui/views/Theorem/Theorem.vue'
 import Question from '../imports/ui/views/Question/Question.vue'
 import Admin from '../imports/ui/views/Admin/Admin.vue'
+import Any from '../imports/ui/views/Any.vue'
 
 const routes = [
     {
@@ -17,11 +18,13 @@ const routes = [
         name: "Home",
         component: Home
     },
+    /*
     {
         path: "/subject",
         name: "Subject",
         component: Subject
     },
+    */
     {
         path: "/concepts",
         name: "Concepts",
@@ -38,15 +41,15 @@ const routes = [
         component: Theorem
     },
     {
-        path: "/units",
-        name: "Units",
-        component: Units
-    },
-    {
         path: "/admin",
         name: "Admin",
         component: Admin
-    }
+    },
+    {
+        path: "/:type",
+        name: "Any",
+        component: Any
+    },
 ]
 
 const router = new VueRouter({

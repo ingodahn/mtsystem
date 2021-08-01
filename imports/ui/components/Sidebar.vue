@@ -184,6 +184,7 @@ export default {
             }
         },
         currentRelation () {
+            console.log(this.session);
             return this.session.relation;
         },
         newNodes () {

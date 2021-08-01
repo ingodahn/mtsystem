@@ -1,17 +1,23 @@
 <template>
     <div class="container">
         <h1>MathTrek System Administration</h1>
-        <p>This is the admin page</p>
+        <p>This is the admin page with {{ getCounter }}</p>
         <v-btn @click="makeExport()">Export</v-btn>
         <v-btn @click="makeImport()">Replace Collection</v-btn>
+        <v-btn @click="incCounter()">Increase counter</v-btn>
     </div>
 </template>
 
 <script>
 import { UnitsCollection } from "../../../api/UnitsCollection";
 import { mtdata } from "./mtData.js";
+import { Session } from "meteor/session";
+
 import Vue from 'vue'
 export default {
+  created () {
+    Session.set('counter',0);
+  },
     methods: {
         makeExport() {
             const allDocs=UnitsCollection.find({}).fetch();
@@ -26,6 +32,11 @@ export default {
                 Meteor.call('insertItem',document);
             })
         },
+       incCounter () {
+         let i=Session.get('counter');
+         console.log(i);
+          Session.set('counter',i+1);
+       },
        
         getChildren(node,relation,ancestors) {
           let rel = UnitsCollection.find({type: 'relation', name: relation, target: node._id}).fetch();
@@ -41,7 +52,10 @@ export default {
       }
     },
     computed: {
-        
+        getCounter () {
+          console.log('Getting counter');
+          return Session.get('counter');
+        },
     },
     meteor: {
       items() {
