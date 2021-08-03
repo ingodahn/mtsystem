@@ -12,10 +12,10 @@
                         <div v-if="relations.length > 1">
                             <div data-app>
                                 <v-select
-                                    :items="relations"
+                                    :items="typedRelations"
                                     label="Select relation:"
-                                    item-text="name"
-                                    item-value="id"
+                                    item-text="text"
+                                    item-value="value"
                                     v-model="session.relation"
                                 >
                             </v-select>
@@ -84,12 +84,9 @@ export default {
         id2relation (id) {
             return this.relations.find(e => e.id == id)
         },
-        getRelationDescription (relation) {
-            let ctype=this.type.charAt(0).toUpperCase()+this.type.substring(1);
-            let source = (this.current.title.length)?this.current.title:ctype+' 1';
-            let target = ctype+' 2';
-
-            return "\""+source+" "+relation.name+" "+target+"\" means: "+relation.description.replaceAll('SOURCE',source).replaceAll('TARGET',target);
+        id2RelationName(id) {
+            const r=this.id2relation(id);
+            return (r.sourceType == this.type)?r.name:r.inverse;
         },
         setTarget (relationId,targets) {
             this.updateRelations[relationId]=targets;
@@ -186,6 +183,13 @@ export default {
         currentRelation () {
             console.log(this.session);
             return this.session.relation;
+        },
+        typedRelations () {
+            let tr=[];
+            this.relations.forEach(r => {
+                tr.push({text: (r.sourceType == this.type)?r.name:r.inverse, value: r.id})
+            });
+            return tr;
         },
         newNodes () {
             return this.session.newNodes;

@@ -20,21 +20,23 @@
                 </v-list-item-group>
             </v-list>
             <p v-else>{{ current.title }} {{ relation.name }} nothing else.</p>
-            <v-list v-if="getCurrentNodeIsTarget(relation.id).length">
-                <v-subheader>{{ current.title }} {{ relation.inverse }}:</v-subheader>
-                <v-list-item-group>
-                    <v-list-item v-for="item in getCurrentNodeIsTarget(relation.id)" 
-                    :key="item._id" @click="selected(item)">                           
-                        <v-list-item-content>
-                            <v-list-item-title v-text="item.title"></v-list-item-title>
-                        </v-list-item-content>                               
-                    </v-list-item>
-                </v-list-item-group>
-            </v-list>
-            <p v-else>{{ current.title }} {{ relation.inverse }} nothing else.</p>
+            <div v-if="relation.targetType == type">
+                <v-list v-if="getCurrentNodeIsTarget(relation.id).length">
+                    <v-subheader>{{ current.title }} {{ relation.inverse }}:</v-subheader>
+                    <v-list-item-group>
+                        <v-list-item v-for="item in getCurrentNodeIsTarget(relation.id)" 
+                        :key="item._id" @click="selected(item)">                           
+                            <v-list-item-content>
+                                <v-list-item-title v-text="item.title"></v-list-item-title>
+                            </v-list-item-content>                               
+                        </v-list-item>
+                    </v-list-item-group>
+                </v-list>
+                <p v-else>{{ current.title }} {{ relation.inverse }} nothing else.</p>
+            </div>
         </div>
         <div v-if = "mode == 'update'">
-            <div data-app>
+            <div v-if="relation.sourceType == type" data-app>
                 <v-autocomplete
                     label="Targets:"
                     v-model="targets"
@@ -48,6 +50,7 @@
                     small-chips
                 ></v-autocomplete>
             </div>
+            <div v-else>Edit relation <b>{{relation.name}}</b> for {{ relation.sourceType }}s.</div>
         </div>
     </div>
 </template>
@@ -93,12 +96,21 @@ export default {
             return rs;
         },
         getRelationDescription (relation) {
-            let ctype=this.type.charAt(0).toUpperCase()+this.type.substring(1);
-            //let source = (this.current.title.length)?this.current.title:ctype+' 1';
-            let source = ctype+' 1';
-            let target = ctype+' 2';
-            let desc="<b>Relation</b> "+source+" <b>"+relation.name+"</b> "+target+"</p><p><b>Means:</b> "+relation.description.replaceAll('SOURCE',source).replaceAll('TARGET',target)+"</p>";
-            desc += "<p><b>Inverse:</b> "+target+" <b>"+relation.inverse+"</b> "+source;
+            console.log(relation);
+            let stype=relation.sourceType;
+            let sString=stype.charAt(0).toUpperCase()+stype.substring(1);
+            let ttype=relation.targetType;
+            let tString=ttype.charAt(0).toUpperCase()+ttype.substring(1);
+            let source = (this.current.title.length)?this.current.title:sString+' 1';
+            let target = tString+' 2';
+            let desc="<b>Relation</b> ";
+            console.log(relation);
+            if (relation.sourceType == this.type) {
+                desc+= "<em>"+source+"</em> <b>"+relation.name+"</b> <em>"+target+"</em></p><p><b>Means:</b> "+relation.description.replaceAll('SOURCE','<em>'+source+'</em>').replaceAll('TARGET','<em>'+target+'</em>')+"</p>";
+                if (relation.targetType == this.type) desc += "<p><b>Inverse:</b> <em>"+target+"</em> <b>"+relation.inverse+"</b> <em>"+source+"</em>";
+            } else {
+                desc += target+" <b>"+relation.inverse+"</b> "+source+"</p><p><b>Means:</b> "+relation.description.replaceAll('SOURCE','<em>'+source+'</em>').replaceAll('TARGET','<em>'+target+'</em>')+"</p>"
+            }            
             return desc;
         },
         selected (doc) {
@@ -129,6 +141,7 @@ export default {
     },
     meteor: {
         all() {
+            console.log(this.relation);
         return UnitsCollection.find(
             {type: this.relation.targetType},
             {sort: { title: 1}}

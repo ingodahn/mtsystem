@@ -43,7 +43,7 @@ export const relations = [
         id: 'isBelow', 
         name: 'helps answering', 
         inverse: 'can be answered best, after answering',
-        description: "Answering \"SOURCE\" will help answering \"TARGET\"."
+        description: "Answering SOURCE will help answering TARGET."
     },
     {
         sourceType: 'unit',
