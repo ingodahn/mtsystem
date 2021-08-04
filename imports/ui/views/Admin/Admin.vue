@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <h1>MathTrek System Administration</h1>
-        <p>This is the admin page with {{ count }}</p>
+        <p>This is the admin page</p>
         <v-btn @click="makeExport()">Export</v-btn>
         <v-btn @click="makeImport()">Replace Collection</v-btn>
     </div>
@@ -28,11 +28,13 @@ export default {
             newWindow = window.open(uriContent, 'neuesDokument');
         },
         makeImport () {
-             Meteor.call('deleteItem',{
-                });
+          if (confirm("Do you REALLY want to replace all data on "+window.location.href+'?')) {
+            Meteor.call('deleteItem',{
+            });
             mtdata.forEach(document => {
-                Meteor.call('insertItem',document);
+              Meteor.call('insertItem',document);
             })
+          }
         },
        
         getChildren(node,relation,ancestors) {

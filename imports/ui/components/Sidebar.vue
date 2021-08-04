@@ -5,7 +5,7 @@
                    
                     <v-btn-toggle v-model="sidebar">
                         <v-btn color="primary">Relation</v-btn>
-                        <v-btn color="primary" v-if="session.id && mode == 'list'">Map</v-btn>
+                        <v-btn color="primary" v-if="session.id && mode == 'list'" :disabled="!sameType">Map</v-btn>
                         <v-btn color="primary" v-if="currentUser && session.id">Note</v-btn>
                     </v-btn-toggle>
                     <div v-if="sidebar==0">
@@ -46,7 +46,7 @@
                                                 <option>14</option>
                                                 <option>30</option>
                                             </select>      
-                                        days, are marked with an <span style="border:solid orange; padding: 1px;">orange ring</span>.
+                                        days, are marked with an <span style="border:solid orange; border-radius: 10px; padding: 1px;">orange ring</span>.
                                     </p>
                                 </v-expansion-panel-content>
                             </v-expansion-panel>
@@ -60,7 +60,6 @@
 </template>
 
 <script>
-import { Session } from "meteor/session";
 import { UnitsCollection } from "../../api/UnitsCollection";
 import UserNotes from "./UserNotes.vue";
 import ConceptMap from "./ConceptMap.vue";
@@ -160,9 +159,6 @@ export default {
         setNode (id) {
             this.$emit('setNode',id);
         },
-        type () {
-            return this.session.type;
-        }
     },
     computed: {
         currentId () {
@@ -187,8 +183,15 @@ export default {
                 }
             }
         },
+        type () {
+            return this.session.type;
+        },
         currentRelation () {
             return this.session.relation;
+        },
+        sameType () {
+            let r=this.id2relation(this.currentRelation);
+            return (r.sourceType  == r.targetType);
         },
         typedRelations () {
             let tr=[];

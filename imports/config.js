@@ -22,13 +22,6 @@ export const relations = [
         inverse: 'is an abstraction of',
         description: "Every SOURCE can be interpreted as an instance of TARGET in a canonical way."
     },
-    {   sourceType: 'unit',
-        targetType: 'unit',
-        id: 'isBelowxx', 
-        name: 'is a part of', 
-        inverse: 'has a part',
-        description: "Every complete description of TARGET must contain a complete description of SOURCE."
-    },
     {
         sourceType: 'theorem',
         targetType: 'theorem',
@@ -44,6 +37,14 @@ export const relations = [
         name: 'helps answering', 
         inverse: 'can be answered best, after answering',
         description: "Answering SOURCE will help answering TARGET."
+    },
+    /*
+    {   sourceType: 'unit',
+        targetType: 'unit',
+        id: 'isBelowxx', 
+        name: 'is a part of', 
+        inverse: 'has a part',
+        description: "Every complete description of TARGET must contain a complete description of SOURCE."
     },
     {
         sourceType: 'unit',
@@ -61,4 +62,21 @@ export const relations = [
         inverse: 'is answered in',
         description: "Reading SOURCE will answer TARGET"
     }
+    */
+    {
+        sourceType: 'theorem',
+        targetType: 'subject',
+        id: 'isAppliedIn', 
+        name: 'is applied in subject', 
+        inverse: 'applies theorem',
+        description: "The theorem SOURCE is applied to solve problems in subject TARGET."
+    },
+    {
+        sourceType: 'concept',
+        targetType: 'subject',
+        id: 'isUsedIn', 
+        name: 'is used in subject', 
+        inverse: 'uses concept',
+        description: "Concept SOURCE is important in subject TARGET."
+    },
 ];

@@ -19,7 +19,9 @@
                     </v-list-item>
                 </v-list-item-group>
             </v-list>
+            <!--
             <p v-else>{{ current.title }} {{ relation.name }} nothing else.</p>
+            -->
             <div v-if="relation.targetType == session.type">
                 <v-list v-if="getCurrentNodeIsTarget(relation.id).length">
                     <v-subheader>{{ current.title }} {{ relation.inverse }}:</v-subheader>
@@ -32,7 +34,9 @@
                         </v-list-item>
                     </v-list-item-group>
                 </v-list>
+                <!--
                 <p v-else>{{ current.title }} {{ relation.inverse }} nothing else.</p>
+                -->
             </div>
         </div>
         <div v-if = "mode == 'update'">
@@ -104,19 +108,26 @@ export default {
             let sString=stype.charAt(0).toUpperCase()+stype.substring(1);
             let ttype=relation.targetType;
             let tString=ttype.charAt(0).toUpperCase()+ttype.substring(1);
-            let source = (this.current.title.length)?this.current.title:sString+' 1';
-            let target = tString+' 2';
+            let source = '';
+            let target = '';
             let desc="<b>Relation</b> ";
             if (relation.sourceType == this.session.type) {
+                source = (this.current.title.length)?this.current.title:sString+' 1';
+                target = tString+' 2';
                 desc+= "<em>"+source+"</em> <b>"+relation.name+"</b> <em>"+target+"</em></p><p><b>Means:</b> "+relation.description.replaceAll('SOURCE','<em>'+source+'</em>').replaceAll('TARGET','<em>'+target+'</em>')+"</p>";
                 if (relation.targetType == this.session.type) desc += "<p><b>Inverse:</b> <em>"+target+"</em> <b>"+relation.inverse+"</b> <em>"+source+"</em>";
             } else {
+                target=(this.current.title.length)?this.current.title:tString+' 2';
+                source=sString+" 1";
                 desc += target+" <b>"+relation.inverse+"</b> "+source+"</p><p><b>Means:</b> "+relation.description.replaceAll('SOURCE','<em>'+source+'</em>').replaceAll('TARGET','<em>'+target+'</em>')+"</p>"
             }            
             return desc;
         },
         selected (doc) {
-            this.$emit('selectedId',doc._id);
+            //this.$emit('selectedId',doc._id);
+            this.session.set('id',doc._id);
+            this.session.set('type',doc.type);
+            this.session.set('edit',false);
         },
         getTargets () {
             if (this.targetsSet) return this.targetsSet;

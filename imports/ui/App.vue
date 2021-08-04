@@ -44,7 +44,7 @@
     edit: false,
     id: '',
     newNodes: 7,
-    debug: true,
+    debug: false,
     set (item,newValue) {
       if (this.debug) console.log('Session setting', item,'to',newValue)
       this[item] = newValue;

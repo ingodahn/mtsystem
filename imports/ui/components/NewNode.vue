@@ -45,7 +45,7 @@ export default {
         return {
             session: this.$root.$data.session,
             current: {
-                title: "",
+                title: "NEW ENTRY - please, edit",
                 type: "",
                 description: "",
                 readMore: "",
