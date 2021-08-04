@@ -3,7 +3,7 @@
         <div class="select" data-app>
             <v-autocomplete
                 :label="selectLabel"
-                v-model="selectedId"
+                v-model="session.id"
                 hide-details="auto"
                 :items="all"
                 item-text="title"
@@ -20,7 +20,7 @@ import { UnitsCollection } from "../../api/UnitsCollection";
 export default {
     data () {
         return {
-            selectedId: this.currentId,
+            session: this.$root.$data.session,
             items: []
         }
     },
@@ -40,6 +40,9 @@ export default {
         selectLabel () {
             return "Select "+this.type+':';
         },
+        selectedId () {
+            return this.session.id;
+        }
     },
 
     meteor: {

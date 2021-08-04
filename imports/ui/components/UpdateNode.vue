@@ -39,9 +39,10 @@ import { UnitsCollection } from '../../api/UnitsCollection';
 import Sidebar from "./Sidebar.vue";
 
 export default {
-    props: ['currentId','relations','type','session'],
+    props: ['relations'],
     data () {
         return {
+            session: this.$root.$data.session,
             current: {
                 title: '',
                 description: '',
@@ -64,7 +65,7 @@ export default {
     },
     methods: {
         cancel () {
-            this.$emit('update',this.currentId);
+            this.session.set('edit',false);
         },
         save () {
             this.current.updatedAt = new Date();
@@ -84,7 +85,7 @@ export default {
                     });
                 })
             });
-            this.$emit('update',this.currentId);
+            this.session.set('edit',false);
         },
         updatedRelations (Rels) {
             this.updateRelations = Rels;
@@ -103,6 +104,12 @@ export default {
     computed: {
         currentRelation () {
             return this.session.relation;
+        },
+        type () {
+            return this.session.type;
+        },
+        currentId () {
+            return this.session.id;
         }
     }
 }

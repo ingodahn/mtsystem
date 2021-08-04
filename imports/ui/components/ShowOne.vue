@@ -27,10 +27,11 @@ import { UnitsCollection } from '../../api/UnitsCollection';
 import ShowMathDoc from "./ShowMathDoc.vue";
 import Sidebar from "./Sidebar.vue";
 export default {
-    props: ['currentId','relations','type','session'],
+    props: ['relations'],
     
     data () {
         return {
+            session: this.$root.$data.session,
             current: {title: "Default title"},
             //currentRelation: this.relations[0].id,
             showMore: false,
@@ -82,6 +83,12 @@ export default {
     computed: {
         currentRelation () {
             return this.session.relation;
+        },
+        currentId () {
+            return this.session.id;
+        },
+        type () {
+            return this.session.type;
         }
     },
     meteor: {

@@ -27,7 +27,7 @@
                     ></v-text-field>
                 </v-col>
                 <v-col xs="12" md="4">
-                    <sidebar currentId="" :type="type" :title="current.title" :relations="relations" mode="update" v-on:updatedRelations="updatedRelations" :session="session"></sidebar>
+                    <sidebar currentId="" :title="current.title" :relations="relations" mode="update" v-on:updatedRelations="updatedRelations"></sidebar>
                 </v-col>
             </v-row>
         </v-layout>
@@ -38,13 +38,15 @@
 import { UnitsCollection } from '../../api/UnitsCollection';
 import { Random } from 'meteor/random';
 import Sidebar from "./Sidebar.vue";
+
 export default {
-    props: ['type','relations','session'],
+    props: ['relations'],
     data () {
         return {
+            session: this.$root.$data.session,
             current: {
                 title: "",
-                type: this.type,
+                type: "",
                 description: "",
                 readMore: "",
                 see: "",
@@ -55,7 +57,8 @@ export default {
     components: { Sidebar },
     methods: {
         cancel () {
-            this.$emit('new','');
+            //this.$emit('new','');
+            this.session.set('edit',false);
         },
         updatedRelations (Rels) {
             this.updateRelations = Rels;
@@ -65,6 +68,8 @@ export default {
             let newId=Random.id([17]);
             this.current._id = newId;
             this.current.updatedAt = newDate;
+            this.current.type=this.session.type;
+            console.log(this.current);
            Meteor.call('insertItem',this.current);
            Object.keys(this.updateRelations).forEach(rid => {
                 Meteor.call('deleteItem',{
@@ -81,8 +86,14 @@ export default {
                     });
                 })
             });
-            this.$emit('new',newId);
-            
+            //this.$emit('new',newId);
+            this.session.set('id',newId);
+            this.session.set('edit',false);
+        }
+    },
+    computed: {
+        type () {
+            return this.session.type;
         }
     }
 }

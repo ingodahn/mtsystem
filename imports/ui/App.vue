@@ -3,11 +3,11 @@
     
     <v-app-bar app>
       <v-btn color="primary" @click="page='home'">Home</v-btn>
-      <v-btn color="primary" @click="page='subject'">Subjects</v-btn>
-      <v-btn color="primary" @click="page='concept'">Concepts</v-btn>
-      <v-btn color="primary" @click="page='theorem'">Theorems</v-btn>
-      <v-btn color="primary" @click="page='question'">Questions</v-btn>
-      <v-btn color="primary" @click="page='unit'" v-if="currentUser && currentUser.username == 'dahn'">Units</v-btn>
+      <v-btn color="primary" @click="launchAny('subject')">Subjects</v-btn>
+      <v-btn color="primary" @click="launchAny('concept')">Concepts</v-btn>
+      <v-btn color="primary" @click="launchAny('theorem')">Theorems</v-btn>
+      <v-btn color="primary" @click="launchAny('question')">Questions</v-btn>
+      <v-btn color="primary" @click="launchAny('unit')" v-if="currentUser && currentUser.username == 'dahn'">Units</v-btn>
       <v-btn color="primary" @click="page='admin'" v-if="currentUser && currentUser.username == 'dahn'">Tools</v-btn>
       <!--
       <v-btn color="primary" to="/">Home</v-btn>
@@ -25,7 +25,7 @@
       <v-container fluid>
         <home v-if="page=='home'"></home>
         <admin v-else-if="page=='admin'"></admin>
-        <any :key="page" v-else :type="page"></any>
+        <any :key="page" v-else></any>
         <!--
         <router-view></router-view>
         -->
@@ -38,12 +38,41 @@
   import Home from '/imports/ui/views/Home/Home.vue'
   import Admin from '/imports/ui/views/Admin/Admin.vue'
   import Any from '/imports/ui/views/Any.vue'
+  var session = {
+    type: '',
+    relation: '',
+    edit: false,
+    id: '',
+    newNodes: 7,
+    debug: true,
+    set (item,newValue) {
+      if (this.debug) console.log('Session setting', item,'to',newValue)
+      this[item] = newValue;
+    },
+    mode () {
+      if (this.id) {
+        if (this.edit) return "update";
+        else return "single";
+      } else {
+        if (this.edit) return "new";
+        else return "all";
+      }
+    },
+    clear () {
+      this.type = '';
+      this.relation='';
+      this.edit=false;
+      this.id='';
+    }
+  };
+
   export default {
     components: {
     },
     data() {
         return {
-          page: 'home'
+          page: 'home',
+          session: session
         };
     },
     components: {
@@ -51,7 +80,14 @@
       Admin,
       Any
     },
-    methods: {},
+    methods: {
+      launchAny(t) {
+        this.session.type=t;
+        this.session.edit=false;
+        this.session.id='';
+        this.page=t;
+      }
+    },
     meteor: {
       $subscribe: {
         'units': [],

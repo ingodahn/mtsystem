@@ -20,7 +20,7 @@
                 </v-list-item-group>
             </v-list>
             <p v-else>{{ current.title }} {{ relation.name }} nothing else.</p>
-            <div v-if="relation.targetType == type">
+            <div v-if="relation.targetType == session.type">
                 <v-list v-if="getCurrentNodeIsTarget(relation.id).length">
                     <v-subheader>{{ current.title }} {{ relation.inverse }}:</v-subheader>
                     <v-list-item-group>
@@ -36,7 +36,7 @@
             </div>
         </div>
         <div v-if = "mode == 'update'">
-            <div v-if="relation.sourceType == type" data-app>
+            <div v-if="relation.sourceType == session.type" data-app>
                 <v-autocomplete
                     label="Targets:"
                     v-model="targets"
@@ -56,17 +56,20 @@
 </template>
 
 <script>
-import { Session } from "meteor/session";
 import { UnitsCollection } from "../../api/UnitsCollection";
 
 export default {
     data () {
         return {
+            //session: this.$root.$data.session,
             // _ids of target
             targets: this.getTargets()
         }
     },
-    props: ['relation', 'id', 'type','mode','targetsSet'],
+    props: ['relation', 'mode','targetsSet'],
+    created () {
+        //this.session=this.$root.$data.session;
+    },
     watch: {
         targets: function (t) {
             this.$emit('setTarget',this.relation.id,t);
@@ -78,7 +81,7 @@ export default {
             const rds = UnitsCollection.find({
                 type: 'relation',
                 name: relationId,
-                target: this.id
+                target: this.session.id
             }).fetch().map(d => d.source);
             this.currentAbove=rds;
             rs=UnitsCollection.find({_id: {$in: rds}},{sort: { title: 1}}).fetch();
@@ -86,17 +89,17 @@ export default {
         },
         // Concepts of which the current node is a source
         getCurrentNodeIsSource (relationId) {
+            let session=this.$root.$data.session;
             const rds = UnitsCollection.find({
                 type: 'relation',
                 name: relationId,
-                source: this.id
+                source: session.id
             }).fetch().map(d => d.target);
             this.currentBelow=rds;
             rs=UnitsCollection.find({_id: {$in: rds}},{sort: { title: 1}}).fetch();
             return rs;
         },
         getRelationDescription (relation) {
-            console.log(relation);
             let stype=relation.sourceType;
             let sString=stype.charAt(0).toUpperCase()+stype.substring(1);
             let ttype=relation.targetType;
@@ -104,44 +107,44 @@ export default {
             let source = (this.current.title.length)?this.current.title:sString+' 1';
             let target = tString+' 2';
             let desc="<b>Relation</b> ";
-            console.log(relation);
-            if (relation.sourceType == this.type) {
+            if (relation.sourceType == this.session.type) {
                 desc+= "<em>"+source+"</em> <b>"+relation.name+"</b> <em>"+target+"</em></p><p><b>Means:</b> "+relation.description.replaceAll('SOURCE','<em>'+source+'</em>').replaceAll('TARGET','<em>'+target+'</em>')+"</p>";
-                if (relation.targetType == this.type) desc += "<p><b>Inverse:</b> <em>"+target+"</em> <b>"+relation.inverse+"</b> <em>"+source+"</em>";
+                if (relation.targetType == this.session.type) desc += "<p><b>Inverse:</b> <em>"+target+"</em> <b>"+relation.inverse+"</b> <em>"+source+"</em>";
             } else {
                 desc += target+" <b>"+relation.inverse+"</b> "+source+"</p><p><b>Means:</b> "+relation.description.replaceAll('SOURCE','<em>'+source+'</em>').replaceAll('TARGET','<em>'+target+'</em>')+"</p>"
             }            
             return desc;
         },
         selected (doc) {
-            //this.$emit('selected',doc);
             this.$emit('selectedId',doc._id);
         },
         getTargets () {
             if (this.targetsSet) return this.targetsSet;
-            if (! this.id) return [];
-            console.log(this.relation);
+            if (! this.$root.$data.session.id) return [];
+            //console.log(this.relation);
             return this.getCurrentNodeIsSource(this.relation.id).map(e => e._id)
         }
     },
      
     computed: {
+        session () {
+            return this.$root.$data.session;
+        },
         current () {
             
-            if (!this.id) {
+            if (!this.session.id) {
                 return {title: ""};
             }
             
-            return UnitsCollection.findOne({_id: this.id});
+            return UnitsCollection.findOne({_id: this.session.id});
         },
         targetUpdated () {
-            this.$emit('setTarget',this.type,this.targets);
+            this.$emit('setTarget',this.session.type,this.targets);
             return this.targets;
         }
     },
     meteor: {
         all() {
-            console.log(this.relation);
         return UnitsCollection.find(
             {type: this.relation.targetType},
             {sort: { title: 1}}

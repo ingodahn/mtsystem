@@ -2,14 +2,15 @@
  <v-container>
     <v-row>
         <v-col xs="12" md="8">
-            <h3>All {{ type }}s <span v-if="sameType"> and the relation <em>{{ id2relation(currentRelation).name }}</em></span></h3>      
+            <h3>All {{ session.type }}s <span v-if="sameType"> and the relation <em>{{ id2relation(session.relation).name }}</em></span></h3>      
             <p>Click node for details. Drag nodes to pin</p>
             <p v-if="currentUser">Color distinguishes 
-                <span style="background-color:green; color: white;">{{ type }}s I know</span> from 
-                <span style="background-color:yellow">{{ type }}s I am exploring</span> and
-                <span style="background-color:red; color: white;">{{ type }}s I find interesting</span>. 
+                <span style="background-color:green; color: white;">{{ session.type }}s I know</span> from 
+                <span style="background-color:yellow">{{ session.type }}s I am exploring</span> and
+                <span style="background-color:red; color: white;">{{ session.type }}s I find interesting</span>. 
             </p>
-            <p>The {{ type }}s, that have been updated in the last 
+            <!-- This bypasses session.set: !? -->
+            <p>The {{ session.type }}s, that have been updated in the last 
                 <select v-model="session.newNodes">
                     <option>1</option>
                     <option>2</option>
@@ -18,7 +19,7 @@
                     <option>14</option>
                     <option>30</option>
                 </select>      
-            days, are marked with an <span style="border:solid orange; padding: 1px;">orange ring</span>.
+            days, are marked with an <span style="border:solid orange; border-radius: 10px; padding: 1px;">orange ring</span>.
             </p>
             <v-row xs="12" md="8" align="center">
                 <v-col
@@ -33,10 +34,10 @@
                     ></v-select>
                 </v-col>
             </v-row>
-            <ConceptMap :key="currentRelation+newNodes+orientation" :cmap="allNodes" v-on:nodeclicked="mapCurrent" :orientation="orientation"></ConceptMap>
+            <ConceptMap :key="session.relation+newNodes+orientation" :cmap="allNodes" v-on:nodeclicked="mapCurrent" :orientation="orientation"></ConceptMap>
         </v-col>
         <v-col xs="12" md="4">
-            <sidebar currentId='' title='' :type="type" :relations="relations" mode="list" :session="session"></sidebar>
+            <sidebar :relations="relations" title='' mode="list"></sidebar>
         </v-col>
     </v-row>
  </v-container>
@@ -50,9 +51,10 @@ import Sidebar from "./Sidebar.vue";
 
 
 export default {
-    props: ['type','relations','session'],
+    props: ['relations'],
     data () {
         return {
+            session: this.$root.$data.session,
             orientations: [
                 {text: 'None', value: null},
 			  	{text: 'Bottom up', value: 'bu'} ,
@@ -83,7 +85,7 @@ export default {
     computed: {
         allNodes () {
             var it = {}, nodeIds = []
-            UnitsCollection.find({type: this.type}).fetch().forEach(c => {
+            UnitsCollection.find({type: this.session.type}).fetch().forEach(c => {
                 it[c._id]=c.title;
                 nodeIds.push(c._id);
             });
@@ -100,7 +102,7 @@ export default {
            if (this.sameType) {
                 linkRels =UnitsCollection.find({
                     type: 'relation', 
-                    name: this.currentRelation, 
+                    name: this.session.relation, 
                     //Same-Type-Links only!
                     source: {$in: nodeIds}
                 }).fetch();
@@ -128,11 +130,8 @@ export default {
             });
             return {"nodes": nodes, "links": links};
         },
-        currentRelation () {
-            return this.session.relation;
-        },
         sameType () {
-            const r=this.id2relation(this.currentRelation);
+            const r=this.id2relation(this.session.relation);
             return (r.sourceType == r.targetType);
         },
         newNodes () {

@@ -5,8 +5,8 @@
                    
                     <v-btn-toggle v-model="sidebar">
                         <v-btn color="primary">Relation</v-btn>
-                        <v-btn color="primary" v-if="currentId && mode == 'list'">Map</v-btn>
-                        <v-btn color="primary" v-if="currentUser && currentId">Note</v-btn>
+                        <v-btn color="primary" v-if="session.id && mode == 'list'">Map</v-btn>
+                        <v-btn color="primary" v-if="currentUser && session.id">Note</v-btn>
                     </v-btn-toggle>
                     <div v-if="sidebar==0">
                         <div v-if="relations.length > 1">
@@ -21,9 +21,9 @@
                             </v-select>
                             </div>
                         </div>
-                        <relation :key="currentId+mode" :id="currentId" :relation="id2relation(currentRelation)" :type="type" :mode="mode" v-on:setTarget="setTarget" v-on:selectedId="setNode" :targetsSet="targetsSet(currentRelation)"></relation>
+                        <relation :key="session.id+mode" :relation="id2relation(currentRelation)" :mode="mode" v-on:setTarget="setTarget" v-on:selectedId="setNode" :targetsSet="targetsSet(currentRelation)"></relation>
                     </div>
-                    <UserNotes v-if="currentUser && currentId && sidebar==2" :title="title" :currentNote="currentNote" :key="currentId"></UserNotes>
+                    <UserNotes v-if="currentUser && session.id && sidebar==2" :title="title" :currentNote="currentNote" :key="currentId"></UserNotes>
                     <div v-if="currentUser && currentId && sidebar==1">
                         <v-expansion-panels accordion>
                             <v-expansion-panel>
@@ -69,11 +69,12 @@ import Relation from "./Relation.vue";
 export default {
     data () {
         return {
+            session: this.$root.$data.session,
             sidebar: 0,
             updateRelations: {},
         }
     },
-    props: ['currentId','type','title','relations','mode', 'session'],
+    props: ['title','relations','mode'],
     components: {
         UserNotes,
         ConceptMap,
@@ -86,7 +87,7 @@ export default {
         },
         id2RelationName(id) {
             const r=this.id2relation(id);
-            return (r.sourceType == this.type)?r.name:r.inverse;
+            return (r.sourceType == this.session.type)?r.name:r.inverse;
         },
         setTarget (relationId,targets) {
             this.updateRelations[relationId]=targets;
@@ -98,7 +99,7 @@ export default {
         },
         neighbourhood(d) {
             var it = {}, nodes=[], links = [];
-            UnitsCollection.find({type: this.type}).fetch().forEach(c => {
+            UnitsCollection.find({type: this.session.type}).fetch().forEach(c => {
                 it[c._id]=c.title;
             });
             const cid=this.currentId;
@@ -158,9 +159,15 @@ export default {
         },
         setNode (id) {
             this.$emit('setNode',id);
+        },
+        type () {
+            return this.session.type;
         }
     },
     computed: {
+        currentId () {
+            return this.session.id;
+        },
         currentNote() {
             if (this.currentId) {
                 let currentNote = UnitsCollection.findOne({
@@ -181,13 +188,12 @@ export default {
             }
         },
         currentRelation () {
-            console.log(this.session);
             return this.session.relation;
         },
         typedRelations () {
             let tr=[];
             this.relations.forEach(r => {
-                tr.push({text: (r.sourceType == this.type)?r.name:r.inverse, value: r.id})
+                tr.push({text: (r.sourceType == this.session.type)?r.name:r.inverse, value: r.id})
             });
             return tr;
         },

@@ -26,6 +26,7 @@ import { Template } from 'meteor/templating';
 Template.registerHelper('gCurrentId', function () { return Session.get('currentId') });
 */
 
+
 Meteor.startup(() => {
   new Vue({
     router,
