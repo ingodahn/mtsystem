@@ -19,9 +19,7 @@
                     </v-list-item>
                 </v-list-item-group>
             </v-list>
-            <!--
-            <p v-else>{{ current.title }} {{ relation.name }} nothing else.</p>
-            -->
+            <p v-else>{{ current.title }} {{ relation.name }} nothing else in this system.</p>
             <div v-if="relation.targetType == session.type">
                 <v-list v-if="getCurrentNodeIsTarget(relation.id).length">
                     <v-subheader>{{ current.title }} {{ relation.inverse }}:</v-subheader>
@@ -34,9 +32,7 @@
                         </v-list-item>
                     </v-list-item-group>
                 </v-list>
-                <!--
-                <p v-else>{{ current.title }} {{ relation.inverse }} nothing else.</p>
-                -->
+                <p v-else>{{ current.title }} {{ relation.inverse }} nothing else in this system.</p>
             </div>
         </div>
         <div v-if = "mode == 'update'">
