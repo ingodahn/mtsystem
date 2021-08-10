@@ -13,6 +13,9 @@
                         <div v-if="current.see">
                             <a :href="current.see" target="_blank">See also</a>
                         </div>
+                        <div>
+                            <a :href="wikiUrl" target="_blank">MathTrek-Wiki</a> (comments, discussions)
+                        </div>
                 </v-col>
                 <v-col xs="12" md="4">
                     <sidebar :currentId="currentId" :title="current.title" :type="type" :relations="relations" mode="list" v-on:setNode="setNode" :session="session"></sidebar>
@@ -89,6 +92,13 @@ export default {
         },
         type () {
             return this.session.type;
+        },
+        wikiUrl () {
+            const base = "https://wiki.mathtrek.eu?title=";
+            let title=this.current.title.replaceAll(" ","_",);
+            title=title.replaceAll("'","%27");
+            title=title.replaceAll("^","%5E")
+            return base+title;
         }
     },
     meteor: {
