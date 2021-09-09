@@ -31,6 +31,14 @@ export const relations = [
         description: "A proof of \"TARGET\" can use \"SOURCE\"."
     },
     {
+        sourceType: 'theorem',
+        targetType: 'theorem',
+        id: 'isSpecial', 
+        name: 'is a special case of', 
+        inverse: 'is a generalization of',
+        description: "\"SOURCE\" is an immediate consequence of the more general \"TARGET\"."
+    },
+    {
         sourceType: 'question',
         targetType: 'question',
         id: 'isBelow', 
