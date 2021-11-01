@@ -9,7 +9,6 @@ import Subject from '../imports/ui/views/Subject/Subject.vue'
 import Concepts from '../imports/ui/views/Concepts/Concepts.vue'
 import Theorem from '../imports/ui/views/Theorem/Theorem.vue'
 import Question from '../imports/ui/views/Question/Question.vue'
-import Example from '../imports/ui/views/Example/Example.vue'
 import Admin from '../imports/ui/views/Admin/Admin.vue'
 import Any from '../imports/ui/views/Any.vue'
 
@@ -37,11 +36,6 @@ const routes = [
     {
         path: "/theorem",
         name: "Theorem",
-        component: Theorem
-    },
-    {
-        path: "/example",
-        name: "Example",
         component: Theorem
     },
     {
