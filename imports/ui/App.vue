@@ -6,19 +6,10 @@
       <v-btn color="primary" @click="launchAny('subject')">Subjects</v-btn>
       <v-btn color="primary" @click="launchAny('concept')">Concepts</v-btn>
       <v-btn color="primary" @click="launchAny('theorem')">Theorems</v-btn>
+      <v-btn color="primary" @click="launchAny('example')">Examples</v-btn>
       <v-btn color="primary" @click="launchAny('question')">Questions</v-btn>
       <v-btn color="primary" @click="launchAny('unit')" v-if="currentUser && currentUser.username == 'dahn'">Units</v-btn>
       <v-btn color="primary" @click="page='admin'" v-if="currentUser && currentUser.username == 'dahn'">Tools</v-btn>
-      <!--
-      <v-btn color="primary" to="/">Home</v-btn>
-      <v-btn color="primary" to="/subject">Subjects</v-btn>
-      <v-btn color="primary" to="/concepts">Concepts</v-btn>
-      <v-btn color="primary" to="/theorem">Theorems</v-btn>
-      <v-btn color="primary" to="/question">Questions</v-btn>
-      <v-btn color="primary" to="/unit" v-if="currentUser && currentUser.username == 'dahn'">Units</v-btn>
-      <v-btn color="primary" to="/admin" v-if="currentUser && currentUser.username == 'dahn'">Tools</v-btn>
-      &nbsp;
-      -->
       <div class="loading" v-if="!$subReady.units">Loading...</div>
     </v-app-bar>
     <v-main>

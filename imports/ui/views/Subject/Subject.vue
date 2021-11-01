@@ -18,7 +18,7 @@ export default {
                 {
                     id: 'requires',
                     name: 'requires knowledge from',
-                    inverse: 'is used in subject',
+                    inverse: 'is used in',
                     description: "Learning about some content in SOURCE requires some knowledge from subject TARGET"
                 }
             ],

@@ -12,7 +12,7 @@ export const relations = [
         targetType: 'subject',
         id: 'requires',
         name: 'requires knowledge from',
-        inverse: 'is used in subject',
+        inverse: 'is used in',
         description: "Learning about some content in SOURCE requires some knowledge from subject TARGET"
     },
     {   sourceType: 'concept',
@@ -86,5 +86,13 @@ export const relations = [
         name: 'is used in subject', 
         inverse: 'uses concept',
         description: "Concept SOURCE is important in subject TARGET."
+    },
+    {
+        sourceType: 'example',
+        targetType: 'concept',
+        id: 'exampleOf', 
+        name: 'is an example for a', 
+        inverse: 'has example',
+        description: "\"SOURCE\" is an example of a \"TARGET\"."
     },
 ];

@@ -9,17 +9,19 @@
             </v-expansion-panel>
         </v-expansion-panels>
         <div v-if="mode == 'list' && current.title">
-            <v-list v-if="getCurrentNodeIsSource(relation.id).length">
-                <v-subheader>{{ current.title }} {{ relation.name }}:</v-subheader>
-                <v-list-item-group>
-                    <v-list-item v-for="item in getCurrentNodeIsSource(relation.id)" :key="item._id" @click="selected(item)">                           
-                        <v-list-item-content>
-                            <v-list-item-title v-text="item.title"></v-list-item-title>
-                        </v-list-item-content>                               
-                    </v-list-item>
-                </v-list-item-group>
-            </v-list>
-            <p v-else>{{ current.title }} {{ relation.name }} nothing else in this system.</p>
+            <div v-if="relation.sourceType == session.type">
+                <v-list v-if="getCurrentNodeIsSource(relation.id).length">
+                    <v-subheader>{{ current.title }} {{ relation.name }}:</v-subheader>
+                    <v-list-item-group>
+                        <v-list-item v-for="item in getCurrentNodeIsSource(relation.id)" :key="item._id" @click="selected(item)">                           
+                            <v-list-item-content>
+                                <v-list-item-title v-text="item.title"></v-list-item-title>
+                            </v-list-item-content>                               
+                        </v-list-item>
+                    </v-list-item-group>
+                </v-list>
+                <p v-else>{{ current.title }} {{ relation.name }} nothing else in this system.</p>
+            </div>
             <div v-if="relation.targetType == session.type">
                 <v-list v-if="getCurrentNodeIsTarget(relation.id).length">
                     <v-subheader>{{ current.title }} {{ relation.inverse }}:</v-subheader>
