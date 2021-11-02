@@ -2,6 +2,14 @@ export const relations = [
     {
         sourceType: 'subject',
         targetType: 'subject',
+        id: 'SisBelowS', 
+        name: 'is a part of', 
+        inverse: 'has as a part',
+        description: "Every complete description of TARGET must contain a complete description of SOURCE."
+    },
+    {
+        sourceType: 'subject',
+        targetType: 'subject',
         id: 'isBelow', 
         name: 'is a part of', 
         inverse: 'has as a part',
@@ -17,10 +25,32 @@ export const relations = [
     },
     {   sourceType: 'concept',
         targetType: 'concept',
+        id: 'CisBelowC', 
+        name: 'is a kind of', 
+        inverse: 'is an abstraction of',
+        description: "Every SOURCE can be interpreted as an instance of TARGET in a canonical way."
+    },
+    {   sourceType: 'concept',
+        targetType: 'concept',
         id: 'isBelow', 
         name: 'is a kind of', 
         inverse: 'is an abstraction of',
         description: "Every SOURCE can be interpreted as an instance of TARGET in a canonical way."
+    },
+    {   sourceType: 'concept',
+        targetType: 'concept',
+        id: 'exampleOf', 
+        name: 'is an example of', 
+        inverse: 'has example',
+        description: "The concept SOURCE provides an example for the concept TARGET."
+    },
+    {
+        sourceType: 'theorem',
+        targetType: 'theorem',
+        id: 'TisBelowT', 
+        name: 'helps proving', 
+        inverse: 'can be proved using',
+        description: "A proof of \"TARGET\" can use \"SOURCE\"."
     },
     {
         sourceType: 'theorem',
@@ -37,6 +67,14 @@ export const relations = [
         name: 'is a special case of', 
         inverse: 'is a generalization of',
         description: "\"SOURCE\" is an immediate consequence of the more general \"TARGET\"."
+    },
+    {
+        sourceType: 'question',
+        targetType: 'question',
+        id: 'QisBelowQ', 
+        name: 'helps answering', 
+        inverse: 'can be answered best, after answering',
+        description: "Answering SOURCE will help answering TARGET."
     },
     {
         sourceType: 'question',
@@ -86,13 +124,5 @@ export const relations = [
         name: 'is used in subject', 
         inverse: 'uses concept',
         description: "Concept SOURCE is important in subject TARGET."
-    },
-    {
-        sourceType: 'example',
-        targetType: 'concept',
-        id: 'exampleOf', 
-        name: 'is an example for a', 
-        inverse: 'has example',
-        description: "\"SOURCE\" is an example of a \"TARGET\"."
     },
 ];

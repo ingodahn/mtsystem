@@ -6,7 +6,7 @@ Meteor.methods({
         if (!this.userId) {
             throw new Meteor.Error('Insert not authorized');
         }
-        const pattern = Match.ObjectIncluding({ type: Match.OneOf("relation","concept","unit","subject","note","theorem","question","example")});
+        const pattern = Match.ObjectIncluding({ type: Match.OneOf("relation","concept","unit","subject","note","theorem","question")});
         var myTest=Match.test(item,pattern);
         if (myTest) {
             var newId=UnitsCollection.insert(item);
@@ -21,7 +21,7 @@ Meteor.methods({
         }
         const pattern = Match.ObjectIncluding({ 
             _id: String, 
-            type: Match.OneOf("relation","concept","unit","subject","note","theorem","question","example")
+            type: Match.OneOf("relation","concept","unit","subject","note","theorem","question")
         });
         var myTest=Match.test(item,pattern);
         if (myTest) {

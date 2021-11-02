@@ -6,7 +6,6 @@
       <v-btn color="primary" @click="launchAny('subject')">Subjects</v-btn>
       <v-btn color="primary" @click="launchAny('concept')">Concepts</v-btn>
       <v-btn color="primary" @click="launchAny('theorem')">Theorems</v-btn>
-      <v-btn color="primary" @click="launchAny('example')">Examples</v-btn>
       <v-btn color="primary" @click="launchAny('question')">Questions</v-btn>
       <v-btn color="primary" @click="launchAny('unit')" v-if="currentUser && currentUser.username == 'dahn'">Units</v-btn>
       <v-btn color="primary" @click="page='admin'" v-if="currentUser && currentUser.username == 'dahn'">Tools</v-btn>

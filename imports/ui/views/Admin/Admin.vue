@@ -11,6 +11,7 @@
 import { UnitsCollection } from "../../../api/UnitsCollection";
 import { mtdata } from "./mtData.js";
 import Vue from 'vue'
+
 export default {
   data () {
     return {
@@ -24,8 +25,9 @@ export default {
         makeExport() {
             const allDocs=UnitsCollection.find({}).fetch();
             var expString="export const mtdata = " + JSON.stringify(allDocs)+';';
-            uriContent = "data:application/octet-stream," + encodeURIComponent(expString);
-            newWindow = window.open(uriContent, 'neuesDokument');
+            var FileSaver=require('file-saver');
+            var blob=new Blob([expString], {type: "text/plain;charset=utf-8"})
+            FileSaver.saveAs(blob,"mtData.js");
         },
         makeImport () {
           if (confirm("Do you REALLY want to replace all data on "+window.location.href+'?')) {
