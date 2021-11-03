@@ -9,12 +9,6 @@ export default {
         return {
             type: 'theorem',
             relations: [
-                {
-                    id: 'isBelow', 
-                    name: 'helps proving', 
-                    inverse: 'can be proved using',
-                    description: "A proof of \"TARGET\" can use \"SOURCE\"."
-                }
             ],
         }
     },

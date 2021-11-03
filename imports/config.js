@@ -7,6 +7,7 @@ export const relations = [
         inverse: 'has as a part',
         description: "Every complete description of TARGET must contain a complete description of SOURCE."
     },
+    /*
     {
         sourceType: 'subject',
         targetType: 'subject',
@@ -15,6 +16,7 @@ export const relations = [
         inverse: 'has as a part',
         description: "Every complete description of TARGET must contain a complete description of SOURCE."
     },
+    */
     {
         sourceType: 'subject',
         targetType: 'subject',
@@ -30,6 +32,7 @@ export const relations = [
         inverse: 'is an abstraction of',
         description: "Every SOURCE can be interpreted as an instance of TARGET in a canonical way."
     },
+    /*
     {   sourceType: 'concept',
         targetType: 'concept',
         id: 'isBelow', 
@@ -37,6 +40,7 @@ export const relations = [
         inverse: 'is an abstraction of',
         description: "Every SOURCE can be interpreted as an instance of TARGET in a canonical way."
     },
+    */
     {   sourceType: 'concept',
         targetType: 'concept',
         id: 'exampleOf', 
@@ -52,6 +56,7 @@ export const relations = [
         inverse: 'can be proved using',
         description: "A proof of \"TARGET\" can use \"SOURCE\"."
     },
+    /*
     {
         sourceType: 'theorem',
         targetType: 'theorem',
@@ -60,6 +65,7 @@ export const relations = [
         inverse: 'can be proved using',
         description: "A proof of \"TARGET\" can use \"SOURCE\"."
     },
+    */
     {
         sourceType: 'theorem',
         targetType: 'theorem',

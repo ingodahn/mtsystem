@@ -99,6 +99,7 @@ export default {
             }).fetch().map(d => d.target);
             this.currentBelow=rds;
             rs=UnitsCollection.find({_id: {$in: rds}},{sort: { title: 1}}).fetch();
+            console.log('Nr. of targets: '+rs.length);
             return rs;
         },
         getRelationDescription (relation) {
