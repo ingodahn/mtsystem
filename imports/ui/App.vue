@@ -7,14 +7,16 @@
       <v-btn color="primary" @click="launchAny('concept')">Concepts</v-btn>
       <v-btn color="primary" @click="launchAny('theorem')">Theorems</v-btn>
       <v-btn color="primary" @click="launchAny('question')">Questions</v-btn>
-      <v-btn color="primary" @click="launchAny('unit')" v-if="currentUser && currentUser.username == 'dahn'">Units</v-btn>
-      <v-btn color="primary" @click="page='admin'" v-if="currentUser && currentUser.username == 'dahn'">Tools</v-btn>
+      <v-btn color="secondary" @click="launchAny('unit')" v-if="currentUser && currentUser.username == 'dahn'">Units</v-btn>
+      <v-btn color="secondary" @click="page='toc'" v-if="currentUser && (currentUser.username == 'dahn' || currentUser.username == 'editor')">TOC</v-btn>
+      <v-btn color="warning" @click="page='admin'" v-if="currentUser && currentUser.username == 'dahn'">Tools</v-btn>
       <div class="loading" v-if="!$subReady.units">Loading...</div>
     </v-app-bar>
     <v-main>
       <v-container fluid>
         <home v-if="page=='home'"></home>
         <admin v-else-if="page=='admin'"></admin>
+        <toc v-else-if="page=='toc'"></toc>
         <any :key="page" v-else></any>
         <!--
         <router-view></router-view>
@@ -27,6 +29,7 @@
 <script>
   import Home from '/imports/ui/views/Home/Home.vue'
   import Admin from '/imports/ui/views/Admin/Admin.vue'
+  import Toc from '/imports/ui/views/Toc/Toc.vue'
   import Any from '/imports/ui/views/Any.vue'
   var session = {
     type: '',
@@ -68,6 +71,7 @@
     components: {
       Home,
       Admin,
+      Toc,
       Any
     },
     methods: {
