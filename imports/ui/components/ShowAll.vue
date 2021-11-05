@@ -3,7 +3,7 @@
     <v-row>
         <v-col xs="12" md="8">
             <h3>All {{ session.type }}s <span v-if="sameType"> and the relation <em>{{ id2relation(session.relation).name }}</em></span></h3>      
-            <p>Click node for details. Drag nodes to pin</p>
+            <p>Click node for details. Drag nodes to pin. Size indicates weight w.r.t. all relations.</p>
             <p v-if="currentUser">Color distinguishes 
                 <span style="background-color:green; color: white;">{{ session.type }}s I know</span> from 
                 <span style="background-color:yellow">{{ session.type }}s I am exploring</span> and
@@ -122,7 +122,8 @@ export default {
                 let updated=new Date(UnitsCollection.findOne({_id: c}).updatedAt).getTime();
                 let isNew = (updated && updated > back)?true:false;
                 if (nodeStatus[c]) group=nodeStatus[c];
-                nodes.push({"id": c, "title": it[c], "color": color, "isNew": isNew});
+                let nodeval=UnitsCollection.find({$or: [{target: c, type: 'relation'},{source: c, type: 'relation'}]}).fetch().length/3; // Denominator may be varied for readability
+                nodes.push({"id": c, "title": it[c], "color": color, "isNew": isNew, val: nodeval});
             });
             
             linkRels.forEach(r => {
