@@ -2,7 +2,7 @@
 <div>
 
 <div class="container" ref="conti">
-	<div id="graph"></div>
+	<div id="graph" ref="graph"></div>
 </div>
 </div>
 
@@ -28,6 +28,31 @@
 		  }
 	  },
 	  mounted() {
+		const Graph = ForceGraph3D()
+		(document.getElementById('graph'))
+			.graphData(this.cmap)
+			.width(this.$refs.graph.clientWidth)
+			.nodeId('id')
+			.nodeLabel(node => `${node.title}`)
+			.linkDirectionalArrowLength(10)
+			.nodeAutoColorBy('group')
+			.onNodeDragEnd(node => {
+				node.fx = node.x;
+				node.fy = node.y;
+				node.fz = node.z;
+			})
+			.dagMode(this.orientation)
+			.onNodeClick(node => this.nodeClicked(node));
+			
+		// ms to cool down
+		  Graph.cooldownTime(2000);
+		  // Zoom to fit
+		  Graph.d3Force('center', null);
+
+		  // fit to canvas when engine stops
+		  Graph.onEngineStop(() => Graph.zoomToFit(500));
+		  
+		  /*
 		  const NODE_R = 8;
 		  const Graph = ForceGraph()
 		  (document.getElementById('graph'))
@@ -68,6 +93,7 @@
 
 		  // fit to canvas when engine stops
 		  Graph.onEngineStop(() => Graph.zoomToFit(500));
+		  */
 	},
   }
 			

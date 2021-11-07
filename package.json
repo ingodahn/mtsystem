@@ -9,17 +9,17 @@
     "visualize": "meteor --production --extra-packages bundle-visualizer"
   },
   "dependencies": {
-    "@babel/runtime": "^7.14.6",
+    "@babel/runtime": "^7.16.0",
     "bcrypt": "^5.0.1",
     "file-saver": "^2.0.5",
-    "meteor-node-stubs": "^1.0.1",
+    "meteor-node-stubs": "^1.1.0",
     "v-markdown": "^1.0.2",
-    "vue": "^2.6.12",
+    "vue": "^2.6.14",
     "vue-cytoscape": "^1.0.8",
     "vue-meteor-tracker": "^2.0.0-beta.5",
-    "vue-router": "^3.5.1",
+    "vue-router": "^3.5.3",
     "vue-session": "^1.0.0",
-    "vuetify": "^2.5.1"
+    "vuetify": "^2.5.12"
   },
   "meteor": {
     "mainModule": {
@@ -30,6 +30,6 @@
   },
   "devDependencies": {
     "eslint": "^7.32.0",
-    "prettier": "^2.3.2"
+    "prettier": "^2.4.1"
   }
 }
