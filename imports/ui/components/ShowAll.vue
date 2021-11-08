@@ -19,7 +19,7 @@
                     <option>14</option>
                     <option>30</option>
                 </select>      
-            days, are marked with an <span style="border:solid orange; border-radius: 10px; padding: 1px;">orange ring</span>.
+            days, <span v-html="markNew"></span>.
             </p>
             <v-row xs="12" md="8" align="center">
                 <v-col
@@ -33,8 +33,19 @@
                     v-model="orientation"
                     ></v-select>
                 </v-col>
+                <v-col
+                    class="d-flex"
+                    cols="12"
+                    sm="6"
+                >
+                    <v-select
+                    :items="views"
+                    label="View"
+                    v-model="view"
+                    ></v-select>
+                </v-col>
             </v-row>
-            <ConceptMap :key="session.relation+newNodes+orientation" :cmap="allNodes" v-on:nodeclicked="mapCurrent" :orientation="orientation"></ConceptMap>
+            <ConceptMap :key="session.relation+newNodes+orientation+view" :cmap="allNodes" v-on:nodeclicked="mapCurrent" :orientation="orientation" :view="view"></ConceptMap>
         </v-col>
         <v-col xs="12" md="4">
             <sidebar :relations="relations" title='' mode="list"></sidebar>
@@ -64,7 +75,9 @@ export default {
 				{text: 'Out', value: 'radialout'} ,
 				{text: 'In', value: 'radialin'} 
 			],
-            orientation: null
+            orientation: null,
+            views: ['2D', '3D'],
+            view: '2D'
         }
     },
     components: {
@@ -137,6 +150,9 @@ export default {
         },
         newNodes () {
             return this.session.newNodes;
+        },
+        markNew () {
+            return (this.view == '2D')?"are marked with an <span style='border:solid orange; border-radius: 10px; padding: 1px;'>orange ring</span>":"are shown as a ring";
         }
     },
 

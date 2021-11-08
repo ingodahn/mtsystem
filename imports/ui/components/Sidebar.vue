@@ -52,7 +52,7 @@
                             </v-expansion-panel>
                         </v-expansion-panels>
                         
-                        <ConceptMap :key="currentId+currentRelation+newNodes" :cmap="neighbourhood(2)" v-on:nodeclicked="setNode" orientation=null></ConceptMap>
+                        <ConceptMap :key="currentId+currentRelation+newNodes" :cmap="neighbourhood(2)" v-on:nodeclicked="setNode" orientation=null view="2D"></ConceptMap>
                     </div>
                 </v-col>
             </v-row>
