@@ -76,7 +76,7 @@ export default {
 				{text: 'In', value: 'radialin'} 
 			],
             orientation: null,
-            views: ['2D', '3D'],
+            //views: ['2D', '3D'],
             view: '2D'
         }
     },
@@ -85,6 +85,7 @@ export default {
         Sidebar
     },
     mounted () {
+        //console.log(this.currentUser.username)
         
     },
     methods: {
@@ -96,6 +97,9 @@ export default {
         }
     },
     computed: {
+        views () {
+            return (this.currentUser && this.currentUser.username == 'dahn')? ['2D', '3D','VR']: ['2D','3D'];
+        },
         allNodes () {
             var it = {}, nodeIds = []
             UnitsCollection.find({type: this.session.type}).fetch().forEach(c => {

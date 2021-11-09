@@ -2,6 +2,7 @@
 <div>
 
 <div class="container" ref="conti">
+	
 	<div id="graph" ref="graph"></div>
 </div>
 </div>
@@ -14,7 +15,6 @@
 	  props: ['cmap','orientation'],
 	  data () {
 		  return {
-			  
 		  }
 	  },
 	  watch: {
