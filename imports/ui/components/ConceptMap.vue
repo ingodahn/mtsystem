@@ -4,7 +4,11 @@
 <div class="container" ref="conti">
 	<Map2D v-if="view=='2D'" :cmap="cmap" :orientation="orientation" v-on:nodeclicked="nodeClicked"></Map2D>
 	<Map3D v-if="view=='3D'" :cmap="cmap" :orientation="orientation" v-on:nodeclicked="nodeClicked"></Map3D>
-	<MapAFrame v-if="view=='VR'" :cmap="cmap" :orientation="orientation" v-on:nodeclicked="nodeClicked"></MapAFrame>
+	<MapVR v-if="view=='VR'" :cmap="cmap" :orientation="orientation" v-on:nodeclicked="nodeClicked"></MapVR>
+	<!--
+	<MapAFrame v-if="view=='AFrame'" :cmap="cmap" :orientation="orientation" v-on:nodeclicked="nodeClicked"></MapAFrame>
+	-->
+	<SaveMap v-if="currentUser.username" :map="cmap"></SaveMap>
 </div>
 </div>
 
@@ -13,7 +17,10 @@
   <script>
   import Map2D from "./Map2D.vue";
   import Map3D from "./Map3D.vue";
-  import MapAFrame from "./MapAFrame.vue";
+  import MapVR from "./MapVR.vue";
+  //import MapAFrame from "./MapAFrame.vue";
+  import SaveMap from "./SaveMap.vue";
+
   export default {
 	  props: ['cmap','orientation','view'],
 	  data () {
@@ -27,8 +34,11 @@
 	  components: {
 		Map2D,
 		Map3D,
-		MapAFrame  
-	  },
+		MapVR,
+		//MapAFrame,
+		SaveMap
+	  }, 
+	
 	  computed: {
 	  },
 	  methods: {
@@ -38,6 +48,11 @@
 	  },
 	  mounted() {
 	},
+	meteor: {
+        currentUser() {
+            return Meteor.user();
+        },
+    }
   }
 			
   </script>

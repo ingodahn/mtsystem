@@ -98,7 +98,9 @@ export default {
     },
     computed: {
         views () {
-            return (this.currentUser && this.currentUser.username == 'dahn')? ['2D', '3D','VR']: ['2D','3D'];
+            return (this.currentUser && this.currentUser.username == 'dahn')? ['2D', '3D','VR',
+            //'AFrame'
+            ]: ['2D','3D'];
         },
         allNodes () {
             var it = {}, nodeIds = []
