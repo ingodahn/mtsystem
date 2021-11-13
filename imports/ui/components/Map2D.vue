@@ -27,11 +27,16 @@
 			  this.$emit('nodeclicked',node.id);
 		  }
 	  },
+	  computed: {
+		  myMap () {
+			  return JSON.parse(JSON.stringify(this.cmap));
+		  },
+	  },
 	  mounted() {
 		const NODE_R = 8;
 		const Graph = ForceGraph()
 		(document.getElementById('graph'))
-		.graphData(this.cmap)
+		.graphData(this.myMap)
 		.linkDirectionalArrowLength(10)
 		.nodeRelSize(6)
 		.nodeId('id')

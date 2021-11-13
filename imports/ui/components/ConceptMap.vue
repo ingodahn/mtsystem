@@ -15,9 +15,10 @@
 </template>
 
   <script>
-  import Map2D from "./Map2D.vue";
-  import Map3D from "./Map3D.vue";
   import MapVR from "./MapVR.vue";
+  import Map3D from "./Map3D.vue";
+  import Map2D from "./Map2D.vue";
+  
   //import MapAFrame from "./MapAFrame.vue";
   import SaveMap from "./SaveMap.vue";
 

@@ -20,6 +20,9 @@
 		  
 	  },
 	  computed: {
+		  myMap () {
+			return JSON.parse(JSON.stringify(this.cmap));
+		  }
 	  },
 	  methods: {
 		  nodeClicked(node) {
@@ -29,7 +32,7 @@
 	  mounted() {
 		const Graph = ForceGraphVR();
 		Graph(document.getElementById('graph'))
-			.graphData(this.cmap)
+			.graphData(this.myMmap)
 			.width(this.$refs.graph.clientWidth)
 			.nodeId('id')
 			.nodeLabel(node => `${node.title}`)
