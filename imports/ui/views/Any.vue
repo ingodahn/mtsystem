@@ -60,7 +60,7 @@ export default {
         ShowAll,
         ShowOne,
         NewNode,
-        UpdateNode
+        UpdateNode,
     },
     created () {
         this.$root.$data.session.set('relation',this.initialRelation);
