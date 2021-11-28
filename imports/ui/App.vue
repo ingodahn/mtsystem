@@ -39,6 +39,7 @@
     relation: '',
     edit: false,
     id: '',
+    view: '3D',
     newNodes: 7,
     debug: false,
     set (item,newValue) {

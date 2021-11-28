@@ -1,7 +1,14 @@
 <template>
 <div>
-    <h2>SpaceMap</h2>
-    <ConceptMap :key="session.relation+newNodes+orientation+view" :cmap="allNodes" v-on:nodeclicked="selectLocal" :orientation="orientation" view="3D"></ConceptMap>
+    <v-row>
+        <v-col xs="12" md="10">
+            <ConceptMap :key="session.relation+newNodes+orientation+view" ref="spacemap" :cmap="allNodes" v-on:nodeclicked="nodeClicked" :orientation="orientation" view="3D" :zoomTo="zoomTarget"></ConceptMap>
+        </v-col>
+        <v-col xs="12" md="2">
+            <h2>SpaceMap</h2>
+            <v-btn color="primary" @click="zoomTo('out')">Zoom Out</v-btn>
+        </v-col>
+    </v-row>
 </div>
 </template>
 
@@ -13,7 +20,8 @@ export default {
         return {
             session: this.$root.$data.session,
             orientation: null,
-            view: '3D'
+            view: '3D',
+            zoomTarget: 'out'
         };
     },
     props: ['relations'],
@@ -25,8 +33,18 @@ export default {
             return this.relations.find(e => e.id == id);
         },
         selectLocal(node) {
+            this.session.id=node;
             this.$emit('selectLocal', node);
-        }        
+        },
+        zoomTo (id) {
+            console.log('zoomTo in Spacemap',id);
+            this.zoomTarget = id;
+        },
+        nodeClicked(nodeId) {
+			this.zoomTarget=nodeId;
+            console.log('zoomTarget in SpaceMap is now ',this.zoomTarget);
+			this.$emit('spacemapclicked',nodeId);
+		}     
     },
     computed: {
            allNodes () {
@@ -64,11 +82,11 @@ export default {
                 const back = new Date().getTime()-parseInt(this.newNodes)*24*60*60*1000;
                 switch (nodeStatus[c]) {
                     case "100": color="green"; break;
-                    //case "2": color="yellow"; break;
+                    case "2": color="yellow"; break;
                     case "150": color="red"; break;
                     default: color="lightblue";
                 }
-                if (c==this.session.id) color="yellow";
+    
                 let updated=new Date(UnitsCollection.findOne({_id: c}).updatedAt).getTime();
                 let isNew = (updated && updated > back)?true:false;
                 if (nodeStatus[c]) group=nodeStatus[c];

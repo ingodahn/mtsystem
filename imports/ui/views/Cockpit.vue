@@ -1,9 +1,23 @@
 <template>
-    <div class="container" ref="conti">
-        <h2>MathTrek Cockpit</h2>
-        <localMap :location="location"></localMap>
-        <spacemap :key="type" :type="type" :relations="relations"></spacemap>
-    </div>
+    <v-container class="container" ref="conti">
+        <v-row>
+            <v-col xs="12" md="12">
+                <h2>MathTrek Cockpit</h2>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col xs="12" md="12">
+                <localMap :key="type+'Local'" :type="type" :relations="relations" v-on:localmapclicked="localmapclicked" :location="location"></localMap>
+            </v-col>
+        </v-row>
+        
+        <v-row>
+            <v-col xs="12" md="12">
+                <spacemap :key="type+'Space'" :type="type" :relations="relations" v-on:spacemapclicked="spacemapclicked"></spacemap>
+            </v-col>
+        </v-row>
+        
+    </v-container>
 </template>
 
 <script>
@@ -21,6 +35,16 @@ export default {
     created () {
         this.$root.$data.session.set('relation',this.initialRelation);
         if (!this.$root.$data.session.id) this.$root.$data.session.set('id',"xaTAqFNYuu5rWDm5m"); //Defaul location Mathematics
+    },
+    methods: {
+        spacemapclicked (id) {
+            this.location = id;
+            this.$root.$data.session.set('id',id);
+        },
+        localmapclicked (id) {
+            this.location = id;
+            this.$root.$data.session.set('id',id);
+        },
     },
     computed: {
         type () {
