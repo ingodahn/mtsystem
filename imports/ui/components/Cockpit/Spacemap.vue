@@ -2,7 +2,7 @@
 <div>
     <v-row>
         <v-col xs="12" md="10">
-            <ConceptMap :key="session.relation+newNodes+orientation+view" ref="spacemap" :cmap="allNodes" v-on:nodeclicked="nodeClicked" :orientation="orientation" view="3D" :zoomTo="zoomTarget"></ConceptMap>
+            <Map3D v-if="this.session.view=='3D'" :cmap="allNodes" :orientation="orientation" :zoomTo="zoomTarget"  v-on:nodeclicked="nodeClicked"></Map3D>
         </v-col>
         <v-col xs="12" md="2">
             <h2>SpaceMap</h2>
@@ -13,20 +13,20 @@
 </template>
 
 <script>
-import ConceptMap from "../ConceptMap.vue";
+import Map3D from "../Map3D.vue";
 import { UnitsCollection } from "../../../api/UnitsCollection";
 export default {
     data () {
         return {
             session: this.$root.$data.session,
             orientation: null,
-            view: '3D',
             zoomTarget: 'out'
         };
     },
     props: ['relations'],
     components: {
-        ConceptMap,
+        //ConceptMap,
+        Map3D
     },
     methods: {
         id2relation (id) {
@@ -108,7 +108,7 @@ export default {
             return this.session.newNodes;
         },
         markNew () {
-            return (this.view == '2D')?"are marked with an <span style='border:solid orange; border-radius: 10px; padding: 1px;'>orange ring</span>":"are shown as a ring";
+            return (this.session.view == '2D')?"are marked with an <span style='border:solid orange; border-radius: 10px; padding: 1px;'>orange ring</span>":"are shown as a ring";
         }
     }
 }

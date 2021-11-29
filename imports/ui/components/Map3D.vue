@@ -48,7 +48,7 @@
 	  },
 	  methods: {
 		  nodeClicked(node) {
-			this.session.set(id,node.id);
+			this.session.set('id',node.id);
 			/*
 			let currentNodeId = this.session.id;
 			if (currentNodeId && currentNodeId != node.id) {

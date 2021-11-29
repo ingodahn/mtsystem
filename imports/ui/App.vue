@@ -41,7 +41,7 @@
     id: '',
     view: '3D',
     newNodes: 7,
-    debug: false,
+    debug: true,
     set (item,newValue) {
       if (this.debug) console.log('Session setting', item,'to',newValue)
       this[item] = newValue;

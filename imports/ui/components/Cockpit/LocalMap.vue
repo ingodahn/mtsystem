@@ -2,51 +2,86 @@
     <div>
         <v-row>
             <v-col xs="12" md="10">
-                <ConceptMap :key="session.relation+session.newNodes+'windows'" :cmap="neighbourhood(100)" v-on:nodeclicked="nodeClicked" orientation=null view="3D" :zoomTo="zoomTarget"></ConceptMap>
+                <Map3D v-if="this.session.view=='3D'" :key="session.id+distance" :cmap="neighbourhood" :orientation="orientation" :zoomTo="zoomTarget"  v-on:nodeclicked="nodeClicked"></Map3D>
             </v-col>
             <v-col xs="12" md="2">
-                <h2>Window</h2>
+                <h2>{{currentNode.title}}</h2>
                 <v-btn color="primary" @click="zoomTo('out')">Zoom Out</v-btn>
+                <v-btn color="primary" @click="showMore">More</v-btn>
+                <v-btn color="primary" @click="showLess">Less</v-btn>
+                <div v-html="currentNode.firstParagraph"></div>
             </v-col>
         </v-row>
     </div>
 </template>
 
 <script>
-import ConceptMap from "../ConceptMap.vue";
+import Map3D from "../Map3D.vue";
 import { UnitsCollection } from "../../../api/UnitsCollection"
 
 export default {
     props: {
-        location: {type: String, default: 'xaTAqFNYuu5rWDm5m'},
     },
     data () {
         return {
             session: this.$root.$data.session,
-            //currentRelation: null,
+            orientation: null,
             newNodes: [],
-            zoomTarget: 'out'
+            zoomTarget: 'out',
+            distance: 1
         }
     },
     components: {
-        ConceptMap
+        Map3D
     },
-    watch: {
-        location (newVal, oldVal) {
-            console.log('Watching in LocalMap, new location:',newVal);
-            this.session.id = newVal;
-        }
+    mounted() {
+            if (!this.session.id) {
+                const defaultLocation = {
+                    subject: "Mathematics",
+                    concept: "Function space",
+                    theorem: "Fundamental theorem of calculus"
+                }
+                let d=UnitsCollection.findOne({type: this.session.type, title: defaultLocation[this.session.type]});
+                if (!d)console.log('LocalMap: Location not found');
+                else this.session.id=d._id;
+            }
     },
     
     methods: {
-            neighbourhood(d) {
+        setNode (id) {
+            this.session.set('id',id);
+        },
+        nodeClicked(nodeId) {
+			this.zoomTarget=nodeId;
+            this.session.set('id',nodeId);
+            this.session.id=nodeId;
+            console.log('zoomTarget in Window is now ',this.zoomTarget);
+			this.$emit('localclicked',nodeId);
+		},     
+        zoomTo (id) {
+            console.log('zoomTo in Window',id);
+            this.zoomTarget = id;
+        },
+        showMore () {
+            this.distance += 1;
+        },
+        showLess () {
+            if (this.distance > 0) this.distance -= 1;
+        },
+    },
+    computed: {
+        currentRelation () {
+            return this.session.relation;
+        },
+        neighbourhood() {
+            console.log('Computing neighbourhood of ',this.session.id);
             var it = {}, nodes=[], links = [];
             UnitsCollection.find({type: this.session.type}).fetch().forEach(c => {
                 it[c._id]=c.title;
             });
             const cid=this.session.id;
             let id=0, newNodeIds=[cid],nodeIds=[cid],linkIds=[];
-            while (id < d) {
+            while (id < this.distance) {
                 let  nextNodeIds=[];
                 UnitsCollection.find({
                     type: 'relation', 
@@ -88,7 +123,7 @@ export default {
                     default: color="lightblue";
                 }
                 let updated=new Date(UnitsCollection.findOne({_id: c}).updatedAt).getTime();
-                //let today = new Date()
+                
                 let isNew = (updated && updated > back)?true:false;
                 if (c == this.session.id) color="pink";
                 if (nodeStatus[c]) group=nodeStatus[c];
@@ -99,26 +134,18 @@ export default {
             });
             return {"nodes": nodes, "links": links};
         },
-        setNode (id) {
-            //this.$emit('setNode',id);
-            this.session.set('id',id);
-        },
-        nodeClicked(nodeId) {
-			this.zoomTarget=nodeId;
-            this.session.set('id',nodeId);
-            this.session.id=nodeId;
-            console.log('zoomTarget in Window is now ',this.zoomTarget);
-			this.$emit('localclicked',nodeId);
-		},     
-        zoomTo (id) {
-            console.log('zoomTo in Window',id);
-            this.zoomTarget = id;
-        },
-    },
-    computed: {
-        currentRelation () {
-            return this.session.relation;
-        }
+        currentNode () {
+            const node=UnitsCollection.findOne({_id: this.session.id})
+            if (node) {
+                desc = node.description
+                const regex = /(<p>[\s\S]*?<\/p>)/gm;
+                const corresp = regex.exec(desc);
+                const firstParagraph = (corresp) ? corresp[0] : "No description available";
+                return {title: node.title, firstParagraph: firstParagraph};
+            } else {
+                return {title: "Window", firstParagraph: "The window shows the local environment"};
+            }           
+        },      
     }
 }
 </script>
