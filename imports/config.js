@@ -1,4 +1,5 @@
-export const relations = [
+export { relations, defaultType, defaultRelation, defaultNode };
+const relations = [
     {
         sourceType: 'subject',
         targetType: 'subject',
@@ -7,16 +8,6 @@ export const relations = [
         inverse: 'has as a part',
         description: "Every complete description of TARGET must contain a complete description of SOURCE."
     },
-    /*
-    {
-        sourceType: 'subject',
-        targetType: 'subject',
-        id: 'isBelow', 
-        name: 'is a part of', 
-        inverse: 'has as a part',
-        description: "Every complete description of TARGET must contain a complete description of SOURCE."
-    },
-    */
     {
         sourceType: 'subject',
         targetType: 'subject',
@@ -32,15 +23,6 @@ export const relations = [
         inverse: 'is an abstraction of',
         description: "Every SOURCE can be interpreted as an instance of TARGET in a canonical way."
     },
-    /*
-    {   sourceType: 'concept',
-        targetType: 'concept',
-        id: 'isBelow', 
-        name: 'is a kind of', 
-        inverse: 'is an abstraction of',
-        description: "Every SOURCE can be interpreted as an instance of TARGET in a canonical way."
-    },
-    */
     {   sourceType: 'concept',
         targetType: 'concept',
         id: 'exampleOf', 
@@ -56,16 +38,6 @@ export const relations = [
         inverse: 'can be proved using',
         description: "A proof of \"TARGET\" can use \"SOURCE\"."
     },
-    /*
-    {
-        sourceType: 'theorem',
-        targetType: 'theorem',
-        id: 'isBelow', 
-        name: 'helps proving', 
-        inverse: 'can be proved using',
-        description: "A proof of \"TARGET\" can use \"SOURCE\"."
-    },
-    */
     {
         sourceType: 'theorem',
         targetType: 'theorem',
@@ -90,31 +62,6 @@ export const relations = [
         inverse: 'can be answered best, after answering',
         description: "Answering SOURCE will help answering TARGET."
     },
-    /*
-    {   sourceType: 'unit',
-        targetType: 'unit',
-        id: 'isBelowxx', 
-        name: 'is a part of', 
-        inverse: 'has a part',
-        description: "Every complete description of TARGET must contain a complete description of SOURCE."
-    },
-    {
-        sourceType: 'unit',
-        targetType: 'unit',
-        id: 'requiresxx',
-        name: 'requires knowledge from',
-        inverse: 'is used in unit',
-        description: "Learning about some content in SOURCE requires some knowledge from unit TARGET"
-    },
-    {
-        sourceType: 'unit',
-        targetType: 'question',
-        id: 'answers',
-        name: 'answers question',
-        inverse: 'is answered in',
-        description: "Reading SOURCE will answer TARGET"
-    }
-    */
     {
         sourceType: 'theorem',
         targetType: 'subject',
@@ -132,3 +79,17 @@ export const relations = [
         description: "Concept SOURCE is important in subject TARGET."
     },
 ];
+
+const defaultType = 'subject';
+const defaultRelation = {
+    subject: 'SisBelowS',
+    concept: 'CisBelowC',
+    theorem: 'TisBelowT',
+    question: 'QisBelowQ',
+};
+const defaultNode = {
+    subject: 'Mathematics',
+    concept: 'Vector space',
+    theorem: 'Fundamental theorem of calculus',
+    question: 'How does the air temperature depend on the height?'
+};

@@ -9,7 +9,9 @@
                 <v-btn color="primary" @click="zoomTo('out')">Zoom Out</v-btn>
                 <v-btn color="primary" @click="showMore">More</v-btn>
                 <v-btn color="primary" @click="showLess">Less</v-btn>
+                
                 <div v-html="currentNode.firstParagraph"></div>
+                <v-btn color="primary" @click="explore">Explore</v-btn>
             </v-col>
         </v-row>
     </div>
@@ -32,9 +34,11 @@ export default {
         }
     },
     components: {
-        Map3D
+        Map3D,
     },
     mounted() {
+        /*
+        console.log('LocalMap mounted with session:', this.session.id);
             if (!this.session.id) {
                 const defaultLocation = {
                     subject: "Mathematics",
@@ -45,6 +49,7 @@ export default {
                 if (!d)console.log('LocalMap: Location not found');
                 else this.session.id=d._id;
             }
+            */
     },
     
     methods: {
@@ -67,6 +72,10 @@ export default {
         },
         showLess () {
             if (this.distance > 0) this.distance -= 1;
+        },
+        explore () {
+            console.log('explore in Window',this.session.id);
+            this.$emit('explore',this.session.id);
         },
     },
     computed: {

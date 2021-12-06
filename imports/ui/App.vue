@@ -18,7 +18,7 @@
         <home v-if="page=='home'"></home>
         <admin v-else-if="page=='admin'"></admin>
         <toc v-else-if="page=='toc'"></toc>
-        <cockpit v-else-if="page=='cockpit'"></cockpit>
+        <cockpit v-else-if="page=='cockpit'" v-on:explore="explore"></cockpit>
         <any :key="page" v-else></any>
         <!--
         <router-view></router-view>
@@ -29,39 +29,31 @@
 </template>
 
 <script>
+  import { UnitsCollection } from "/imports//api/UnitsCollection";
   import Home from '/imports/ui/views/Home/Home.vue'
   import Admin from '/imports/ui/views/Admin/Admin.vue'
   import Toc from '/imports/ui/views/Toc/Toc.vue'
   import Any from '/imports/ui/views/Any.vue'
   import Cockpit from '/imports/ui/views/Cockpit.vue'
+  import {relations, defaultType, defaultRelation, defaultNode} from '/imports/config.js'
+  let cid0=UnitsCollection.find({type: defaultType,title: defaultNode[defaultType]}).fetch();
+  let cid=cid0._id;
+  console.log('ID ',cid);
   var session = {
-    type: '',
-    relation: '',
-    edit: false,
-    id: '',
+    type: defaultType,
+    relation: defaultRelation[defaultType],
+    //id: UnitsCollection.findOne({type: defaultType,title: defaultNode[defaultType]})._id,
+    id: cid,
+    mode: 'view', // view, edit, create
     view: '3D',
     newNodes: 7,
-    debug: true,
+    debug: false,
     set (item,newValue) {
       if (this.debug) console.log('Session setting', item,'to',newValue)
       this[item] = newValue;
     },
-    mode () {
-      if (this.id) {
-        if (this.edit) return "update";
-        else return "single";
-      } else {
-        if (this.edit) return "new";
-        else return "all";
-      }
-    },
-    clear () {
-      this.type = '';
-      this.relation='';
-      this.edit=false;
-      this.id='';
-    }
   };
+  console.log('App:',session.id)
 
   export default {
     data() {
@@ -81,7 +73,7 @@
       launchAny(t) {
         this.session.type=t;
         this.session.edit=false;
-        this.session.id='';
+        this.session.id=defaultNode;
         this.page=t;
       },
       launchCockpit() {
@@ -89,6 +81,12 @@
         this.session.edit=false;
         this.session.id='';
         this.page='cockpit';
+      },
+      explore(id) {
+        console.log('App explore',id)
+        this.session.set('id', id);
+        this.session.set('mode', 'single');
+        this.page=id;
       }
     },
     meteor: {

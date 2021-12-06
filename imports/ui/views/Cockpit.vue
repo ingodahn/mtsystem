@@ -1,13 +1,16 @@
 <template>
     <v-container class="container" ref="conti">
         <v-row>
-            <v-col xs="12" md="12">
-                <h2>MathTrek Cockpit</h2>
+            <v-col xs="12" md="4">
+                <h2>MathTrek Cockpit {{ session.type }} ID: {{session.id}}</h2>
+            </v-col>
+            <v-col xs="12" md="4">
+                <selector :key="session.id" :type="session.type" v-on:selected="selectedNode"></selector>
             </v-col>
         </v-row>
         <v-row>
             <v-col xs="12" md="12">
-                <localMap :key="type+'Local'" :type="type" :relations="relations" v-on:localmapclicked="localmapclicked" :location="location"></localMap>
+                <localMap :key="type+'Local'" :type="type" :relations="relations" v-on:localmapclicked="localmapclicked" :location="session.id" v-on:explore="explore"></localMap>
             </v-col>
         </v-row>
         
@@ -21,30 +24,35 @@
 </template>
 
 <script>
-import {relations} from '/imports/config.js'
+import {relations, defaultType, defaultRelation, defaultNode} from '/imports/config.js'
 import spacemap from "../components/Cockpit/Spacemap.vue"
 import LocalMap from "../components/Cockpit/LocalMap.vue"
+import Selector from "../components/Selector.vue";
 export default {
     data () {
         return {
-            session: this.$root.$data.session,
-            location: "xaTAqFNYuu5rWDm5m" // _id of Mathematics
+            session: this.$root.$data.session
         }
     },
-    components: { spacemap,LocalMap },
+    components: { Selector,spacemap,LocalMap },
     created () {
-        this.$root.$data.session.set('relation',this.initialRelation);
-        if (!this.$root.$data.session.id) this.$root.$data.session.set('id',"xaTAqFNYuu5rWDm5m"); //Defaul location Mathematics
+
     },
     methods: {
         spacemapclicked (id) {
-            this.location = id;
-            this.$root.$data.session.set('id',id);
+            this.session.set('id',id);
         },
         localmapclicked (id) {
-            this.location = id;
-            this.$root.$data.session.set('id',id);
+            this.session.set('id',id);
         },
+        explore (id) {
+            console.log('Cockpit explore',id);
+            this.$emit('explore',id);
+        },
+        selectedNode (id) {
+            console.log('Cockpit selectedNode',id);
+            this.session.set('id',id);
+        }
     },
     computed: {
         type () {

@@ -48,13 +48,13 @@ export default {
     },
     
     mounted () {
-        
-        const myCurrent=UnitsCollection.findOne({_id: this.currentId});
+        console.log('XX',this.session.id,'YY');
+        const myCurrent=UnitsCollection.findOne({_id: this.session.id});
         if (myCurrent) { this.current=myCurrent;
         }
         
         else {
-            console.log(this.currentId+' not found');
+            console.log(this.session.id+' not found');
         }
         
     },

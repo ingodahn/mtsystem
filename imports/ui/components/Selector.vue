@@ -32,7 +32,6 @@ export default {
     watch: {
         selectedId: function () {
             if (this.selectedId) this.$emit('selected',this.selectedId);
-            else this.$emit('selected','')
         }
     },
 
