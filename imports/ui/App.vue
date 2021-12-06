@@ -6,8 +6,7 @@
       <v-btn color="primary" @click="launchAny('subject')">Subjects</v-btn>
       <v-btn color="primary" @click="launchAny('concept')">Concepts</v-btn>
       <v-btn color="primary" @click="launchAny('theorem')">Theorems</v-btn>
-      <v-btn color="primary" @click="launchAny('question')">Questions</v-btn>
-      <v-btn color="secondary" @click="launchAny('unit')" v-if="currentUser && currentUser.username == 'dahn'">Units</v-btn>
+      <v-btn color="primary" @click="launchAny('person')">Persons</v-btn>
       <v-btn color="secondary" @click="page='toc'" v-if="currentUser && (currentUser.username == 'dahn' || currentUser.username == 'editor')">TOC</v-btn>
       <v-btn color="warning" @click="page='admin'" v-if="currentUser && currentUser.username == 'dahn'">Tools</v-btn>
       <div class="loading" v-if="!$subReady.units">Loading...</div>
@@ -18,9 +17,6 @@
         <admin v-else-if="page=='admin'"></admin>
         <toc v-else-if="page=='toc'"></toc>
         <any :key="page" v-else></any>
-        <!--
-        <router-view></router-view>
-        -->
       </v-container>
     </v-main>
   </v-app>

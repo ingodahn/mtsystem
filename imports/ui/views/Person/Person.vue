@@ -7,7 +7,7 @@ import node from "../../components/Node.vue"
 export default {
     data () {
         return {
-            type: 'question',
+            type: 'person',
             relations: [
             ],
         }

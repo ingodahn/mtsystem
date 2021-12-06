@@ -7,16 +7,6 @@ export const relations = [
         inverse: 'has as a part',
         description: "Every complete description of TARGET must contain a complete description of SOURCE."
     },
-    /*
-    {
-        sourceType: 'subject',
-        targetType: 'subject',
-        id: 'isBelow', 
-        name: 'is a part of', 
-        inverse: 'has as a part',
-        description: "Every complete description of TARGET must contain a complete description of SOURCE."
-    },
-    */
     {
         sourceType: 'subject',
         targetType: 'subject',
@@ -32,15 +22,6 @@ export const relations = [
         inverse: 'is an abstraction of',
         description: "Every SOURCE can be interpreted as an instance of TARGET in a canonical way."
     },
-    /*
-    {   sourceType: 'concept',
-        targetType: 'concept',
-        id: 'isBelow', 
-        name: 'is a kind of', 
-        inverse: 'is an abstraction of',
-        description: "Every SOURCE can be interpreted as an instance of TARGET in a canonical way."
-    },
-    */
     {   sourceType: 'concept',
         targetType: 'concept',
         id: 'exampleOf', 
@@ -56,16 +37,6 @@ export const relations = [
         inverse: 'can be proved using',
         description: "A proof of \"TARGET\" can use \"SOURCE\"."
     },
-    /*
-    {
-        sourceType: 'theorem',
-        targetType: 'theorem',
-        id: 'isBelow', 
-        name: 'helps proving', 
-        inverse: 'can be proved using',
-        description: "A proof of \"TARGET\" can use \"SOURCE\"."
-    },
-    */
     {
         sourceType: 'theorem',
         targetType: 'theorem',
@@ -75,46 +46,13 @@ export const relations = [
         description: "\"SOURCE\" is an immediate consequence of the more general \"TARGET\"."
     },
     {
-        sourceType: 'question',
-        targetType: 'question',
-        id: 'QisBelowQ', 
-        name: 'helps answering', 
-        inverse: 'can be answered best, after answering',
-        description: "Answering SOURCE will help answering TARGET."
+        sourceType: 'person',
+        targetType: 'person',
+        id: 'PbuildsOnP', 
+        name: 'builds on', 
+        inverse: 'inspired',
+        description: "Work of SOURCE builds on the work of TARGET."
     },
-    {
-        sourceType: 'question',
-        targetType: 'question',
-        id: 'isBelow', 
-        name: 'helps answering', 
-        inverse: 'can be answered best, after answering',
-        description: "Answering SOURCE will help answering TARGET."
-    },
-    /*
-    {   sourceType: 'unit',
-        targetType: 'unit',
-        id: 'isBelowxx', 
-        name: 'is a part of', 
-        inverse: 'has a part',
-        description: "Every complete description of TARGET must contain a complete description of SOURCE."
-    },
-    {
-        sourceType: 'unit',
-        targetType: 'unit',
-        id: 'requiresxx',
-        name: 'requires knowledge from',
-        inverse: 'is used in unit',
-        description: "Learning about some content in SOURCE requires some knowledge from unit TARGET"
-    },
-    {
-        sourceType: 'unit',
-        targetType: 'question',
-        id: 'answers',
-        name: 'answers question',
-        inverse: 'is answered in',
-        description: "Reading SOURCE will answer TARGET"
-    }
-    */
     {
         sourceType: 'theorem',
         targetType: 'subject',

@@ -3,12 +3,11 @@ import VueRouter from 'vue-router'
 
 Vue.use(VueRouter)
 
-import Units from '../imports/ui/views/Units/Unit.vue'
 import Home from '../imports/ui/views/Home/Home.vue'
 import Subject from '../imports/ui/views/Subject/Subject.vue'
 import Concepts from '../imports/ui/views/Concepts/Concepts.vue'
 import Theorem from '../imports/ui/views/Theorem/Theorem.vue'
-import Question from '../imports/ui/views/Question/Question.vue'
+import Person from '../imports/ui/views/Person/Person.vue'
 import Admin from '../imports/ui/views/Admin/Admin.vue'
 import Any from '../imports/ui/views/Any.vue'
 
@@ -29,9 +28,9 @@ const routes = [
         component: Concepts
     },
     {
-        path: "/question",
-        name: "Question",
-        component: Question
+        path: "/person",
+        name: "Person",
+        component: Person
     },
     {
         path: "/theorem",
