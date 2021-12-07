@@ -54,6 +54,22 @@ export const relations = [
         description: "Work of SOURCE builds on the work of TARGET."
     },
     {
+        sourceType: 'person',
+        targetType: 'subject',
+        id: 'PcontributedToS', 
+        name: 'contributed to subject', 
+        inverse: 'was developed by',
+        description: "SOURCE made key contributions to TARGET."
+    },
+    {
+        sourceType: 'person',
+        targetType: 'concept',
+        id: 'PcontributedToC', 
+        name: 'contributed to concept', 
+        inverse: 'was developed by',
+        description: "SOURCE contributed to the development of TARGET."
+    },
+    {
         sourceType: 'theorem',
         targetType: 'subject',
         id: 'isAppliedIn', 
