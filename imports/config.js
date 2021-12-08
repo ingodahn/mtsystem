@@ -47,20 +47,28 @@ const relations = [
         description: "\"SOURCE\" is an immediate consequence of the more general \"TARGET\"."
     },
     {
-        sourceType: 'question',
-        targetType: 'question',
-        id: 'QisBelowQ', 
-        name: 'helps answering', 
-        inverse: 'can be answered best, after answering',
-        description: "Answering SOURCE will help answering TARGET."
+        sourceType: 'person',
+        targetType: 'person',
+        id: 'PbuildsOnP', 
+        name: 'builds on', 
+        inverse: 'inspired',
+        description: "Work of SOURCE builds on the work of TARGET."
     },
     {
-        sourceType: 'question',
-        targetType: 'question',
-        id: 'isBelow', 
-        name: 'helps answering', 
-        inverse: 'can be answered best, after answering',
-        description: "Answering SOURCE will help answering TARGET."
+        sourceType: 'person',
+        targetType: 'subject',
+        id: 'PcontributedToS', 
+        name: 'contributed to subject', 
+        inverse: 'was developed by',
+        description: "SOURCE made key contributions to TARGET."
+    },
+    {
+        sourceType: 'person',
+        targetType: 'concept',
+        id: 'PcontributedToC', 
+        name: 'contributed to concept', 
+        inverse: 'was developed by',
+        description: "SOURCE contributed to the development of TARGET."
     },
     {
         sourceType: 'theorem',
@@ -85,11 +93,11 @@ const defaultRelation = {
     subject: 'SisBelowS',
     concept: 'CisBelowC',
     theorem: 'TisBelowT',
-    question: 'QisBelowQ',
+    person: 'PbuildsOnP',
 };
 const defaultNode = {
     subject: 'Mathematics',
     concept: 'Vector space',
     theorem: 'Fundamental theorem of calculus',
-    question: 'How does the air temperature depend on the height?'
+    person: 'Claudius Ptolemy'
 };

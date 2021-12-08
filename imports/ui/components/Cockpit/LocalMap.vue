@@ -37,8 +37,9 @@ export default {
         Map3D,
     },
     mounted() {
-        /*
+        
         console.log('LocalMap mounted with session:', this.session.id);
+        /*
             if (!this.session.id) {
                 const defaultLocation = {
                     subject: "Mathematics",

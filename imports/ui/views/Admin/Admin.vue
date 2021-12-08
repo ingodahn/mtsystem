@@ -96,8 +96,8 @@ export default {
                   case 'theorem':
                     r.name='TisBelowT';
                     break;
-                  case 'question':
-                    r.name='QisBelowQ';
+                  case 'person':
+                    r.name='PbuildsOnP';
                     break;
                   default:
                     console.log('Unhandled type '+st);

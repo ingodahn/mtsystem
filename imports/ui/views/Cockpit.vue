@@ -2,7 +2,10 @@
     <v-container class="container" ref="conti">
         <v-row>
             <v-col xs="12" md="4">
-                <h2>MathTrek Cockpit {{ session.type }} ID: {{session.id}}</h2>
+                <h2>MathTrek Cockpit {{ session.type }}</h2>
+            </v-col>
+            <v-col xs="12" md="4">
+                <v-select :items="types" label="Type" v-model="session.type" ></v-select>
             </v-col>
             <v-col xs="12" md="4">
                 <selector :key="session.id" :type="session.type" v-on:selected="selectedNode"></selector>
@@ -25,18 +28,21 @@
 
 <script>
 import {relations, defaultType, defaultRelation, defaultNode} from '/imports/config.js'
+import { UnitsCollection } from "/imports/api/UnitsCollection";
 import spacemap from "../components/Cockpit/Spacemap.vue"
 import LocalMap from "../components/Cockpit/LocalMap.vue"
 import Selector from "../components/Selector.vue";
 export default {
     data () {
         return {
-            session: this.$root.$data.session
+            session: this.$root.$data.session,
+            types: [{value: 'subject', text: 'Subjects'},{value: 'concept', text: 'Concepts'},{value: 'theorem',text: 'Theorems'},{value: 'person', text: 'Persons'}]
         }
     },
     components: { Selector,spacemap,LocalMap },
     created () {
-
+        this.session.id= UnitsCollection.findOne({type: defaultType,title: defaultNode[defaultType]})._id,
+        console.log('Cockpit created with',this.session.id);
     },
     methods: {
         spacemapclicked (id) {

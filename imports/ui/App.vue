@@ -6,8 +6,7 @@
       <v-btn color="primary" @click="launchAny('subject')">Subjects</v-btn>
       <v-btn color="primary" @click="launchAny('concept')">Concepts</v-btn>
       <v-btn color="primary" @click="launchAny('theorem')">Theorems</v-btn>
-      <v-btn color="primary" @click="launchAny('question')">Questions</v-btn>
-      <v-btn color="secondary" @click="launchAny('unit')" v-if="currentUser && currentUser.username == 'dahn'">Units</v-btn>
+      <v-btn color="primary" @click="launchAny('person')">Persons</v-btn>
       <v-btn color="secondary" @click="page='toc'" v-if="currentUser && (currentUser.username == 'dahn' || currentUser.username == 'editor')">TOC</v-btn>
        <v-btn color="secondary" @click="launchCockpit()" v-if="currentUser && currentUser.username == 'dahn'">Cockpit</v-btn>
       <v-btn color="warning" @click="page='admin'" v-if="currentUser && currentUser.username == 'dahn'">Tools</v-btn>
@@ -29,39 +28,33 @@
 </template>
 
 <script>
-  import { UnitsCollection } from "/imports//api/UnitsCollection";
   import Home from '/imports/ui/views/Home/Home.vue'
   import Admin from '/imports/ui/views/Admin/Admin.vue'
   import Toc from '/imports/ui/views/Toc/Toc.vue'
   import Any from '/imports/ui/views/Any.vue'
   import Cockpit from '/imports/ui/views/Cockpit.vue'
   import {relations, defaultType, defaultRelation, defaultNode} from '/imports/config.js'
-  let cid0=UnitsCollection.find({type: defaultType,title: defaultNode[defaultType]}).fetch();
-  let cid=cid0._id;
-  console.log('ID ',cid);
-  var session = {
-    type: defaultType,
-    relation: defaultRelation[defaultType],
-    //id: UnitsCollection.findOne({type: defaultType,title: defaultNode[defaultType]})._id,
-    id: cid,
-    mode: 'view', // view, edit, create
-    view: '3D',
-    newNodes: 7,
-    debug: false,
-    set (item,newValue) {
-      if (this.debug) console.log('Session setting', item,'to',newValue)
-      this[item] = newValue;
-    },
-  };
-  console.log('App:',session.id)
-
+  
   export default {
     data() {
-        return {
-          page: 'home',
-          session: session
-        };
+      return {
+        page: 'home',
+        session: {
+          type: defaultType,
+          relation: defaultRelation[defaultType],
+          id: 'none', // will be set in cockpit
+          mode: 'view', // view, edit, create
+          view: '3D',
+          newNodes: 7,
+          debug: false,
+          set (item,newValue) {
+            if (this.debug) console.log('Session setting', item,'to',newValue)
+            this[item] = newValue;
+          }
+        }
+      }
     },
+    
     components: {
       Home,
       Admin,

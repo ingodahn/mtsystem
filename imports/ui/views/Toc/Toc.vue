@@ -33,8 +33,8 @@ export default {
         }
     },
     mounted () {
-        this.items=[{title: 'Subjects', children:[]},{title: 'Concepts',children:[]},{title: 'Theorems',children:[]},{title: 'Questions',children:[]}];
-        ['subject','concept','theorem','question'].forEach((item, index) => {
+        this.items=[{title: 'Subjects', children:[]},{title: 'Concepts',children:[]},{title: 'Theorems',children:[]},{title: 'Persons',children:[]}];
+        ['subject','concept','theorem','person'].forEach((item, index) => {
             let nodes=UnitsCollection.find({type: item},{sort: { title: 1}}).fetch();
             this.items[index].children=nodes.map((node) => {
                 return {
