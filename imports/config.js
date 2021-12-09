@@ -1,4 +1,5 @@
-export const relations = [
+export { relations, defaultType, defaultRelation, defaultNode };
+const relations = [
     {
         sourceType: 'subject',
         targetType: 'subject',
@@ -86,3 +87,17 @@ export const relations = [
         description: "Concept SOURCE is important in subject TARGET."
     },
 ];
+
+const defaultType = 'subject';
+const defaultRelation = {
+    subject: 'SisBelowS',
+    concept: 'CisBelowC',
+    theorem: 'TisBelowT',
+    person: 'PbuildsOnP',
+};
+const defaultNode = {
+    subject: 'Mathematics',
+    concept: 'Vector space',
+    theorem: 'Fundamental theorem of calculus',
+    person: 'Claudius Ptolemy'
+};

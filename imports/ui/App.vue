@@ -27,33 +27,7 @@
   import Admin from '/imports/ui/views/Admin/Admin.vue'
   import Toc from '/imports/ui/views/Toc/Toc.vue'
   import Any from '/imports/ui/views/Any.vue'
-  var session = {
-    type: '',
-    relation: '',
-    edit: false,
-    id: '',
-    newNodes: 7,
-    debug: false,
-    set (item,newValue) {
-      if (this.debug) console.log('Session setting', item,'to',newValue)
-      this[item] = newValue;
-    },
-    mode () {
-      if (this.id) {
-        if (this.edit) return "update";
-        else return "single";
-      } else {
-        if (this.edit) return "new";
-        else return "all";
-      }
-    },
-    clear () {
-      this.type = '';
-      this.relation='';
-      this.edit=false;
-      this.id='';
-    }
-  };
+  import {relations, defaultType, defaultRelation, defaultNode} from '/imports/config.js'
 
   export default {
     components: {
@@ -61,7 +35,35 @@
     data() {
         return {
           page: 'home',
-          session: session
+          session: {
+            type: defaultType,
+            relation: defaultRelation[defaultType],
+            edit: false,
+            id: '',
+            view: '3D',
+            neighbourhood: 2,
+            newNodes: 7,
+            debug: false,
+            set (item,newValue) {
+              if (this.debug) console.log('Session setting', item,'to',newValue)
+              this[item] = newValue;
+            },
+            mode () {
+              if (this.id) {
+                if (this.edit) return "update";
+                else return "single";
+              } else {
+                if (this.edit) return "new";
+                else return "all";
+              }
+            },
+            clear () {
+              this.type = defaultType;
+              this.relation=defaultRelation[defaultType];
+              this.edit=false;
+              this.id='';
+            }
+          }
         };
     },
     components: {
