@@ -12,6 +12,7 @@
 			<v-btn color="primary" class="mx-1 my-1" @click="showAll">Show all</v-btn>
 			<v-btn color="primary" class="mx-1 my-1" @click="showLess">Less</v-btn>
 			<v-btn color="primary" class="mx-1 my-1" @click="showMore">More</v-btn>
+			<v-btn color="primary" class="mx-1 my-1" @click="explore">Explore</v-btn>
 		</v-row>
 		<v-row><h3>Camera control</h3></v-row>
 		<v-row>
@@ -24,7 +25,7 @@
 			<v-btn color="primary" class="mx-1 my-1" @click="cameraControl('in')">+</v-btn>
 			<v-btn color="primary" class="mx-1 my-1" @click="cameraControl('out')">-</v-btn>
 		</v-row>
-		<NodeInfo :nodeId="currentId" v-if="currentId"></NodeInfo>
+		<NodeInfo :nodeId="currentNode.id" v-if="currentNode"></NodeInfo>
 	</v-col>
 </v-row>
 
@@ -37,7 +38,8 @@
 	  data () {
 		  return {
 			  session: this.$root.$data.session,
-			  currentId: null,
+			  //currentId: null,
+			  currentNode: null,
 			  currentColor: 'lightblue',
 			  Graph: null
 		  }
@@ -50,46 +52,8 @@
 		  mapId () {
 			  return 'graph'+Math.random().toString();
 		  },
-		  currentTitle () {
-			  if (this.currentId) {
-				  return this.cmap.nodes.find(n => n.id==this.currentId).title;
-			  }
-		  }
-	  },
-	  methods: {
-		  nodeClicked(node) {
-			  console.log('Clicked on',node.title);
-			  node.x=0;
-			  node.y=0;
-				this.Graph.graphData(this.neighbourhood(node,this.session.neighbourhood));
-				this.setCurrentNode(node,'pink');
-				this.Graph.d3Force('center', null);
-				this.Graph.cameraPosition({},node);
-				this.Graph.zoomToFit(500,10,n => n.id == node.id);
-			  	//this.Graph.zoomToFit(500,10,n => this.neighbourhood_1(node,this.session.neighbourhood).includes(n.id));
-			  //this.$emit('nodeclicked',node.id);
-		  },
-		  setCurrentNode(node,color) {
-			  if (node.id != this.currentId) {
-				  if (this.currentId) {
-					  // Reset old node color
-					  let cnode=this.cmap.nodes.find(d => d.id==this.currentId);
-					  if (! cnode) {
-						  console.log('Node',this.currentId,'not found')
-					  } else {
-						  cnode.color=this.currentColor;
-					  }
-				  }
-				  let c=node.color;
-				  this.currentColor = node.color;
-				  node.color=color;
-				  this.currentId=node.id;
-			  }
-		  },
-		  copyData(d) {
-			  return JSON.parse(JSON.stringify(d));
-		  },
-		  neighbourhood(node,d) {
+		  neighbourhood() {
+			const node=this.currentNode, d=this.session.neighbourhood;
             const cid=node.id;
 			
             let id=0, newNodeIds=[cid],nodeIds=[cid];
@@ -112,11 +76,35 @@
 			let nodes=this.cmap.nodes.filter(nn => nodeIds.includes(nn.id));
 			let links=this.cmap.links.filter(nn => (nodeIds.includes(nn.source.id) && nodeIds.includes(nn.target.id)));
 			console.log({"nodes": nodes, "links": links});
-			if (this.currentId) this.cmap.nodes.find(n => n.id==this.currentId).color='pink';
             return {nodes: nodes, links: links};
         },
-		neighbourhood_1(node,d) {
-			return this.neighbourhood(node,d).nodes.map(n => n.id);
+	  },
+	  methods: {
+		  nodeClicked(node) {
+			  console.log('Clicked on',node.title);
+			  node.x=0;
+			  node.y=0;
+			  this.setCurrentNode(node,'pink');
+				this.Graph.graphData(this.neighbourhood);
+				this.Graph.d3Force('center', null);
+				this.Graph.cameraPosition({},node);
+				this.Graph.zoomToFit(500,10,n => n == node);
+			  //this.$emit('nodeclicked',node.id);
+		  },
+		  setCurrentNode(node,color) {
+			  if (node != this.currentNode) {
+				  if (this.currentNode) {
+					  // Reset old node color
+					  this.currentNode.color=this.currentColor;
+				  }
+				  this.currentColor = node.color;
+				  node.color=color;
+				  this.currentNode=node;
+			  }
+		  },
+		  
+		neighbourhood_1() {
+			return this.neighbourhood().nodes.map(n => n.id);
 		},
 		showAll() {
 			this.Graph.graphData(this.cmap);
@@ -124,9 +112,22 @@
 			this.Graph.zoomToFit(500);
 		},
 		showLess() {
-			this.Graph.graphData(this.cmap);
+			let d=this.session.neighbourhood;
+			if (d) {
+				this.session.neighbourhood=d-1;
+				this.Graph.graphData(this.neighbourhood);
+				this.Graph.d3Force('center', null);
+				this.Graph.zoomToFit(500);
+			}
+		},
+		showMore() {
+			this.session.neighbourhood+=1;
+			this.Graph.graphData(this.neighbourhood);
 			this.Graph.d3Force('center', null);
 			this.Graph.zoomToFit(500);
+		},
+		explore () {
+			this.session.id=this.currentNode.id;
 		},
 		cameraControl (dir) {
 			let pos=this.Graph.cameraPosition();
@@ -154,7 +155,8 @@
 		}
 	  },
 	  mounted() {
-		this.currentId=this.session.id;
+		//this.currentId=this.session.id;
+		if (this.session.id) this.currentNode=this.cmap.node.find(d => d.id == this.session.id)
 		
 		this.Graph = ForceGraph3D({ controlType: 'orbit' })
 		(document.getElementById(this.mapId));

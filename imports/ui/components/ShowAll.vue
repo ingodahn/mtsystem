@@ -41,7 +41,7 @@
                     <v-select
                     :items="views"
                     label="View"
-                    v-model="view"
+                    v-model="session.view"
                     ></v-select>
                 </v-col>
             </v-row>
@@ -51,7 +51,7 @@
             <sidebar :relations="relations" title='' mode="list"></sidebar>
         </v-col>
     </v-row>
-            <ConceptMap :key="session.relation+newNodes+orientation+view" :cmap="allNodes" v-on:nodeclicked="mapCurrent" :orientation="orientation" :view="view"></ConceptMap>
+            <ConceptMap :key="session.relation+newNodes+orientation+session.view" :cmap="allNodes" v-on:nodeclicked="mapCurrent" :orientation="orientation" :view="session.view"></ConceptMap>
  </v-container>
 </template>
 
@@ -153,7 +153,7 @@ export default {
             return this.session.newNodes;
         },
         markNew () {
-            return (this.view == '2D')?"are marked with an <span style='border:solid orange; border-radius: 10px; padding: 1px;'>orange ring</span>":"are shown as a ring";
+            return (this.session.view == '2D')?"are marked with an <span style='border:solid orange; border-radius: 10px; padding: 1px;'>orange ring</span>":"are shown as a ring";
         }
     },
 

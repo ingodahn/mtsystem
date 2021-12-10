@@ -40,7 +40,7 @@
             relation: defaultRelation[defaultType],
             edit: false,
             id: '',
-            view: '3D',
+            view: '2D',
             neighbourhood: 2,
             newNodes: 7,
             debug: false,
