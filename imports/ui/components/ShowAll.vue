@@ -45,12 +45,13 @@
                     ></v-select>
                 </v-col>
             </v-row>
-            <ConceptMap :key="session.relation+newNodes+orientation+view" :cmap="allNodes" v-on:nodeclicked="mapCurrent" :orientation="orientation" :view="view"></ConceptMap>
+            
         </v-col>
         <v-col xs="12" md="4">
             <sidebar :relations="relations" title='' mode="list"></sidebar>
         </v-col>
     </v-row>
+            <ConceptMap :key="session.relation+newNodes+orientation+view" :cmap="allNodes" v-on:nodeclicked="mapCurrent" :orientation="orientation" :view="view"></ConceptMap>
  </v-container>
 </template>
 

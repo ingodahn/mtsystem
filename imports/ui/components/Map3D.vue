@@ -1,14 +1,37 @@
 <template>
-<div>
 
-<div class="container" ref="conti">
-	<div :id="mapId" :ref="mapId"></div>
-</div>
-</div>
+<v-row class="container" ref="conti">
+	<v-col xs="12" md="8">
+		<div :id="mapId" :ref="mapId"></div>
+	</v-col>
+	<v-col xs="12" md="4">
+		<v-row>
+			<h2>Panel</h2>
+		</v-row>
+		<v-row>
+			<v-btn color="primary" class="mx-1 my-1" @click="showAll">Show all</v-btn>
+			<v-btn color="primary" class="mx-1 my-1" @click="showLess">Less</v-btn>
+			<v-btn color="primary" class="mx-1 my-1" @click="showMore">More</v-btn>
+		</v-row>
+		<v-row><h3>Camera control</h3></v-row>
+		<v-row>
+			<v-btn color="primary" class="mx-1 my-1" @click="cameraControl('up')">&uArr;</v-btn>
+			<v-btn color="primary" class="mx-1 my-1" @click="cameraControl('down')">&dArr;</v-btn>
+			<v-btn color="primary" class="mx-1 my-1" @click="cameraControl('left')">&lArr;</v-btn>
+			<v-btn color="primary" class="mx-1 my-1" @click="cameraControl('right')">&rArr;</v-btn>
+		</v-row>
+		<v-row>
+			<v-btn color="primary" class="mx-1 my-1" @click="cameraControl('in')">+</v-btn>
+			<v-btn color="primary" class="mx-1 my-1" @click="cameraControl('out')">-</v-btn>
+		</v-row>
+		<NodeInfo :nodeId="currentId" v-if="currentId"></NodeInfo>
+	</v-col>
+</v-row>
 
 </template>
 
   <script>
+  import NodeInfo from "./NodeInfo.vue";
   export default {
 	  props: ['cmap','orientation'],
 	  data () {
@@ -19,19 +42,31 @@
 			  Graph: null
 		  }
 	  },
+	  components: { NodeInfo },
 	  watch: {
 		  
 	  },
 	  computed: {
 		  mapId () {
 			  return 'graph'+Math.random().toString();
+		  },
+		  currentTitle () {
+			  if (this.currentId) {
+				  return this.cmap.nodes.find(n => n.id==this.currentId).title;
+			  }
 		  }
 	  },
 	  methods: {
 		  nodeClicked(node) {
+			  console.log('Clicked on',node.title);
+			  node.x=0;
+			  node.y=0;
 				this.Graph.graphData(this.neighbourhood(node,this.session.neighbourhood));
 				this.setCurrentNode(node,'pink');
-			  	this.Graph.zoomToFit(500);
+				this.Graph.d3Force('center', null);
+				this.Graph.cameraPosition({},node);
+				this.Graph.zoomToFit(500,10,n => n.id == node.id);
+			  	//this.Graph.zoomToFit(500,10,n => this.neighbourhood_1(node,this.session.neighbourhood).includes(n.id));
 			  //this.$emit('nodeclicked',node.id);
 		  },
 		  setCurrentNode(node,color) {
@@ -53,7 +88,6 @@
 		  },
 		  copyData(d) {
 			  return JSON.parse(JSON.stringify(d));
-			  console.log('copied');
 		  },
 		  neighbourhood(node,d) {
             const cid=node.id;
@@ -61,65 +95,67 @@
             let id=0, newNodeIds=[cid],nodeIds=[cid];
             while (id < d) {
                 let  nextNodeIds=[];
-				//console.log(this.cmap.links[0], "Link 0");
-				//console.log('Found as source',this.cmap.links.filter(ll => newNodeIds.includes(ll.source.id)).length);
+				
 				this.cmap.links.filter(ll => newNodeIds.includes(ll.source.id)).forEach(lf => {
 					nextNodeIds.push(lf.target.id)
 				});
 				this.cmap.links.filter(ll => newNodeIds.includes(ll.target.id)).forEach(lf => {
 					nextNodeIds.push(lf.source.id)
 				});
-				//console.log('Found',nextNodeIds.length);
+				
                 let nextNodeReduced=[...new Set(nextNodeIds)].filter(item => (! nodeIds.includes(item)));
                 nodeIds=nodeIds.concat(nextNodeReduced);
                 newNodeIds=[...nextNodeReduced];
                 id++;
             }
-			/*
-            let nodeStatus={};
-            if (this.currentUser) {
-                UnitsCollection.find({type: 'note',
-                    item: {$in: nodeIds},
-                    userId: this.currentUser._id
-                    }).fetch().forEach(n => {
-                        nodeStatus[n.item]=n.status;
-                    });
-            }
-            nodeIds.forEach(c => {
-				/*
-                let color="lightblue";
-                const back = new Date().getTime()-parseInt(this.newNodes)*24*60*60*1000;
-                switch (nodeStatus[c]) {
-                    case "100": color="green"; break;
-                    case "2": color="yellow"; break;
-                    case "150": color="red"; break;
-                    default: color="lightblue";
-                }
-                let updated=new Date(UnitsCollection.findOne({_id: c}).updatedAt).getTime();
-                //let today = new Date()
-                let isNew = (updated && updated > back)?true:false;
-                if (c == this.currentId) color="black";
-                if (nodeStatus[c]) group=nodeStatus[c];
-                nodes.push({"id": c, "title": it[c], "color": color, "isNew": isNew});
-            });
-            linkIds.forEach(r => {
-                links.push({source: r.source, target: r.target})
-            });
-			*/
+			
 			let nodes=this.cmap.nodes.filter(nn => nodeIds.includes(nn.id));
 			let links=this.cmap.links.filter(nn => (nodeIds.includes(nn.source.id) && nodeIds.includes(nn.target.id)));
 			console.log({"nodes": nodes, "links": links});
 			if (this.currentId) this.cmap.nodes.find(n => n.id==this.currentId).color='pink';
             return {nodes: nodes, links: links};
         },
+		neighbourhood_1(node,d) {
+			return this.neighbourhood(node,d).nodes.map(n => n.id);
+		},
+		showAll() {
+			this.Graph.graphData(this.cmap);
+			this.Graph.d3Force('center', null);
+			this.Graph.zoomToFit(500);
+		},
+		showLess() {
+			this.Graph.graphData(this.cmap);
+			this.Graph.d3Force('center', null);
+			this.Graph.zoomToFit(500);
+		},
+		cameraControl (dir) {
+			let pos=this.Graph.cameraPosition();
+			switch (dir) {
+				case 'up':
+					pos.y-=250;
+					break;
+				case 'down':
+					pos.y+=250;
+					break;
+				case 'left':
+					pos.x+=250;
+					break;
+				case 'right':
+					pos.x-=250;
+					break;
+				case 'in':
+					pos.z-=250;
+					break;
+				case 'out':
+					pos.z+=250;
+					break;
+			}
+			this.Graph.cameraPosition(pos);		
+		}
 	  },
 	  mounted() {
 		this.currentId=this.session.id;
-		/* let cmap1=this.copyData(this.cmap); // Orphaned links?
-		let cnodes=cmap1.nodes.map(n => n.id),orp=[];
-		cmap1.links.forEach(ll => {if (!cnodes.includes(ll.target.id) || !cnodes.includes(ll.source.id)) orp.push(ll)});
-		console.log('Orphans',orp.length);
-		*/
+		
 		this.Graph = ForceGraph3D({ controlType: 'orbit' })
 		(document.getElementById(this.mapId));
 		this.Graph
