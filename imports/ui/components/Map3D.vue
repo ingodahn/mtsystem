@@ -9,10 +9,10 @@
 			<h2>Panel</h2>
 		</v-row>
 		<v-row>
-			<v-btn color="primary" class="mx-1 my-1" @click="showAll">Show all</v-btn>
-			<v-btn color="primary" class="mx-1 my-1" @click="showLess">Less</v-btn>
-			<v-btn color="primary" class="mx-1 my-1" @click="showMore">More</v-btn>
-			<v-btn color="primary" class="mx-1 my-1" @click="explore">Explore</v-btn>
+			<v-btn color="primary" class="mx-1 my-1" @click="showAll" :disabled="!showOne">Show all</v-btn>
+			<v-btn color="primary" class="mx-1 my-1" @click="showLess" :disabled="!showOne">Less</v-btn>
+			<v-btn color="primary" class="mx-1 my-1" @click="showMore" :disabled="!showOne">More</v-btn>
+			<v-btn color="primary" class="mx-1 my-1" @click="explore" :disabled="!currentNode">Explore</v-btn>
 		</v-row>
 		<v-row><h3>Camera control</h3></v-row>
 		<v-row>
@@ -41,7 +41,8 @@
 			  //currentId: null,
 			  currentNode: null,
 			  currentColor: 'lightblue',
-			  Graph: null
+			  Graph: null,
+			  showOne: false
 		  }
 	  },
 	  components: { NodeInfo },
@@ -89,6 +90,7 @@
 				this.Graph.d3Force('center', null);
 				this.Graph.cameraPosition({},node);
 				this.Graph.zoomToFit(500,10,n => n == node);
+				this.showOne=true;
 			  //this.$emit('nodeclicked',node.id);
 		  },
 		  setCurrentNode(node,color) {
@@ -107,6 +109,7 @@
 			return this.neighbourhood().nodes.map(n => n.id);
 		},
 		showAll() {
+			this.showOne=false;
 			this.Graph.graphData(this.cmap);
 			this.Graph.d3Force('center', null);
 			this.Graph.zoomToFit(500);
@@ -168,7 +171,9 @@
 			.nodeLabel(node => `${node.title}`)
 			.nodeRelSize(6)
 			//.linkDirectionalArrowLength(10)
+			.linkWidth(5)
 			.linkDirectionalParticles(10)
+			.linkDirectionalParticleWidth(2.5)
 			.linkDirectionalParticleSpeed(d => 0.005)
 			.nodeAutoColorBy('group')
 			.nodeThreeObject(node => {
