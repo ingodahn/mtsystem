@@ -69,7 +69,6 @@ export default {
             this.current._id = newId;
             this.current.updatedAt = newDate;
             this.current.type=this.session.type;
-            console.log(this.current);
            Meteor.call('insertItem',this.current);
            Object.keys(this.updateRelations).forEach(rid => {
                 Meteor.call('deleteItem',{

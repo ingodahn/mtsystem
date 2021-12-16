@@ -5,9 +5,6 @@
                    
                     <v-btn-toggle v-model="sidebar">
                         <v-btn color="primary">Relation</v-btn>
-                        <!--
-                        <v-btn color="primary" v-if="session.id && mode == 'list'" :disabled="!sameType">Map</v-btn>
-                        -->
                         <v-btn color="primary" v-if="currentUser && session.id && session.mode == 'single'">Note</v-btn>
                     </v-btn-toggle>
                     <div v-if="sidebar==0">
@@ -26,38 +23,6 @@
                         <relation :key="session.id+mode" v-if="session.mode == 'single'" :relation="id2relation(currentRelation)" :mode="mode" v-on:setTarget="setTarget" v-on:selectedId="setNode" :targetsSet="targetsSet(currentRelation)"></relation>
                     </div>
                     <UserNotes v-if="currentUser && session.id && sidebar==1" :title="title" :currentNote="currentNote" :key="currentId"></UserNotes>
-                    <!--
-                    <div v-if="currentUser && currentId && sidebar==1">
-                        <v-expansion-panels accordion>
-                            <v-expansion-panel>
-                                <v-expansion-panel-header>Info</v-expansion-panel-header>
-                                <v-expansion-panel-content>
-                                    <h3>Environment of {{ type }} <em>{{ title }}</em> w.r.t. relation <em>{{ id2relation(currentRelation).name }}</em></h3>
-                                    <p>Click node for details. Drag nodes to pin</p>
-                                    <p v-if="currentUser">Color distinguishes 
-                                        <span style="background-color:green; color: white;">{{ type }}s I know</span> from 
-                                        <span style="background-color:yellow">{{ type }}s I am exploring</span> and
-                                        <span style="background-color:red; color: white;">{{ type }}s I find interesting</span>. 
-                                    </p>
-                                    <p>The {{ type }} <em>{{ title }}</em> is shown in black.</p>
-                                    <p>The {{ type }}s, that have been updated in the last 
-                                            <select color="primary" v-model="session.newNodes">
-                                                <option>1</option>
-                                                <option>2</option>
-                                                <option>3</option>
-                                                <option>7</option>
-                                                <option>14</option>
-                                                <option>30</option>
-                                            </select>      
-                                        days, are marked with an <span style="border:solid orange; border-radius: 10px; padding: 1px;">orange ring</span>.
-                                    </p>
-                                </v-expansion-panel-content>
-                            </v-expansion-panel>
-                        </v-expansion-panels>
-                        
-                        <ConceptMap :key="currentId+currentRelation+newNodes" :cmap="neighbourhood(2)" v-on:nodeclicked="setNode" orientation=null view="2D"></ConceptMap>
-                    </div>
-                    -->
                 </v-col>
             </v-row>
     </v-container>
@@ -66,7 +31,6 @@
 <script>
 import { UnitsCollection } from "../../api/UnitsCollection";
 import UserNotes from "./UserNotes.vue";
-import ConceptMap from "./ConceptMap.vue";
 import Relation from "./Relation.vue";
 
 export default {
@@ -80,7 +44,6 @@ export default {
     props: ['title','relations','mode'],
     components: {
         UserNotes,
-        ConceptMap,
         Relation
     },
     
@@ -149,7 +112,6 @@ export default {
                     default: color="lightblue";
                 }
                 let updated=new Date(UnitsCollection.findOne({_id: c}).updatedAt).getTime();
-                //let today = new Date()
                 let isNew = (updated && updated > back)?true:false;
                 if (c == this.currentId) color="black";
                 if (nodeStatus[c]) group=nodeStatus[c];

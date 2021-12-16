@@ -99,7 +99,6 @@ export default {
             }).fetch().map(d => d.target);
             this.currentBelow=rds;
             rs=UnitsCollection.find({_id: {$in: rds}},{sort: { title: 1}}).fetch();
-            console.log('Nr. of targets: '+rs.length);
             return rs;
         },
         getRelationDescription (relation) {
@@ -131,7 +130,6 @@ export default {
         getTargets () {
             if (this.targetsSet) return this.targetsSet;
             if (! this.$root.$data.session.id) return [];
-            //console.log(this.relation);
             return this.getCurrentNodeIsSource(this.relation.id).map(e => e._id)
         }
     },

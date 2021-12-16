@@ -2,27 +2,7 @@
  <v-container>
     <v-row>
         <v-col xs="12" md="8">
-            <!--
-            <h3>MathTrek {{ this.session.type }}s <span v-if="sameType"> and the relation <em>{{ id2relation(session.relation).name }}</em></span></h3>      
-            -->
-            <p>Click node for details. Drag nodes to pin. Size indicates weight w.r.t. all relations.</p>
-            <p v-if="currentUser">Color distinguishes 
-                <span style="background-color:green; color: white;">{{ session.type }}s I know</span> from 
-                <span style="background-color:yellow">{{ session.type }}s I am exploring</span> and
-                <span style="background-color:red; color: white;">{{ session.type }}s I find interesting</span>. 
-            </p>
-            <!-- This bypasses session.set: !? -->
-            <p>The {{ session.type }}s, that have been updated in the last 
-                <select v-model="session.newNodes">
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>7</option>
-                    <option>14</option>
-                    <option>30</option>
-                </select>      
-            days, <span v-html="markNew"></span>.
-            </p>
+           
             <v-row xs="12" md="8" align="center">
                 <v-col
                     class="d-flex"
@@ -47,20 +27,48 @@
                     ></v-select>
                 </v-col>
             </v-row>
-            
+            <v-card class="mx-auto">
+               <v-card-actions>
+                   <v-btn text color="blue" @click="reveal = !reveal">Graph Legend</v-btn>
+               </v-card-actions>
+               <v-expand-transition>
+                   <v-card v-if="reveal" class="transition-fast-in-fast-out v-card--reveal" style="height: 100%;">
+                       <v-card-text>
+            <p>Click node for details. Drag nodes to pin. Size indicates weight w.r.t. all relations.</p>
+            <p v-if="currentUser">Color distinguishes 
+                <span style="background-color:green; color: white;">{{ session.type }}s I know</span> from 
+                <span style="background-color:yellow">{{ session.type }}s I am exploring</span> and
+                <span style="background-color:red; color: white;">{{ session.type }}s I find interesting</span>. 
+            </p>
+            <!-- This bypasses session.set: !? -->
+            <p>The {{ session.type }}s, that have been updated in the last 
+                <select v-model="session.newNodes">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>7</option>
+                    <option>14</option>
+                    <option>30</option>
+                </select>      
+            days, <span v-html="markNew"></span>.
+            </p>
+            <p>The last selected {{ session.type }} is shown in <span style="background-color:pink; color: black;">pink</span></p>
+                       </v-card-text>
+                   </v-card>
+               </v-expand-transition>
+           </v-card>
         </v-col>
         <v-col xs="12" md="4">
             <sidebar :relations="relations" title='' mode="list"></sidebar>
         </v-col>
     </v-row>
-            <ConceptMap :key="session.relation+newNodes+orientation+session.view" :cmap="allNodes" v-on:nodeclicked="mapCurrent" :orientation="orientation" :view="session.view"></ConceptMap>
+    <Maps :key="session.relation+newNodes+orientation+session.view" :cmap="allNodes" :orientation="orientation"></Maps>
  </v-container>
 </template>
 
 <script>
-import { Session } from "meteor/session";
 import { UnitsCollection } from "../../api/UnitsCollection";
-import ConceptMap from "./ConceptMap.vue";
+import Maps from "./Maps.vue";
 import Sidebar from "./Sidebar.vue";
 
 
@@ -80,11 +88,12 @@ export default {
 			],
             orientation: null,
             views: ['2D', '3D'],
-            view: '2D'
+            view: '2D',
+            reveal: false
         }
     },
     components: {
-        ConceptMap,
+        Maps,
         Sidebar
     },
     mounted () {
