@@ -55,17 +55,24 @@
 		  },
 		  neighbourhood() {
 			const node=this.currentNode, d=this.session.neighbourhood;
+			
             const cid=node.id;
+			function linkSourceId(link) {
+				return ((typeof link.source) == 'object')?link.source.id:link.source;
+			}
+			function linkTargetId(link) {
+				return ((typeof link.target) == 'object')?link.target.id:link.target;
+			}
 			
             let id=0, newNodeIds=[cid],nodeIds=[cid];
             while (id < d) {
                 let  nextNodeIds=[];
 				
-				this.cmap.links.filter(ll => newNodeIds.includes(ll.source.id)).forEach(lf => {
-					nextNodeIds.push(lf.target.id)
+				this.cmap.links.filter(ll => newNodeIds.includes(linkSourceId(ll))).forEach(lf => {
+					nextNodeIds.push(linkTargetId(lf))
 				});
-				this.cmap.links.filter(ll => newNodeIds.includes(ll.target.id)).forEach(lf => {
-					nextNodeIds.push(lf.source.id)
+				this.cmap.links.filter(ll => newNodeIds.includes(linkTargetId(ll))).forEach(lf => {
+					nextNodeIds.push(linkSourceId(lf))
 				});
 				
                 let nextNodeReduced=[...new Set(nextNodeIds)].filter(item => (! nodeIds.includes(item)));
@@ -75,14 +82,14 @@
             }
 			
 			let nodes=this.cmap.nodes.filter(nn => nodeIds.includes(nn.id));
-			let links=this.cmap.links.filter(nn => (nodeIds.includes(nn.source.id) && nodeIds.includes(nn.target.id)));
-			console.log({"nodes": nodes, "links": links});
+			let links=this.cmap.links.filter(nn => (nodeIds.includes(linkSourceId(nn)) && nodeIds.includes(linkTargetId(nn))));
+			
             return {nodes: nodes, links: links};
         },
 	  },
 	  methods: {
 		  nodeClicked(node) {
-			  console.log('Clicked on',node.title);
+			  
 			  node.x=0;
 			  node.y=0;
 			  this.setCurrentNode(node,'pink');
@@ -102,6 +109,7 @@
 				  this.currentColor = node.color;
 				  node.color=color;
 				  this.currentNode=node;
+				  this.session.id='';
 			  }
 		  },
 		  
@@ -159,18 +167,21 @@
 	  },
 	  mounted() {
 		//this.currentId=this.session.id;
-		if (this.session.id) this.currentNode=this.cmap.node.find(d => d.id == this.session.id)
 		
+		if (this.session.id) {
+			this.currentNode=this.cmap.nodes.find(d => d.id == this.session.id);
+			this.currentColor=this.currentNode.color;
+			this.currentNode.color='pink';
+			this.showOne = true;
+		}
 		this.Graph = ForceGraph3D({ controlType: 'orbit' })
 		(document.getElementById(this.mapId));
 		this.Graph
-			.graphData(this.cmap)
 			//.graphData(this.cmap)
 			.width(this.$refs[this.mapId].clientWidth)
 			.nodeId('id')
 			.nodeLabel(node => `${node.title}`)
 			.nodeRelSize(6)
-			//.linkDirectionalArrowLength(10)
 			.linkWidth(5)
 			.linkDirectionalParticles(10)
 			.linkDirectionalParticleWidth(2.5)
@@ -200,12 +211,21 @@
 			
 		// ms to cool down
 		  this.Graph.cooldownTime(2000);
+		  
+		  if (this.currentNode) {
+			  
+			  let nb=this.neighbourhood;
+			  
+			  this.Graph.graphData(nb);
+		  }  else this.Graph.graphData(this.cmap);
+
 		  // Zoom to fit
 		  this.Graph.d3Force('center', null);
-
+			//this.Graph.graphData(this.cmap);
 		  // fit to canvas when engine stops
 		  //Graph.onEngineStop(() => Graph.zoomToFit(500));
 		  this.Graph.zoomToFit(500);
+		  
 	},
   }
 			

@@ -21,18 +21,23 @@ export default {
     data () {
         return {
             session: this.$root.$data.session,
-            items: []
+            items: [],
+            selectedId: ''
         }
     },
-    props: ['type','currentId'],
+    props: ['type'],
 
     mounted () {
+        this.selectedId=this.session.id;
     },
 
     watch: {
-        selectedId: function () {
-            if (this.selectedId) this.$emit('selected',this.selectedId);
-            else this.$emit('selected','')
+        selectedId: function (newId,oldId) {
+            if (newId == oldId) return;
+            this.session.set('id',newId);
+            if (newId) this.session.set('mode','single'); else this.session.set('mode','all');
+            //if (this.selectedId) this.$emit('selected',this.selectedId);
+            //else this.$emit('selected','')
         }
     },
 
@@ -40,9 +45,6 @@ export default {
         selectLabel () {
             return "Select "+this.type+':';
         },
-        selectedId () {
-            return this.session.id;
-        }
     },
 
     meteor: {

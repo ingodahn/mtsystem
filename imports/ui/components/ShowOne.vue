@@ -4,6 +4,7 @@
             <v-row>
                 <v-col xs="12" md="8">
                     <h2> {{ current.title }}</h2>
+                    <v-btn color="primary" id="btnRelated" @click="session.set('mode','all')">Related {{ type }}s</v-btn>
                         <show-math-doc :key="current.description" v-if="current.description " :content="current.description"></show-math-doc>
                         <div v-if="current.readMore">
                             <v-btn v-if="! showMore" @click="showMore=true">Show more...</v-btn>

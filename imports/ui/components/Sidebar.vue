@@ -5,8 +5,10 @@
                    
                     <v-btn-toggle v-model="sidebar">
                         <v-btn color="primary">Relation</v-btn>
+                        <!--
                         <v-btn color="primary" v-if="session.id && mode == 'list'" :disabled="!sameType">Map</v-btn>
-                        <v-btn color="primary" v-if="currentUser && session.id">Note</v-btn>
+                        -->
+                        <v-btn color="primary" v-if="currentUser && session.id && session.mode == 'single'">Note</v-btn>
                     </v-btn-toggle>
                     <div v-if="sidebar==0">
                         <div v-if="relations.length > 1">
@@ -21,9 +23,10 @@
                             </v-select>
                             </div>
                         </div>
-                        <relation :key="session.id+mode" :relation="id2relation(currentRelation)" :mode="mode" v-on:setTarget="setTarget" v-on:selectedId="setNode" :targetsSet="targetsSet(currentRelation)"></relation>
+                        <relation :key="session.id+mode" v-if="session.mode == 'single'" :relation="id2relation(currentRelation)" :mode="mode" v-on:setTarget="setTarget" v-on:selectedId="setNode" :targetsSet="targetsSet(currentRelation)"></relation>
                     </div>
-                    <UserNotes v-if="currentUser && session.id && sidebar==2" :title="title" :currentNote="currentNote" :key="currentId"></UserNotes>
+                    <UserNotes v-if="currentUser && session.id && sidebar==1" :title="title" :currentNote="currentNote" :key="currentId"></UserNotes>
+                    <!--
                     <div v-if="currentUser && currentId && sidebar==1">
                         <v-expansion-panels accordion>
                             <v-expansion-panel>
@@ -54,6 +57,7 @@
                         
                         <ConceptMap :key="currentId+currentRelation+newNodes" :cmap="neighbourhood(2)" v-on:nodeclicked="setNode" orientation=null view="2D"></ConceptMap>
                     </div>
+                    -->
                 </v-col>
             </v-row>
     </v-container>

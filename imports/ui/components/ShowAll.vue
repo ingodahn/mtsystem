@@ -2,7 +2,9 @@
  <v-container>
     <v-row>
         <v-col xs="12" md="8">
-            <h3>All {{ session.type }}s <span v-if="sameType"> and the relation <em>{{ id2relation(session.relation).name }}</em></span></h3>      
+            <!--
+            <h3>MathTrek {{ this.session.type }}s <span v-if="sameType"> and the relation <em>{{ id2relation(session.relation).name }}</em></span></h3>      
+            -->
             <p>Click node for details. Drag nodes to pin. Size indicates weight w.r.t. all relations.</p>
             <p v-if="currentUser">Color distinguishes 
                 <span style="background-color:green; color: white;">{{ session.type }}s I know</span> from 
@@ -97,6 +99,14 @@ export default {
         }
     },
     computed: {
+        subject () {
+            if (this.session.id) {
+                let name=UnitsCollection.findOne({_id: this.session.id}).title;
+                return "The "+this.session.type+" "+name;
+            } else {
+                return "All "+this.session.type+"s"
+;            }
+        },
         allNodes () {
             var it = {}, nodeIds = []
             UnitsCollection.find({type: this.session.type}).fetch().forEach(c => {

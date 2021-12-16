@@ -43,11 +43,13 @@
             view: '2D',
             neighbourhood: 2,
             newNodes: 7,
-            debug: false,
+            debug: true,
             set (item,newValue) {
               if (this.debug) console.log('Session setting', item,'to',newValue)
               this[item] = newValue;
             },
+            mode: 'all',
+            /*
             mode () {
               if (this.id) {
                 if (this.edit) return "update";
@@ -57,6 +59,7 @@
                 else return "all";
               }
             },
+            */
             clear () {
               this.type = defaultType;
               this.relation=defaultRelation[defaultType];
@@ -75,8 +78,9 @@
     methods: {
       launchAny(t) {
         this.session.type=t;
+        this.session.mode='all';
         this.session.edit=false;
-        this.session.id='';
+        //this.session.id='';
         this.page=t;
       }
     },
