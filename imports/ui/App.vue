@@ -43,23 +43,13 @@
             view: '2D',
             neighbourhood: 2,
             newNodes: 7,
-            debug: true,
+            debug: false,
             set (item,newValue) {
               if (this.debug) console.log('Session setting', item,'to',newValue)
               this[item] = newValue;
             },
             mode: 'all',
-            /*
-            mode () {
-              if (this.id) {
-                if (this.edit) return "update";
-                else return "single";
-              } else {
-                if (this.edit) return "new";
-                else return "all";
-              }
-            },
-            */
+            
             clear () {
               this.type = defaultType;
               this.relation=defaultRelation[defaultType];
