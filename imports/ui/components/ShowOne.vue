@@ -12,22 +12,22 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                    <show-math-doc :key="current.description" v-if="current.description " :content="current.description"></show-math-doc>
-                    <div v-if="current.readMore">
+                        <show-math-doc :key="current.description" v-if="current.description " :content="current.description"></show-math-doc>
+                    </v-row>
+                    <v-row v-if="current.readMore">
                         <v-btn v-if="! showMore" @click="showMore=true">Show more...</v-btn>
                         <show-math-doc :key="current.readMore" v-if="showMore" :content="current.readMore"></show-math-doc>
                         <v-btn v-if="showMore" @click="showMore=false">Show less</v-btn>
-                    </div>
-                    <div v-if="current.see">
+                    </v-row>
+                    <v-row v-if="current.see">
                         <a :href="current.see" target="_blank">See also</a>
-                    </div>
-                    <div>
+                    </v-row>
+                    <v-row>
                         <a :href="wikiUrl" target="_blank">MathTrek-Wiki</a> (comments, discussions)
-                    </div>
                     </v-row>
                 </v-col>
                 <v-col xs="12" md="4">
-                    <sidebar :currentId="currentId" :title="current.title" :type="type" :relations="relations" mode="list" v-on:setNode="setNode" :session="session"></sidebar>
+                    <sidebar :currentId="currentId" :title="current.title" :type="type" :relations="relations" mode="list"></sidebar>
                 </v-col>
             </v-row>
         

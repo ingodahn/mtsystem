@@ -65,7 +65,7 @@ export default {
     },
     methods: {
         cancel () {
-            this.session.set('edit',false);
+            this.session.set('mode','single');
         },
         save () {
             this.current.updatedAt = new Date();
@@ -85,7 +85,7 @@ export default {
                     });
                 })
             });
-            this.session.set('edit',false);
+            this.session.set('mode','single');
         },
         updatedRelations (Rels) {
             this.updateRelations = Rels;

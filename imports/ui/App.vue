@@ -69,8 +69,6 @@
       launchAny(t) {
         this.session.type=t;
         this.session.mode='all';
-        this.session.edit=false;
-        //this.session.id='';
         this.page=t;
       }
     },

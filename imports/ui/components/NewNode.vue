@@ -58,7 +58,7 @@ export default {
     methods: {
         cancel () {
             //this.$emit('new','');
-            this.session.set('edit',false);
+            this.session.set('mode','all');
         },
         updatedRelations (Rels) {
             this.updateRelations = Rels;

@@ -1,5 +1,6 @@
 <template>
     <div class="container">
+        <p>Relation running with mode {{mode}}</p>
         <v-expansion-panels accordion>
             <v-expansion-panel>
                 <v-expansion-panel-header>Info</v-expansion-panel-header>
@@ -37,7 +38,9 @@
                 <p v-else>{{ current.title }} {{ relation.inverse }} nothing else in this system.</p>
             </div>
         </div>
-        <div v-if = "mode == 'update'">
+        <p>Mode: {{ mode}}</p>
+        <div v-if="mode == 'update'">
+            <p>Updating</p>
             <div v-if="relation.sourceType == session.type" data-app>
                 <v-autocomplete
                     label="Targets:"
@@ -68,8 +71,12 @@ export default {
             targets: this.getTargets()
         }
     },
-    props: ['relation', 'mode','targetsSet'],
+    props: ['relation', 
+        //'mode',
+        'targetsSet'
+        ],
     created () {
+        console.log('Relation called with mode',this.mode);
         //this.session=this.$root.$data.session;
     },
     watch: {
@@ -122,7 +129,6 @@ export default {
             return desc;
         },
         selected (doc) {
-            //this.$emit('selectedId',doc._id);
             this.session.set('id',doc._id);
             this.session.set('type',doc.type);
             this.session.set('edit',false);
@@ -137,6 +143,9 @@ export default {
     computed: {
         session () {
             return this.$root.$data.session;
+        },
+        mode () {
+            return (this.session.mode=='new' || this.session.mode=='update')?'update':'list';
         },
         current () {
             

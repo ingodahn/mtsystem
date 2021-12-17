@@ -103,9 +103,6 @@ export default {
         id2relation (id) {
             return this.relations.find(e => e.id == id);
         },
-        mapCurrent (mapNode) {
-            this.$emit('nodeselected',mapNode);
-        }
     },
     computed: {
         subject () {

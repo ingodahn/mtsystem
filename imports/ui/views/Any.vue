@@ -11,9 +11,9 @@
                     
                 </v-col>
                 <v-col xs="12" md="8" name="editorMenu" v-if="isEditor">
-                        <v-btn v-if="session.mode=='all'" color="success" id="btnNew" @click="session.edit=true">New {{ type }}</v-btn>
+                        <v-btn v-if="session.mode=='all'" color="success" id="btnNew" @click="session.mode='new'">New {{ type }}</v-btn>
                         <span v-if="session.mode == 'single'">
-                            <v-btn color="warning" id="btnUpdate" @click="session.edit = true">Update {{ type }}</v-btn>
+                            <v-btn color="warning" id="btnUpdate" @click="session.mode = 'update'">Update {{ type }}</v-btn>
                             <v-btn color="error" id="btnDelete" @click="deleteNode">Delete {{ type }}</v-btn>
                         </span>
                 </v-col>
@@ -21,7 +21,7 @@
             
                 <v-row v-if="session.type">
                 <v-col xs="12">
-                    <show-all :key="type" v-if="session.mode=='all'" :relations="relations" v-on:nodeselected="nodeSelected" v-on:relationselected="relationSelected"></show-all>
+                    <show-all :key="type" v-if="session.mode=='all'" :relations="relations"></show-all>
                     <show-one :key="session.id" v-if="session.mode=='single'" :relations="relations" v-on:setNode="nodeSelected" v-on:relationselected="relationSelected"></show-one>
                     <new-node v-if="session.mode=='new'" :relations="relations" v-on:new="setNode"></new-node>
                     <update-node v-if="session.mode=='update'" :relations="relations"></update-node>
@@ -108,7 +108,7 @@ export default {
                 target: this.session.id
             });
             this.session.set('id','');
-            this.mode="all";
+            this.session.mode="all";
         }
     },
     computed: {
