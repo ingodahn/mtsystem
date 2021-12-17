@@ -3,20 +3,28 @@
         
             <v-row>
                 <v-col xs="12" md="8">
-                    <h2> {{ current.title }}</h2>
-                    <v-btn color="primary" id="btnRelated" @click="session.set('mode','all')">Related {{ type }}s</v-btn>
-                        <show-math-doc :key="current.description" v-if="current.description " :content="current.description"></show-math-doc>
-                        <div v-if="current.readMore">
-                            <v-btn v-if="! showMore" @click="showMore=true">Show more...</v-btn>
-                            <show-math-doc :key="current.readMore" v-if="showMore" :content="current.readMore"></show-math-doc>
-                            <v-btn v-if="showMore" @click="showMore=false">Show less</v-btn>
-                        </div>
-                        <div v-if="current.see">
-                            <a :href="current.see" target="_blank">See also</a>
-                        </div>
-                        <div>
-                            <a :href="wikiUrl" target="_blank">MathTrek-Wiki</a> (comments, discussions)
-                        </div>
+                    <v-row>
+                        <v-col xs="12" md="8">
+                            <h2> {{ current.title }}</h2>
+                        </v-col>
+                        <v-col xs="12" md="4">
+                            <v-btn color="primary" id="btnRelated" @click="session.set('mode','all')">Related {{ type }}s</v-btn>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                    <show-math-doc :key="current.description" v-if="current.description " :content="current.description"></show-math-doc>
+                    <div v-if="current.readMore">
+                        <v-btn v-if="! showMore" @click="showMore=true">Show more...</v-btn>
+                        <show-math-doc :key="current.readMore" v-if="showMore" :content="current.readMore"></show-math-doc>
+                        <v-btn v-if="showMore" @click="showMore=false">Show less</v-btn>
+                    </div>
+                    <div v-if="current.see">
+                        <a :href="current.see" target="_blank">See also</a>
+                    </div>
+                    <div>
+                        <a :href="wikiUrl" target="_blank">MathTrek-Wiki</a> (comments, discussions)
+                    </div>
+                    </v-row>
                 </v-col>
                 <v-col xs="12" md="4">
                     <sidebar :currentId="currentId" :title="current.title" :type="type" :relations="relations" mode="list" v-on:setNode="setNode" :session="session"></sidebar>

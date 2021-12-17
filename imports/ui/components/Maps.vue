@@ -142,6 +142,7 @@
 		},
 		explore () {
 			this.session.id=this.currentNode.id;
+			this.session.mode='single';
 		},
 		cameraControl (dir) {
 			let pos=this.Graph.cameraPosition();
