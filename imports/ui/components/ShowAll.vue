@@ -114,11 +114,28 @@ export default {
 ;            }
         },
         allNodes () {
-            var it = {}, nodeIds = []
-            UnitsCollection.find({type: this.session.type}).fetch().forEach(c => {
-                it[c._id]=c.title;
-                nodeIds.push(c._id);
-            });
+            let myNodes=UnitsCollection.find({type: this.session.type}).fetch();
+            let linkRels=UnitsCollection.find({
+                    type: 'relation', 
+                    name: this.session.relation, 
+                }).fetch();
+            if (!this.sameType) {
+                const r=this.id2relation(this.session.relation);
+                if (this.session.type == r.sourceType) {
+                    linkRels.forEach(ll => {
+                        if (! myNodes.find(nx => nx._id == ll.target))
+                            myNodes.push(UnitsCollection.findOne({_id: ll.target}));
+                    });
+                };
+                if (this.session.type == r.targetType) {
+                    linkRels.forEach(ll => {
+                        if (! myNodes.find(nx => nx._id == ll.source)) 
+                            myNodes.push(UnitsCollection.findOne({_id: ll.source}));
+                    });
+                };
+            }
+           
+           const nodeIds=myNodes.map(n => n._id);
             let nodeStatus={};
             if (this.currentUser) {
                 UnitsCollection.find({type: 'note',
@@ -128,40 +145,33 @@ export default {
                     nodeStatus[n.item]=n.status;
                 });
             }
-            let linkRels = [];
-           if (this.sameType) {
-                linkRels =UnitsCollection.find({
-                    type: 'relation', 
-                    name: this.session.relation, 
-                    //Same-Type-Links only!
-                    source: {$in: nodeIds}
-                }).fetch();
-           }
-            
-            
+           
             let links = [],nodes = [];
-            nodeIds.forEach(c => {
+            myNodes.forEach(n => {
+                let nid=n._id;
                 let color="lightblue";
                 const back = new Date().getTime()-parseInt(this.newNodes)*24*60*60*1000;
-                switch (nodeStatus[c]) {
+                switch (nodeStatus[nid]) {
                     case "100": color="green"; break;
                     case "2": color="yellow"; break;
                     case "150": color="red"; break;
                     default: color="lightblue";
                 }
-                let updated=new Date(UnitsCollection.findOne({_id: c}).updatedAt).getTime();
+                let updated=new Date(n.updatedAt).getTime();
                 let isNew = (updated && updated > back)?true:false;
-                if (nodeStatus[c]) group=nodeStatus[c];
-                let nodeval=UnitsCollection.find({$or: [{target: c, type: 'relation'},{source: c, type: 'relation'}]}).fetch().length/3; // Denominator may be varied for readability
-                nodes.push({"id": c, "title": it[c], "color": color, "isNew": isNew, val: nodeval});
+                if (nodeStatus[nid]) group=nodeStatus[nid];
+                let nodeval=UnitsCollection.find({$or: [{target: nid, type: 'relation'},{source: nid, type: 'relation'}]}).fetch().length/3; // Denominator may be varied for readability
+                nodes.push({"id": nid, "title": n.title, "color": color, "isNew": isNew, val: nodeval, type: n.type});
             });
             
             linkRels.forEach(r => {
                 links.push({source: r.source, target: r.target})
             });
+            
             return {"nodes": nodes, "links": links};
         },
         sameType () {
+            console.log(this.session.relation);
             const r=this.id2relation(this.session.relation);
             return (r.sourceType == r.targetType);
         },

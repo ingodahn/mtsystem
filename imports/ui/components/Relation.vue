@@ -1,6 +1,5 @@
 <template>
     <div class="container">
-        <p>Relation running with mode {{mode}}</p>
         <v-expansion-panels accordion>
             <v-expansion-panel>
                 <v-expansion-panel-header>Info</v-expansion-panel-header>
@@ -38,7 +37,6 @@
                 <p v-else>{{ current.title }} {{ relation.inverse }} nothing else in this system.</p>
             </div>
         </div>
-        <p>Mode: {{ mode}}</p>
         <div v-if="mode == 'update'">
             <p>Updating</p>
             <div v-if="relation.sourceType == session.type" data-app>
@@ -76,7 +74,6 @@ export default {
         'targetsSet'
         ],
     created () {
-        console.log('Relation called with mode',this.mode);
         //this.session=this.$root.$data.session;
     },
     watch: {

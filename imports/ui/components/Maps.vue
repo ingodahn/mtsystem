@@ -142,6 +142,7 @@
 		},
 		explore () {
 			this.session.id=this.currentNode.id;
+			if (this.session.type != this.currentNode.type) this.session.set('type',this.currentNode.type);
 			this.session.mode='single';
 		},
 		cameraControl (dir) {

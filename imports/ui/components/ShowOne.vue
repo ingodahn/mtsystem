@@ -8,7 +8,7 @@
                             <h2> {{ current.title }}</h2>
                         </v-col>
                         <v-col xs="12" md="4">
-                            <v-btn color="primary" id="btnRelated" @click="session.set('mode','all')">Related {{ type }}s</v-btn>
+                            <v-btn color="primary" id="btnRelated" @click="session.set('mode','all')">Related {{ relatedType }}s</v-btn>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -101,6 +101,10 @@ export default {
         },
         type () {
             return this.session.type;
+        },
+        relatedType () {
+            const cr = this.relations.find(r => r.id==this.session.relation);
+            return (cr.sourceType == this.session.type)?cr.targetType:cr.sourceType;
         },
         wikiUrl () {
             const base = "https://wiki.mathtrek.eu?title=";
