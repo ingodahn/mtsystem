@@ -20,7 +20,7 @@
                         </v-list-item>
                     </v-list-item-group>
                 </v-list>
-                <p v-else>{{ current.title }} {{ relation.name }} nothing else in this system.</p>
+                <p v-else>{{ current.title }} {{ relation.name }} no {{ relation.targetType }} in this system.</p>
             </div>
             <div v-if="relation.targetType == session.type">
                 <v-list v-if="getCurrentNodeIsTarget(relation.id).length">
@@ -34,7 +34,7 @@
                         </v-list-item>
                     </v-list-item-group>
                 </v-list>
-                <p v-else>{{ current.title }} {{ relation.inverse }} nothing else in this system.</p>
+                <p v-else>{{ current.title }} {{ relation.inverse }} no {{ relation.sourceType }} in this system.</p>
             </div>
         </div>
         <div v-if="mode == 'update'">

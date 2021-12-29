@@ -99,7 +99,7 @@ export default {
         typedRelations () {
             let tr=[];
             this.relations.forEach(r => {
-                tr.push({text: (r.sourceType == this.session.type)?r.name:r.inverse, value: r.id})
+                tr.push({text: (r.sourceType == this.session.type)?r.name+' '+r.targetType:r.inverse+' '+r.sourceType, value: r.id})
             });
             return tr;
         },

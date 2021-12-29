@@ -46,6 +46,7 @@ const relations = [
         inverse: 'is a generalization of',
         description: "\"SOURCE\" is an immediate consequence of the more general \"TARGET\"."
     },
+    
     {
         sourceType: 'person',
         targetType: 'person',
@@ -54,11 +55,20 @@ const relations = [
         inverse: 'inspired',
         description: "Work of SOURCE builds on the work of TARGET."
     },
+    
+    {
+        sourceType: 'person',
+        targetType: 'person',
+        id: 'PinspiredP', 
+        name: 'inspired', 
+        inverse: 'builds on',
+        description: "Work of SOURCE inspired the work of TARGET."
+    },
     {
         sourceType: 'person',
         targetType: 'subject',
         id: 'PcontributedToS', 
-        name: 'contributed to subject', 
+        name: 'contributed to', 
         inverse: 'was developed by',
         description: "SOURCE made key contributions to TARGET."
     },
@@ -66,7 +76,7 @@ const relations = [
         sourceType: 'person',
         targetType: 'concept',
         id: 'PcontributedToC', 
-        name: 'contributed to concept', 
+        name: 'contributed to', 
         inverse: 'was developed by',
         description: "SOURCE contributed to the development of TARGET."
     },
@@ -74,16 +84,16 @@ const relations = [
         sourceType: 'theorem',
         targetType: 'subject',
         id: 'isAppliedIn', 
-        name: 'is applied in subject', 
-        inverse: 'applies theorem',
+        name: 'is applied in', 
+        inverse: 'applies',
         description: "The theorem SOURCE is applied to solve problems in subject TARGET."
     },
     {
         sourceType: 'concept',
         targetType: 'subject',
         id: 'isUsedIn', 
-        name: 'is used in subject', 
-        inverse: 'uses concept',
+        name: 'is used in', 
+        inverse: 'uses',
         description: "Concept SOURCE is important in subject TARGET."
     },
 ];
@@ -93,7 +103,7 @@ const defaultRelation = {
     subject: 'SisBelowS',
     concept: 'CisBelowC',
     theorem: 'TisBelowT',
-    person: 'PbuildsOnP',
+    person: 'PinspredP',
 };
 const defaultNode = {
     subject: 'Mathematics',

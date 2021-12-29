@@ -63,50 +63,19 @@ export default {
           if (confirm("Do you REALLY want to replace all data on "+window.location.href+'?')) {
             const allRels=UnitsCollection.find({
             type: 'relation',
-            name: 'isBelow'
+            name: 'PbuildsOnP'
             }).fetch();
-            var typeErrors=0;
-            var checked=0;
+            
             allRels.forEach(r => {
-              checked++;
-              let s=UnitsCollection.findOne({_id: r.source});
-              let st= 'no source'
-              if (! s) {
-                console.log('No source'); return;
-                } else {
-                  st=s.type;
-                }
-              let t=UnitsCollection.findOne({_id: r.target});
-              let tt='no target'
-              if (! t) {
-                console.log('No target'); return;
-                } else {
-                  tt=t.type;
-                }
-
-              if (st != tt) typeErrors++;
-              else {
-                switch (st) {
-                  case 'subject':
-                    r.name='SisBelowS';
-                    break;
-                  case 'concept':
-                    r.name='CisBelowC';
-                    break;
-                  case 'theorem':
-                    r.name='TisBelowT';
-                    break;
-                  case 'person':
-                    r.name='PbuildsOnP';
-                    break;
-                  default:
-                    console.log('Unhandled type '+st);
-                    typeErrors++;
-                }
+              console.log('Old source',r.source,'old target', r.target);
+                let s=r.source;
+                r.source=r.target;
+                r.target=s;
+                r.name="PinspiredP";
+                //console.log('New source',r.source,'new target', r.target);
                 Meteor.call('updateItem',r);
-              }
             });
-            alert(typeErrors+=" Errors in "+checked+" items");
+            alert(allRels.length+' items changed');
           }
         },
         query () {
