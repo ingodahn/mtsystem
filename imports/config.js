@@ -46,16 +46,6 @@ const relations = [
         inverse: 'is a generalization of',
         description: "\"SOURCE\" is an immediate consequence of the more general \"TARGET\"."
     },
-    
-    {
-        sourceType: 'person',
-        targetType: 'person',
-        id: 'PbuildsOnP', 
-        name: 'builds on', 
-        inverse: 'inspired',
-        description: "Work of SOURCE builds on the work of TARGET."
-    },
-    
     {
         sourceType: 'person',
         targetType: 'person',
