@@ -171,7 +171,6 @@ export default {
             return {"nodes": nodes, "links": links};
         },
         sameType () {
-            console.log(this.session.relation);
             const r=this.id2relation(this.session.relation);
             return (r.sourceType == r.targetType);
         },
@@ -179,7 +178,7 @@ export default {
             return this.session.newNodes;
         },
         markNew () {
-            return (this.session.view == '2D')?"are marked with an <span style='border:solid orange; border-radius: 10px; padding: 1px;'>orange ring</span>":"are shown as a ring";
+            return (this.session.view == '2D')?"are marked with an <span style='border:solid orange; border-radius: 10px; padding: 1px;'>orange ring</span>":"are shown as a polygon";
         }
     },
 

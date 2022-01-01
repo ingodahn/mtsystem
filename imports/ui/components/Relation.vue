@@ -38,7 +38,6 @@
             </div>
         </div>
         <div v-if="mode == 'update'">
-            <p>Updating</p>
             <div v-if="relation.sourceType == session.type" data-app>
                 <v-autocomplete
                     label="Targets:"

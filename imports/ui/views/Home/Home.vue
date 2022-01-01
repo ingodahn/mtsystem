@@ -16,6 +16,7 @@
         <template v-else>
             <LoginForm/>
         </template>
+        <v-btn color="primary" @click="clearLocalStorage()">Clear Session</v-btn>
     </div>
 </template>
 
@@ -28,6 +29,9 @@ export default {
     methods: {
         logout() {
             Meteor.logout();
+        },
+        clearLocalStorage () {
+            localStorage.clear();
         }
     },
     meteor: {

@@ -47,6 +47,7 @@
             set (item,newValue) {
               if (this.debug) console.log('Session setting', item,'to',newValue)
               this[item] = newValue;
+              localStorage.setItem('session',this);
             },
             mode: 'all',
             
@@ -58,6 +59,10 @@
             }
           }
         };
+    },
+    created () {
+      let s=localStorage.getItem('session');
+      if (s) this.session=s;
     },
     components: {
       Home,
