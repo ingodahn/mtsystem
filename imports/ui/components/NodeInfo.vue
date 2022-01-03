@@ -1,7 +1,7 @@
 <template>
     <v-row>
         <v-col xs="12" md="12">
-            <h2>{{currentNode.title}}</h2>
+            <h2 :class="classColor">{{currentNode.title}}</h2>
             <div v-html="currentNode.firstParagraph"></div>
         </v-col>
     </v-row>
@@ -26,6 +26,21 @@ export default {
                 return {title: "Description", firstParagraph: "Description of the current node"};
             }           
         },
+        classColor () {
+            return (this.nodeId == this.$root.$data.session.id)?"sessionNode":"selectedNode";
+        }
     }
 }
 </script>
+
+<style scoped>
+.sessionNode {
+    background-color: pink;
+    text-align: center;
+}
+.selectedNode {
+    background-color: brown;
+    color: white;
+    text-align: center;
+}
+</style>

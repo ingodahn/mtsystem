@@ -96,19 +96,21 @@ export default {
         },
         
         deleteNode () {
-            Meteor.call('deleteItem',{
+            if (confirm("Do you REALLY want to delete this "+this.type+" on "+window.location.href+'?')) {
+                Meteor.call('deleteItem',{
                 _id: this.session.id
-            });
-            Meteor.call('deleteItem',{
-                type: 'relation',
-                source: this.session.id
-            });
-            Meteor.call('deleteItem',{
-                type: 'relation',
-                target: this.session.id
-            });
-            this.session.set('id','');
-            this.session.mode="all";
+                });
+                Meteor.call('deleteItem',{
+                    type: 'relation',
+                    source: this.session.id
+                });
+                Meteor.call('deleteItem',{
+                    type: 'relation',
+                    target: this.session.id
+                });
+                this.session.set('id','');
+                this.session.mode="all";
+            }
         }
     },
     computed: {

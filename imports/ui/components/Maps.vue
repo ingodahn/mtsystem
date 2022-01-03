@@ -43,19 +43,26 @@
 			  currentNode: null,
 			  currentColor: 'lightblue',
 			  Graph: null,
-			  showOne: false
+			  showOne: false,
+			  colors: {
+				  default: 'lightblue',
+				  sessionNode: 'pink',
+				  selectedNode: 'brown'
+			  }
 		  }
 	  },
 	  components: { NodeInfo },
 	  watch: {
-		  
+		  currentColor: function (nc,oc) {
+			  	console.log('currentColor',oc,'->',nc);
+		  }
 	  },
 	  computed: {
 		  mapId () {
 			  return 'graph'+Math.random().toString();
 		  },
 		  neighbourhood() {
-			const node=this.currentNode, d=this.session.neighbourhood;
+			const node=this.cmap.nodes.find(n => (n.id==this.session.id)), d=this.session.neighbourhood;
 			
             const cid=node.id;
 			function linkSourceId(link) {
@@ -92,7 +99,8 @@
 		  nodeClicked(node) {
 			node.x=0;
 			node.y=0;
-			this.setCurrentNode(node,'pink');
+			this.setCurrentNode(node,this.colors.selectedNode);
+			if (! this.session.id) this.session.set('id',node.id);
 			this.Graph.graphData(this.neighbourhood);
 			this.Graph.d3Force('center', null);
 			if (this.session.view == '3D') {
@@ -104,6 +112,9 @@
 			this.showOne=true;
 		  },
 		  setCurrentNode(node,color) {
+			  if (node.id == this.session.id) {
+				  this.currentColor=this.colors.default;
+			  }
 			  if (node != this.currentNode) {
 				  if (this.currentNode) {
 					  // Reset old node color
@@ -112,13 +123,9 @@
 				  this.currentColor = node.color;
 				  node.color=color;
 				  this.currentNode=node;
-				  this.session.id='';
 			  }
 		  },
 		  
-		neighbourhood_1() {
-			return this.neighbourhood().nodes.map(n => n.id);
-		},
 		showAll() {
 			this.showOne=false;
 			this.Graph.graphData(this.cmap);
@@ -171,11 +178,10 @@
 		}
 	  },
 	  mounted() {
-	
 		if (this.session.id) {
 			this.currentNode=this.cmap.nodes.find(d => d.id == this.session.id);
 			this.currentColor=this.currentNode.color;
-			this.currentNode.color='pink';
+			this.currentNode.color=this.colors.sessionNode;
 			this.showOne = true;
 		}
 		
@@ -192,12 +198,14 @@
 			.linkDirectionalParticleWidth(2.5)
 			.linkDirectionalParticleSpeed(d => 0.005)
 			.nodeAutoColorBy('group')
+			.nodeThreeObjectExtend(true)
 			.nodeThreeObject(node => {
 				if (node.isNew) {
 					const obj = new THREE.Mesh(
-					new THREE.TorusGeometry(5+node.val,5),
+					new THREE.TorusGeometry(2*node.val,2),
+					//new THREE.SphereGeometry(2+node.val),
 					new THREE.MeshBasicMaterial({
-						color: node.color,
+						color: 'orange',
 						opacity: 0.5,
 						transparent: true
 					})
@@ -239,9 +247,10 @@
 		.linkDirectionalArrowLength(10)
 		.nodeRelSize(6)
 		.nodeId('id')
-		.nodeAutoColorBy('group')
+		//.nodeAutoColorBy('group')
+		.nodeColor(d => (d.id == this.session.id)?this.colors.sessionNode:d.color)
 		.nodeLabel(node => `${node.title}`)
-		.nodeRelSize(NODE_R)
+		//.nodeRelSize(NODE_R)
 		.dagMode(this.orientation)
 		.d3Force('link', d3.forceLink().id(d => d.id).distance(100).strength(1))
 		//.d3Force('charge', d3.forceManyBody().strength(-100))
