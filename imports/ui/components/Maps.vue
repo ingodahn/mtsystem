@@ -48,15 +48,15 @@
 				  default: 'lightblue',
 				  sessionNode: 'pink',
 				  selectedNode: 'brown'
-			  }
+			  },
+			  view: this.$root.$data.session.view
 		  }
 	  },
 	  components: { NodeInfo },
 	  watch: {
-		  currentColor: function (nc,oc) {
-			  	console.log('currentColor',oc,'->',nc);
-		  }
+		  
 	  },
+	 
 	  computed: {
 		  mapId () {
 			  return 'graph'+Math.random().toString();
@@ -176,6 +176,11 @@
 			}
 			this.Graph.cameraPosition(pos);		
 		}
+	  },
+	  beforeDestroy() {
+		  if (this.currentNode) {	
+			this.currentNode.color=this.currentColor
+		};
 	  },
 	  mounted() {
 		if (this.session.id) {
