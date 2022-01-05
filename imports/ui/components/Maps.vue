@@ -62,8 +62,8 @@
 			  return 'graph'+Math.random().toString();
 		  },
 		  neighbourhood() {
-			const node=this.cmap.nodes.find(n => (n.id==this.session.id)), d=this.session.neighbourhood;
-			
+			let node=this.cmap.nodes.find(n => (n.id==this.session.id)), d=this.session.neighbourhood;
+			if (! node) node = this.currentNode;
             const cid=node.id;
 			function linkSourceId(link) {
 				return ((typeof link.source) == 'object')?link.source.id:link.source;
@@ -99,8 +99,7 @@
 		  nodeClicked(node) {
 			node.x=0;
 			node.y=0;
-			this.setCurrentNode(node,this.colors.selectedNode);
-			if (! this.session.id) this.session.set('id',node.id);
+			this.setCurrentNode(node);
 			this.Graph.graphData(this.neighbourhood);
 			this.Graph.d3Force('center', null);
 			if (this.session.view == '3D') {
@@ -111,19 +110,42 @@
 			this.Graph.zoomToFit(500,10,n => n == node);
 			this.showOne=true;
 		  },
-		  setCurrentNode(node,color) {
+		  setCurrentNode(node) {
+			  //console.log('SessionId',this.session.id,'CurrentId',this.currentNode);
+			  if (node == this.currentNode) return;
+			  //Now new node selected:
+			  if (! this.currentNode) {
+				  //console.log('Case 1');
+				  this.currentColor=node.color;
+				  this.currentNode = node;
+				  node.color=this.colors.selectedNode;
+				  return;
+			  }
+			  //Now CurrentNode exists
+			  if (this.currentNode.id != this.session.id) {
+				  //console.log('Case 2');
+				  this.currentNode.color=this.currentColor;
+				  this.currentColor=node.color;
+				  this.currentNode = node;
+				  if (node.id != this.session.id) node.color=this.colors.selectedNode;
+				  return;
+			  }
+			  //Now CurrentNode equals SessionNode
+			  /*
+			  //The following case doesn't happen as currentNode is the last clicked and if clicked again nothing will happen.
 			  if (node.id == this.session.id) {
+				  console.log('Case 3');
 				  this.currentColor=this.colors.default;
-			  }
-			  if (node != this.currentNode) {
-				  if (this.currentNode) {
-					  // Reset old node color
-					  this.currentNode.color=this.currentColor;
-				  }
-				  this.currentColor = node.color;
-				  node.color=color;
 				  this.currentNode=node;
+				  node.color=this.colors.sessionNode;
+				  return;
 			  }
+			  */
+			  //Now not SessionNode selected
+			  //console.log('Case 4');
+			  this.currentColor=node.color;
+			  this.currentNode=node;
+			  node.color=this.colors.selectedNode;
 		  },
 		  
 		showAll() {
@@ -178,7 +200,7 @@
 		}
 	  },
 	  beforeDestroy() {
-		  if (this.currentNode) {	
+		  if (this.currentNode && this.currentNode != this.session.id) {	
 			this.currentNode.color=this.currentColor
 		};
 	  },
