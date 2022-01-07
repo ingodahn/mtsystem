@@ -2,11 +2,23 @@
     <div class="container">
         <h1>MathTrek System Administration</h1>
         <p>This is the admin page</p>
+        <div>
         <v-btn @click="makeExport()">Export</v-btn>
         <v-btn @click="makeImport()">Replace Collection</v-btn>
         <v-btn @click="checkRelation()">Check Relation</v-btn>
         <v-btn @click="changeRelation()">Change Relation</v-btn>
         <v-btn @click="query()">Query</v-btn>
+        </div>
+        <div>
+          <v-select v-model="session.type" :items="typeItems" label="Source and TargetType"></v-select>
+          <v-select v-model="session.relation" :items="relationItems" label="Relation"></v-select>
+          <p>Found {{ allRelations.length }} pairs</p>
+          <ul>
+            <li v-for="(p, index) in paths" :key=index>
+              <p>From {{ p.source }} to {{ p.target }} through {{ p.through }}</p>
+            </li>
+          </ul>
+        </div>
     </div>
 </template>
 
@@ -19,7 +31,8 @@ import Vue from 'vue'
 export default {
   data () {
     return {
-      session: this.$root.$data.session
+      session: this.$root.$data.session,
+      paths: []
     }
   },
   created () {
@@ -43,21 +56,25 @@ export default {
           }
         },
         checkRelation () {
-          const allRels=UnitsCollection.find({
-            type: 'relation',
-            name: 'isBelow'
-          }).fetch();
-          var typeErrors=0;
-          var checked=0;
-          allRels.forEach(r => {
-            checked++;
-            let s=UnitsCollection.findOne({_id: r.source});
-            if (! s) {console.log('No source'); return;}
-            let t=UnitsCollection.findOne({_id: r.target});
-            if (! t) {console.log('No target'); return;}
-            if (s.type != t.type) typeErrors++;
+          let trans=[];
+          
+          this.allRelations.forEach((r,i,a) => {
+            console.log(i,'/',a.length);
+            let sid=r.source, tid=r.target;
+            let s=UnitsCollection.findOne({_id: sid});
+            let t=UnitsCollection.findOne({_id: tid});
+            let sP={nodes: {},relations: {}};
+            this.getParents(s,this.session.relation,sP,tid);
+            let tC={nodes: {},relations: {}}
+            this.getChildren(t,this.session.relation,tC,sid);
+            let path=Object.keys(sP.nodes).filter(n => Object.keys(tC.nodes).includes(n));
+            if (path.length>0) {
+              this.paths.push({source: s.title, target: t.title, through: path.map(n => sP.nodes[n].title).join(', ')});
+              trans.push({source: s, target: t, path: path, sP: sP, tC: tC});
+            }
           });
-          alert(typeErrors+=" Errors in "+checked+" items");
+          console.log(trans);
+          
         },
         changeRelation () {
           if (confirm("Do you REALLY want to replace all data on "+window.location.href+'?')) {
@@ -104,20 +121,47 @@ export default {
           })
           alert(errcount+' entries deleted from '+checked+' entries');
         },
-        getChildren(node,relation,ancestors) {
+        getChildren(node,relation,ancestors,X=null) {
           let rel = UnitsCollection.find({type: 'relation', name: relation, target: node._id}).fetch();
           rel.forEach(r => {
+            if (r.source != X) {
               let rid = r._id;
               ancestors.relations[rid] = r;
               if (! ancestors.nodes.hasOwnProperty(rid)){
                 let nr = UnitsCollection.findOne({_id: r.source});
                 ancestors.nodes[nr._id]=nr;
-                this.getChildren(nr,relation,ancestors);
+                this.getChildren(nr,relation,ancestors,X);
               }
+            }
+          })
+      },
+      getParents(node,relation,predecessors,X={}) {
+          let rel = UnitsCollection.find({type: 'relation', name: relation, source: node._id}).fetch();
+          rel.forEach(r => {
+            if (r.target !=X) {
+              let rid = r._id;
+              predecessors.relations[rid] = r;
+              if (! predecessors.nodes.hasOwnProperty(rid)){
+                let nr = UnitsCollection.findOne({_id: r.target});
+                predecessors.nodes[nr._id]=nr;
+                this.getParents(nr,relation,predecessors,X);
+              }
+            }
           })
       }
     },
     computed: {
+      typeItems () {
+        return ['subject','concept','theorem','person'];
+      },
+      relationItems () {
+            return relations.filter(e => (e.sourceType == this.session.type && e.targetType == this.session.type)).map(d => {return {text: d.name, value: d.id}});
+      },
+      allRelations () {
+        let rels=[]
+        if (this.session.relation) rels=UnitsCollection.find({type: 'relation', name: this.session.relation}).fetch()
+        return rels;
+      }
     },
     meteor: {
       items() {
