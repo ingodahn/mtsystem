@@ -215,7 +215,7 @@
 			.nodeThreeObject(node => {
 				if (node.isNew) {
 					const obj = new THREE.Mesh(
-					new THREE.TorusGeometry(2*node.val,2),
+					new THREE.TorusGeometry(5+node.val,5),
 					//new THREE.SphereGeometry(2+node.val),
 					new THREE.MeshBasicMaterial({
 						color: 'orange',
