@@ -111,11 +111,9 @@
 			this.showOne=true;
 		  },
 		  setCurrentNode(node) {
-			  //console.log('SessionId',this.session.id,'CurrentId',this.currentNode);
 			  if (node == this.currentNode) return;
 			  //Now new node selected:
 			  if (! this.currentNode) {
-				  //console.log('Case 1');
 				  this.currentColor=node.color;
 				  this.currentNode = node;
 				  node.color=this.colors.selectedNode;
@@ -123,7 +121,6 @@
 			  }
 			  //Now CurrentNode exists
 			  if (this.currentNode.id != this.session.id) {
-				  //console.log('Case 2');
 				  this.currentNode.color=this.currentColor;
 				  this.currentColor=node.color;
 				  this.currentNode = node;
@@ -131,18 +128,7 @@
 				  return;
 			  }
 			  //Now CurrentNode equals SessionNode
-			  /*
-			  //The following case doesn't happen as currentNode is the last clicked and if clicked again nothing will happen.
-			  if (node.id == this.session.id) {
-				  console.log('Case 3');
-				  this.currentColor=this.colors.default;
-				  this.currentNode=node;
-				  node.color=this.colors.sessionNode;
-				  return;
-			  }
-			  */
 			  //Now not SessionNode selected
-			  //console.log('Case 4');
 			  this.currentColor=node.color;
 			  this.currentNode=node;
 			  node.color=this.colors.selectedNode;
