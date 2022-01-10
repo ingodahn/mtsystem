@@ -21,6 +21,7 @@
 			<v-btn color="primary" class="mx-1 my-1" @click="cameraControl('down')">&dArr;</v-btn>
 			<v-btn color="primary" class="mx-1 my-1" @click="cameraControl('left')">&lArr;</v-btn>
 			<v-btn color="primary" class="mx-1 my-1" @click="cameraControl('right')">&rArr;</v-btn>
+			<v-btn color="primary" class="mx-1 my-1" @click="saveGraph()" :disabled="!currentNode">SaveGraph</v-btn>
 		</v-row>
 		<v-row v-if="session.view == '3D'">
 			<v-btn color="primary" class="mx-1 my-1" @click="cameraControl('in')">+</v-btn>
@@ -35,6 +36,8 @@
 
   <script>
   import NodeInfo from "./NodeInfo.vue";
+  import {relations} from '/imports/config.js'
+
   export default {
 	  props: ['cmap','orientation'],
 	  data () {
@@ -94,6 +97,17 @@
 			
             return {nodes: nodes, links: links};
         },
+		graphTitle () {
+			let title='Neighbourhodd of '+this.session.type+' ';
+			let cnode=this.currentNode;
+			let pnode= this.cmap.nodes.find(n => n.id==this.session.id);
+			title+=pnode.title+' of size '+this.session.neighbourhood;
+			if (cnode) title+=' with selected node '+cnode.title;
+			let rt=relations.find(r => r.id==this.session.relation).name;
+			title+=' w.r.t. relation <em>'+rt+'</em>';
+			console.log(title);
+			return title;
+		},
 	  },
 	  methods: {
 		  nodeClicked(node) {
@@ -183,6 +197,25 @@
 					break;
 			}
 			this.Graph.cameraPosition(pos);		
+		},
+		
+		saveGraph () {
+			let graphData= {
+				meta: {
+					view: this.session.view,
+					heading: this.graphTitle,
+				},
+				graph: this.neighbourhood
+			}
+			console.log(graphData);
+			/*
+			let gs=JSON.stringify(graphData);
+			let blob=new Blob([gs], {type: 'text/plain'});
+			let url=window.URL.createObjectURL(blob);
+			let a=document.createElement('a');
+			a.href=url;
+			a.download='graph.json';
+			*/
 		}
 	  },
 	  beforeDestroy() {
