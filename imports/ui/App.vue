@@ -43,9 +43,9 @@
             view: '2D',
             neighbourhood: 2,
             newNodes: 7,
-            debug: false,
-            set (item,newValue) {
-              if (this.debug) console.log('Session setting', item,'to',newValue)
+            debug: true,
+            set (item,newValue,by="???") {
+              if (this.debug) console.log('Session setting', item,'to',newValue,'by',by)
               this[item] = newValue;
             },
             mode: 'all',

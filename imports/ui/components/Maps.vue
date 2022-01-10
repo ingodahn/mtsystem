@@ -157,7 +157,7 @@
 		},
 		explore () {
 			this.session.id=this.currentNode.id;
-			if (this.session.type != this.currentNode.type) this.session.set('type',this.currentNode.type);
+			if (this.session.type != this.currentNode.type) this.session.set('type',this.currentNode.type,"Maps:160");
 			this.session.mode='single';
 		},
 		cameraControl (dir) {
@@ -193,8 +193,10 @@
 	  mounted() {
 		if (this.session.id) {
 			this.currentNode=this.cmap.nodes.find(d => d.id == this.session.id);
-			this.currentColor=this.currentNode.color;
-			this.currentNode.color=this.colors.sessionNode;
+			if (this.currentNode) {
+				this.currentColor=this.currentNode.color;
+				this.currentNode.color=this.colors.sessionNode;
+			}
 			this.showOne = true;
 		}
 		
@@ -263,6 +265,7 @@
 		//.nodeAutoColorBy('group')
 		.nodeColor(d => (d.id == this.session.id)?this.colors.sessionNode:d.color)
 		.nodeLabel(node => `${node.title}`)
+		//.linkLabel(link => `${link.name}`) // only if link.name is used
 		//.nodeRelSize(NODE_R)
 		.dagMode(this.orientation)
 		.d3Force('link', d3.forceLink().id(d => d.id).distance(100).strength(1))

@@ -14,12 +14,12 @@
                                     label="Select relation:"
                                     item-text="text"
                                     item-value="value"
-                                    v-model="session.relation"
+                                    v-model="currentRelation"
                                 >
                             </v-select>
                             </div>
                         </div>
-                        <relation :key="session.id+mode" :relation="id2relation(currentRelation)" v-on:setTarget="setTarget" :targetsSet="targetsSet(currentRelation)"></relation>
+                        <relation :key="session.id+mode+currentRelation" :relation="id2relation(currentRelation)" v-on:setTarget="setTarget" :targetsSet="targetsSet(currentRelation)"></relation>
                     </div>
                     <UserNotes v-if="currentUser && session.id && sidebar==1" :title="title" :currentNote="currentNote" :key="currentId"></UserNotes>
                 </v-col>
@@ -38,6 +38,7 @@ export default {
             session: this.$root.$data.session,
             sidebar: 0,
             updateRelations: {},
+            currentRelation: this.$root.$data.session.relation,
         }
     },
     props: ['title','relations','mode'],
@@ -45,13 +46,21 @@ export default {
         UserNotes,
         Relation
     },
-    
+    mounted () {
+    },
+    watch: {
+        currentRelation: function (newRel) {
+            this.session.set('relation',newRel);
+        }
+    },
     methods: {
         id2relation (id) {
-            return this.relations.find(e => e.id == id)
+            const r=this.relations.find(e => e.id == id);
+            return r;
         },
         id2RelationName(id) {
             const r=this.id2relation(id);
+            console.log('Relation',r)
             return (r.sourceType == this.session.type)?r.name:r.inverse;
         },
         setTarget (relationId,targets) {
@@ -88,9 +97,6 @@ export default {
         },
         type () {
             return this.session.type;
-        },
-        currentRelation () {
-            return this.session.relation;
         },
         sameType () {
             let r=this.id2relation(this.currentRelation);
