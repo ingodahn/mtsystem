@@ -257,7 +257,10 @@
 			this.Graph = ForceGraph()
 			(document.getElementById(this.mapId));
 		this.Graph
-		.linkDirectionalArrowLength(10)
+		.linkWidth(5)
+		.linkDirectionalParticles(10)
+		.linkDirectionalParticleWidth(2.5)
+		.linkDirectionalParticleSpeed(d => 0.005)
 		.nodeRelSize(6)
 		.nodeId('id')
 		//.nodeAutoColorBy('group')
