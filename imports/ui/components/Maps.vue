@@ -14,7 +14,9 @@
 			<v-btn color="primary" class="mx-1 my-1" @click="showMore" :disabled="!showOne">More</v-btn>
 			<v-btn color="primary" class="mx-1 my-1" @click="explore" :disabled="!currentNode">Explore</v-btn>
 		</v-row>
-		
+		<v-row>
+			<v-btn color="primary" class="mx-1 my-1" @click="setNodeForm" :disabled="!showOne">Nodes as {{ nodeForm }}</v-btn>
+		</v-row>
 		<v-row v-if="session.view == '3D'"><h3>Camera control</h3></v-row>
 		<v-row v-if="session.view == '3D'">
 			<v-btn color="primary" class="mx-1 my-1" @click="cameraControl('up')">&uArr;</v-btn>
@@ -49,7 +51,8 @@
 				  sessionNode: 'pink',
 				  selectedNode: 'brown'
 			  },
-			  view: this.$root.$data.session.view
+			  view: this.$root.$data.session.view,
+			  nodeForm: 'balls'
 		  }
 	  },
 	  components: { NodeInfo },
@@ -183,6 +186,38 @@
 					break;
 			}
 			this.Graph.cameraPosition(pos);		
+		},
+		setNodeForm () {
+			if (this.session.view == '2D') {
+				switch (this.nodeForm) {
+					case 'balls': {
+						this.Graph.nodeCanvasObject((node, ctx, globalScale) => {
+							const label = node.title;
+							const fontSize = 12/globalScale;
+							ctx.font = `${fontSize}px Sans-Serif`;
+							const textWidth = ctx.measureText(label).width;
+							const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2); // some padding
+
+							ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+							ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions);
+
+							ctx.textAlign = 'center';
+							ctx.textBaseline = 'middle';
+							ctx.fillStyle = node.color;
+							ctx.fillText(label, node.x, node.y);
+
+							node.__bckgDimensions = bckgDimensions; // to re-use in nodePointerAreaPaint
+						})
+						.nodePointerAreaPaint((node, color, ctx) => {
+							ctx.fillStyle = color;
+							const bckgDimensions = node.__bckgDimensions;
+							bckgDimensions && ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions);
+						});
+						this.nodeForm = 'text';
+					}
+				}
+			}
+			
 		}
 	  },
 	  beforeDestroy() {
