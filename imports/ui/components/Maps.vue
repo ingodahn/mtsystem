@@ -200,6 +200,14 @@
 		},
 		
 		saveGraph () {
+			let graphData=this.Graph.graphData();
+			let g={nodes: [], links: []};
+			graphData.nodes.forEach(n => {g.nodes.push({id: n.id, title: n.title, isNew: n.isNew, color: n.color, type: n.type, fx: n.x, fy: n.y, fz: n.z})});
+			graphData.links.forEach(l => {g.links.push({source: l.source.id, target: l.target.id})});
+			console.log(graphData);
+			this.Graph.graphData(g);
+			console.log('reloaded');
+			/*
 			let graphData= {
 				meta: {
 					view: this.session.view,
@@ -208,7 +216,7 @@
 				graph: this.neighbourhood
 			}
 			console.log(graphData);
-			/*
+			
 			let gs=JSON.stringify(graphData);
 			let blob=new Blob([gs], {type: 'text/plain'});
 			let url=window.URL.createObjectURL(blob);
