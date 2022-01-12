@@ -40,13 +40,20 @@
             relation: defaultRelation[defaultType],
             edit: false,
             id: '',
-            view: '2D',
-            neighbourhood: 2,
-            newNodes: 7,
+            graph: {
+              view: '2D',
+              neighbourhood: 2,
+              newNodes: 7,
+              orientation: null
+            },
             debug: false,
             set (item,newValue) {
               if (this.debug) console.log('Session setting', item,'to',newValue)
               this[item] = newValue;
+            },
+            setGraph (item,newValue) {
+              if (this.debug) console.log('Session setting graph', item,'to',newValue)
+              this.session.graph[item] = newValue;
             },
             mode: 'all',
             

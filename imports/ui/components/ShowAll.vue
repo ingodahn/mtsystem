@@ -1,6 +1,8 @@
 <template>
  <v-container>
+    
     <v-row>
+        <!--
         <v-col xs="12" md="8">
            
             <v-row xs="12" md="8" align="center">
@@ -40,7 +42,7 @@
                 <span style="background-color:yellow">{{ session.type }}s I am exploring</span> and
                 <span style="background-color:red; color: white;">{{ session.type }}s I find interesting</span>. 
             </p>
-            <!-- This bypasses session.set: !? -->
+            
             <p>The {{ session.type }}s, that have been updated in the last 
                 <select v-model="session.newNodes">
                     <option>1</option>
@@ -52,16 +54,19 @@
                 </select>      
             days, <span v-html="markNew"></span>.
             </p>
+            
             <p>The last selected {{ session.type }} is shown in <span style="background-color:pink; color: black;">pink</span>. The last {{ session.type }} selected in the graph is shown in <span style="background-color:brown; color: white;">brown</span>.</p>
                        </v-card-text>
                    </v-card>
                </v-expand-transition>
            </v-card>
         </v-col>
+        -->
         <v-col xs="12" md="4">
             <sidebar :relations="relations" title='' mode="list"></sidebar>
         </v-col>
     </v-row>
+    
     <Maps :key="session.relation+newNodes+orientation+session.view" :cmap="allNodes" :orientation="orientation"></Maps>
  </v-container>
 </template>
@@ -150,7 +155,7 @@ export default {
             myNodes.forEach(n => {
                 let nid=n._id;
                 let color="lightblue";
-                const back = new Date().getTime()-parseInt(this.newNodes)*24*60*60*1000;
+                const back = new Date().getTime()-parseInt(this.session.graph.newNodes)*24*60*60*1000;
                 switch (nodeStatus[nid]) {
                     case "100": color="green"; break;
                     case "2": color="yellow"; break;

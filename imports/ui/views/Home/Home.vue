@@ -1,29 +1,42 @@
 <template>
     <div class="container">
-        <h1>MathTrek System</h1>
-        <p>
-            Login is only required to add personal notes or to edit content. 
-        </p>
-        <p>
-            To view content, click one of the buttons above.
-        </p>
-        <div v-if="currentUser">
-            <p>You are logged in into the MathTrek System as user {{ currentUser.username }}.</p>
-            <v-btn v-on:click="logout">
-                Logout {{currentUser.username}} 🚪
-            </v-btn>
+        <div>
+            <h1>MathTrek System</h1>
+            <p>
+                Login is only required to add personal notes or to edit content. 
+            </p>
+            <p>
+                To view content, click one of the buttons above.
+            </p>
         </div>
-        <template v-else>
-            <LoginForm/>
-        </template>
+        <div v-if="currentUser" class="c1">
+            <div>
+                You are logged in into the MathTrek System as user {{ currentUser.username }}.
+            </div>
+            <div>
+                <v-btn v-on:click="logout">
+                    Logout {{currentUser.username}}
+                </v-btn>
+            </div>
+        </div>
+        <div v-else>
+            <template>
+                <LoginForm/>
+            </template>
+        </div>
+        <div>
+            <GraphControl/>
+        </div>
     </div>
 </template>
 
 <script>
 import LoginForm from "../../../ui/components/LoginForm.vue";
+import GraphControl from "/imports/ui/components/GraphControl.vue";
 export default {
     components: {
-        LoginForm
+        LoginForm,
+        GraphControl,
     },
     methods: {
         logout() {
@@ -39,3 +52,9 @@ export default {
 }
 
 </script>
+
+<style scoped>
+.c1 {
+    margin: 1em;
+}
+</style>

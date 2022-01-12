@@ -191,6 +191,7 @@
 		};
 	  },
 	  mounted() {
+		  console.log(this.cmap);
 		if (this.session.id) {
 			this.currentNode=this.cmap.nodes.find(d => d.id == this.session.id);
 			this.currentColor=this.currentNode.color;
@@ -198,10 +199,16 @@
 			this.showOne = true;
 		}
 		
-		if (this.session.view == '3D') {
+		// Establishing Graph
+		if (this.session.graph.view == '3D') {
 			this.Graph = ForceGraph3D({ controlType: 'orbit' })
 			(document.getElementById(this.mapId));
-			this.Graph
+		} else {
+			this.Graph = ForceGraph()
+			(document.getElementById(this.mapId));
+		}
+		// Basic node and link geometry
+		this.Graph
 			.width(this.$refs[this.mapId].clientWidth)
 			.nodeId('id')
 			.nodeLabel(node => `${node.title}`)
@@ -210,29 +217,45 @@
 			.linkDirectionalParticles(10)
 			.linkDirectionalParticleWidth(2.5)
 			.linkDirectionalParticleSpeed(d => 0.005)
-			.nodeAutoColorBy('group')
-			.nodeThreeObjectExtend(true)
-			.nodeThreeObject(node => {
-				if (node.isNew) {
-					const obj = new THREE.Mesh(
-					new THREE.TorusGeometry(5+node.val,5),
-					//new THREE.SphereGeometry(2+node.val),
-					new THREE.MeshBasicMaterial({
-						color: 'orange',
-						opacity: 0.5,
-						transparent: true
-					})
-				)
-				obj.userData = node
-				return obj
-				}
-			})
-			.onNodeDragEnd(node => {
-				node.fx = node.x;
-				node.fy = node.y;
-				node.fz = node.z;
-			})
-			.dagMode(this.orientation)
+			.nodeAutoColorBy('group');
+		
+		//Node Form
+		if (this.session.graph.view == "3D") {
+			this.Graph
+				.nodeThreeObjectExtend(true)
+				.nodeThreeObject(node => {
+					if (node.isNew) {
+						const obj = new THREE.Mesh(
+						new THREE.TorusGeometry(5+node.val,5),
+						//new THREE.SphereGeometry(2+node.val),
+						new THREE.MeshBasicMaterial({
+							color: 'orange',
+							opacity: 0.5,
+							transparent: true
+						})
+					)
+					obj.userData = node
+					return obj
+					}
+				})
+				.onNodeDragEnd(node => {
+					node.fx = node.x;
+					node.fy = node.y;
+					node.fz = node.z;
+				})
+		} else {
+			//In 2D circle is default form
+			this.Graph	
+				.onNodeDragEnd(node => {
+					node.fx = node.x;
+					node.fy = node.y;
+				})
+		}
+
+
+		if (this.session.graph.view == '3D') {
+			this.Graph
+			.dagMode(this.session.orientation)
 			.onNodeClick(node => this.nodeClicked(node));
 			
 		// ms to cool down
@@ -254,18 +277,10 @@
 		
 		} else {
 			const NODE_R = 8;
-			this.Graph = ForceGraph()
-			(document.getElementById(this.mapId));
 		this.Graph
-		.linkWidth(5)
-		.linkDirectionalParticles(10)
-		.linkDirectionalParticleWidth(2.5)
-		.linkDirectionalParticleSpeed(d => 0.005)
-		.nodeRelSize(6)
-		.nodeId('id')
-		//.nodeAutoColorBy('group')
+		
 		.nodeColor(d => (d.id == this.session.id)?this.colors.sessionNode:d.color)
-		.nodeLabel(node => `${node.title}`)
+		//.nodeLabel(node => `${node.title}`)
 		//.nodeRelSize(NODE_R)
 		.dagMode(this.orientation)
 		.d3Force('link', d3.forceLink().id(d => d.id).distance(100).strength(1))
@@ -280,10 +295,7 @@
 	ctx.fillStyle = 'orange';
 	ctx.fill();
 	})
-		.onNodeDragEnd(node => {
-			node.fx = node.x;
-			node.fy = node.y;
-		})
+	
 		.onNodeClick(node => this.nodeClicked(node))
 		;
 		// ms to cool down
