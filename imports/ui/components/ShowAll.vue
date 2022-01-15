@@ -6,6 +6,7 @@
             <v-row xs="12" md="8" align="center">
                 <v-col
                     class="d-flex"
+                    md="3"
                     cols="12"
                     sm="6"
                 >
@@ -17,6 +18,7 @@
                 </v-col>
                 <v-col
                     class="d-flex"
+                    md="3"
                     cols="12"
                     sm="6"
                 >
@@ -24,6 +26,54 @@
                     :items="views"
                     label="View"
                     v-model="session.view"
+                    ></v-select>
+                </v-col>
+                <v-col
+                    class="d-flex"
+                    md="3"
+                    cols="12"
+                    sm="6"
+                >
+                    <v-select
+                    :items="distance"
+                    label="Distance"
+                    v-model="session.neighbourhood"
+                    ></v-select>
+                </v-col>
+                <v-col
+                    class="d-flex"
+                    md="3"
+                    cols="12"
+                    sm="6"
+                >
+                    <v-select
+                    :items="newItems"
+                    label="New since..."
+                    v-model="session.newNodes"
+                    ></v-select>
+                </v-col>
+                <v-col
+                    class="d-flex"
+                    md="3"
+                    cols="12"
+                    sm="6"
+                >
+                    <v-select
+                    :items="nodeForms"
+                    label="Nodes as..."
+                    v-model="session.nodeForm"
+                    ></v-select>
+                </v-col>
+                <v-col
+                    class="d-flex"
+                    md="3"
+                    cols="12"
+                    sm="6"
+                >
+                    <v-select
+                    :items="directions"
+                    label="Follow links..."
+                    v-model="session.direction"
                     ></v-select>
                 </v-col>
             </v-row>
@@ -62,7 +112,7 @@
             <sidebar :relations="relations" title='' mode="list"></sidebar>
         </v-col>
     </v-row>
-    <Maps :key="session.relation+newNodes+orientation+session.view" :cmap="allNodes" :orientation="orientation"></Maps>
+    <Maps :key="session.relation+newNodes+orientation+session.view+session.neighbourhood+session.nodeForm+session.direction" :cmap="mapNodes" :orientation="orientation"></Maps>
  </v-container>
 </template>
 
@@ -87,8 +137,23 @@ export default {
 				{text: 'In', value: 'radialin'} 
 			],
             orientation: null,
+            newItems: [
+                {text: '1 day', value: 1},
+                {text: '2 days', value: 2},
+                {text: '3 days', value: 3},
+                {text: '7 days', value: 7},
+                {text: '14 days', value: 14},
+                {text: '30 days', value: 30}
+            ],
+            directions: [
+                {text: 'Outgoing', value: 'out'},
+                {text: 'Incoming', value: 'in'},
+                {text: 'Both', value: 'both'}
+            ],
             views: ['2D', '3D'],
             view: '2D',
+            distance: [1,2,3,4,5],
+            nodeForms: ['symbol','text'],
             reveal: false
         }
     },
@@ -112,6 +177,9 @@ export default {
             } else {
                 return "All "+this.session.type+"s"
 ;            }
+        },
+        mapNodes() {
+            return(this.session.id)?this.neighbourhood:this.allNodes;
         },
         allNodes () {
             let myNodes=UnitsCollection.find({type: this.session.type}).fetch();
@@ -169,6 +237,44 @@ export default {
             });
             
             return {"nodes": nodes, "links": links};
+        },
+        neighbourhood() {
+			let node=this.allNodes.nodes.find(n => (n.id==this.session.id)), d=this.session.neighbourhood;
+			if (! node) console.log('ShowAll:178 node', session.id,'not found');
+            const cid=node.id;
+			function linkSourceId(link) {
+				return ((typeof link.source) == 'object')?link.source.id:link.source;
+			}
+			function linkTargetId(link) {
+				return ((typeof link.target) == 'object')?link.target.id:link.target;
+			}
+			
+            let id=0, newNodeIds=[cid],nodeIds=[cid];
+            while (id < d) {
+                let  nextNodeIds=[];
+
+                if (this.session.direction != 'in') {
+                    this.allNodes.links.filter(ll => newNodeIds.includes(linkSourceId(ll))).forEach(lf => {
+					nextNodeIds.push(linkTargetId(lf))
+				    });
+                }
+				if (this.session.direction != 'out') {
+                    this.allNodes.links.filter(ll => newNodeIds.includes(linkTargetId(ll))).forEach(lf => {
+					nextNodeIds.push(linkSourceId(lf))
+				    });
+                }
+				
+				
+                let nextNodeReduced=[...new Set(nextNodeIds)].filter(item => (! nodeIds.includes(item)));
+                nodeIds=nodeIds.concat(nextNodeReduced);
+                newNodeIds=[...nextNodeReduced];
+                id++;
+            }
+			
+			let nodes=this.allNodes.nodes.filter(nn => nodeIds.includes(nn.id));
+			let links=this.allNodes.links.filter(nn => (nodeIds.includes(linkSourceId(nn)) && nodeIds.includes(linkTargetId(nn))));
+			
+            return {nodes: nodes, links: links};
         },
         sameType () {
             const r=this.id2relation(this.session.relation);

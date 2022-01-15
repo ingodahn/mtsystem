@@ -13,7 +13,7 @@
     </v-app-bar>
     <v-main>
       <v-container fluid>
-        <home v-if="page=='home'"></home>
+        <home v-if="page=='home'" v-on:sessionReloaded="restoreSession"></home>
         <admin v-else-if="page=='admin'"></admin>
         <toc v-else-if="page=='toc'"></toc>
         <any :key="page" v-else></any>
@@ -32,6 +32,8 @@
   export default {
     components: {
     },
+    watch: {
+    },
     data() {
         return {
           page: 'home',
@@ -42,8 +44,10 @@
             id: '',
             view: '2D',
             neighbourhood: 2,
+            nodeForm: 'symbol',
+            direction: 'both',
             newNodes: 7,
-            debug: false,
+            debug: true,
             set (item,newValue) {
               if (this.debug) console.log('Session setting', item,'to',newValue)
               this[item] = newValue;
@@ -71,6 +75,10 @@
         this.session.mode='all';
         this.session.id='';
         this.page=t;
+      },
+      restoreSession () {
+        //alert('Session restored')
+        this.launchAny(this.session.type);
       }
     },
     meteor: {
