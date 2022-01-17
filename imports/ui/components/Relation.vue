@@ -8,8 +8,10 @@
                 </v-expansion-panel-content>
             </v-expansion-panel>
         </v-expansion-panels>
-        <div v-if="mode == 'list' && current.title">
+        <div v-if="mode == 'list' && session.mode != 'all' && current.title">
             <div v-if="relation.sourceType == session.type">
+                <v-select v-if="getCurrentNodeIsSource(relation.id).length" :items="getCurrentNodeIsSource(relation.id)" :label="current.title+' '+relation.name" item-text="title" item-value="_id" v-model="selectedTarget" return-object hide-details="auto"></v-select>
+                <!-- Change to select
                 <v-list v-if="getCurrentNodeIsSource(relation.id).length">
                     <v-subheader>{{ current.title }} {{ relation.name }}:</v-subheader>
                     <v-list-item-group>
@@ -20,9 +22,12 @@
                         </v-list-item>
                     </v-list-item-group>
                 </v-list>
+                -->
                 <p v-else>{{ current.title }} {{ relation.name }} no {{ relation.targetType }} in this system.</p>
             </div>
             <div v-if="relation.targetType == session.type">
+                <v-select v-if="getCurrentNodeIsTarget(relation.id).length" :items="getCurrentNodeIsTarget(relation.id)" :label="current.title+' '+relation.inverse" item-text="title" item-value="_id" v-model="selectedSource" return-object hide-details="auto"></v-select>
+                <!--
                 <v-list v-if="getCurrentNodeIsTarget(relation.id).length">
                     <v-subheader>{{ current.title }} {{ relation.inverse }}:</v-subheader>
                     <v-list-item-group>
@@ -34,6 +39,7 @@
                         </v-list-item>
                     </v-list-item-group>
                 </v-list>
+                -->
                 <p v-else>{{ current.title }} {{ relation.inverse }} no {{ relation.sourceType }} in this system.</p>
             </div>
         </div>
@@ -52,7 +58,7 @@
                     small-chips
                 ></v-autocomplete>
             </div>
-            <div v-else>Edit relation <b>{{relation.name}}</b> for {{ relation.sourceType }}s.</div>
+            <div v-else>To modify this relation: Edit relation <b>{{relation.name}}</b> for {{ relation.sourceType }}s.</div>
         </div>
     </div>
 </template>
@@ -63,9 +69,9 @@ import { UnitsCollection } from "../../api/UnitsCollection";
 export default {
     data () {
         return {
-            //session: this.$root.$data.session,
-            // _ids of target
-            targets: this.getTargets()
+            targets: this.getTargets(),
+            selectedTarget: {},
+            selectedSource: {}
         }
     },
     props: ['relation', 
@@ -78,7 +84,13 @@ export default {
     watch: {
         targets: function (t) {
             this.$emit('setTarget',this.relation.id,t);
-            }
+            },
+        selectedSource: function(n) {
+            this.selected(n);
+        },
+        selectedTarget: function(n) {
+            this.selected(n);
+        }
     },
     methods: {
          // Concepts of which the current node is a target
@@ -104,6 +116,7 @@ export default {
             rs=UnitsCollection.find({_id: {$in: rds}},{sort: { title: 1}}).fetch();
             return rs;
         },
+        
         getRelationDescription (relation) {
             let stype=relation.sourceType;
             let sString=stype.charAt(0).toUpperCase()+stype.substring(1);

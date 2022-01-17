@@ -63,8 +63,7 @@ export default {
         UpdateNode
     },
     created () {
-        this.$root.$data.session.set('relation',this.initialRelation);
-        this.$root.$data.session.set('id','')
+        console.log('Any create with mode', this.session.mode)
     },
     watch: {
         
@@ -96,19 +95,21 @@ export default {
         },
         
         deleteNode () {
-            Meteor.call('deleteItem',{
+            if (confirm("Do you REALLY want to delete this "+this.type+" on "+window.location.href+'?')) {
+                Meteor.call('deleteItem',{
                 _id: this.session.id
-            });
-            Meteor.call('deleteItem',{
-                type: 'relation',
-                source: this.session.id
-            });
-            Meteor.call('deleteItem',{
-                type: 'relation',
-                target: this.session.id
-            });
-            this.session.set('id','');
-            this.session.mode="all";
+                });
+                Meteor.call('deleteItem',{
+                    type: 'relation',
+                    source: this.session.id
+                });
+                Meteor.call('deleteItem',{
+                    type: 'relation',
+                    target: this.session.id
+                });
+                this.session.set('id','');
+                this.session.mode="all";
+            }
         }
     },
     computed: {
@@ -125,14 +126,6 @@ export default {
         currentRelation () {
             return this.session.relation;
         },
-        sessionInit () {
-            return {
-                type: this.type,
-                relation: this.relations[0].id,
-                id: '',
-                newNodes: 7
-            };
-        }
     },
     meteor: {
         isEditor() {

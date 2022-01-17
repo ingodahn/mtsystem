@@ -19,10 +19,10 @@
                         <show-math-doc :key="current.readMore" v-if="showMore" :content="current.readMore"></show-math-doc>
                         <v-btn v-if="showMore" @click="showMore=false">Show less</v-btn>
                     </v-row>
-                    <v-row v-if="current.see">
+                    <v-row v-if="current.see" class="wiki" >
                         <a :href="current.see" target="_blank">See also</a>
                     </v-row>
-                    <v-row>
+                    <v-row class="wiki" >
                         <a :href="wikiUrl" target="_blank">MathTrek-Wiki</a> (comments, discussions)
                     </v-row>
                 </v-col>
@@ -120,3 +120,9 @@ export default {
 }
 
 </script>
+
+<style scoped>
+.wiki {
+    margin-top: 1em
+}
+</style>
