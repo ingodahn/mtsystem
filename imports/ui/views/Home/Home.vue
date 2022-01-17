@@ -79,6 +79,7 @@ export default {
                 this.restoreSession(reader.result);
             }
         },
+        // TODO: Handle Graph
         restoreSession (sessionString) {
             const sessionData=JSON.parse(sessionString);
             if (!sessionData) {
@@ -89,12 +90,15 @@ export default {
             if (!dataSession) {
                 alert('No Session Found in File')
             }
-            this.session.type = dataSession.type;
-            this.session.relation = dataSession.relation;
-            this.session.id = dataSession.id;
-            this.session.view = dataSession.view;
-            this.session.neighbourhood = dataSession.neighbourhood;
-            this.session.newNodes = dataSession.newNodes;
+            this.session.set('type', dataSession.type);
+            this.session.set('relation', dataSession.relation);
+            this.session.set('id', dataSession.id);
+            this.session.set('view', dataSession.view);
+            this.session.set('mode', dataSession.mode);
+            this.session.set('neighbourhood', dataSession.neighbourhood);
+            this.session.set('direction', dataSession.direction);
+            this.session.set('newNodes', dataSession.newNodes);
+            this.$root.$data.coords=sessionData.coords;
             this.$emit('sessionReloaded')
         }
     },

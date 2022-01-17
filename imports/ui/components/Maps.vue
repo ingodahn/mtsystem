@@ -8,29 +8,38 @@
         <h2>Panel</h2>
       </v-row>
       <v-row>
-        <v-btn
-          color="primary"
-          class="mx-1 my-1"
-          @click="showAll"
-          :disabled="!showOne"
-          >Show all</v-btn
-        >
-        <v-btn
+		  <div class="select" data-app>
+			<v-autocomplete
+				label="Select a node"
+				v-model="selectedId"
+				hide-details="auto"
+				:items="nodeItems"
+				item-text="title"
+				item-value="id"
+				@change="nodeClicked(selectedId)"
+			></v-autocomplete>
+		</div>
+		<v-btn
           color="primary"
           class="mx-1 my-1"
           @click="explore"
           :disabled="!currentNode"
           >Explore</v-btn
         >
-        <v-select
-          :items="cmap.nodes"
-          item-text="title"
-          item-value="id"
-          :label="'Select a node'"
-          v-model="selectedId"
+        <v-btn
+          color="primary"
           class="mx-1 my-1"
-          @change="nodeClicked(selectedId)"
-        ></v-select>
+          @click="showAll"
+          :disabled="!session.id"
+          >Show all</v-btn
+        >
+		 <v-btn
+          color="primary"
+          class="mx-1 my-1"
+          @click="saveGraph()"
+          :disabled="!currentNode"
+          > Save Graph</v-btn
+        >
       </v-row>
 
       <v-row v-if="session.view == '3D'"><h3>Camera control</h3></v-row>
@@ -46,13 +55,6 @@
         >
         <v-btn color="primary" class="mx-1 my-1" @click="cameraControl('right')"
           >&rArr;</v-btn
-        >
-        <v-btn
-          color="primary"
-          class="mx-1 my-1"
-          @click="saveGraph()"
-          :disabled="!currentNode"
-          >SaveGraph</v-btn
         >
       </v-row>
       <v-row v-if="session.view == '3D'">
@@ -83,7 +85,6 @@
 		  return {
 			  session: this.$root.$data.session,
 			  Graph: null,
-			  showOne: false,
 			  currentId: this.$root.$data.session.id,
 			  selectedId: this.$root.$data.session.id,
 			  currentColor: 'lightblue',
@@ -140,30 +141,19 @@
 		
 		currentNode() {
 			let nodeId=(this.currentId)?this.currentId:this.session.id;
-			console.log('Recalculated currentnode: '+nodeId);
 			return this.cmap.nodes.find(n => (n.id==nodeId));
 		},
 		
-		graphTitle () {
-			let title='Neighbourhodd of '+this.session.type+' ';
-			let cnode=this.currentNode;
-			let pnode= this.cmap.nodes.find(n => n.id==this.session.id);
-			title+=pnode.title+' of size '+this.session.neighbourhood;
-			if (cnode) title+=' with selected node '+cnode.title;
-			let rt=relations.find(r => r.id==this.session.relation).name;
-			title+=' w.r.t. relation <em>'+rt+'</em>';
-			console.log(title);
-			return title;
-		},
+		nodeItems () {
+			return this.cmap.nodes.map(n => {return {id: n.id, title: n.title}}).sort(function(a,b) {return (a.title < b.title)?-1:1});
+		}
 	  },
 	  methods: {
 		  nodeClicked(node0) {
 			let node=(typeof node0 == 'object')?node0:this.cmap.nodes.find(n => n.id==node0);
 			console.log('Map:130 nodeClicked: '+node.id);
-			//node.x=0;
-			//node.y=0;
 			this.setCurrentNode(node);
-			//this.Graph.graphData(this.neighbourhood);
+			/*
 			this.Graph.d3Force('center', null);
 			if (this.session.view == '3D') {
 				this.Graph.cameraPosition({},node);
@@ -172,7 +162,7 @@
 			}
 			this.selectedId=node.id;
 			this.Graph.zoomToFit(500,10);
-			this.showOne=true;
+			*/
 		  },
 		  setCurrentNode(node) {
 			  if (node.id == this.currentId) return;
@@ -205,10 +195,7 @@
 		  },
 		  
 		showAll() {
-			this.showOne=false;
-			this.Graph.graphData(this.cmap);
-			this.Graph.d3Force('center', null);
-			this.Graph.zoomToFit(500);
+			this.session.id='';
 		},
 		
 		explore () {
@@ -252,22 +239,12 @@
 			.linkDirectionalParticleSpeed(d => 0.005)
 			.nodeRelSize(6)
 			.nodeId('id')
-			//.nodeAutoColorBy('group')
 			.nodeColor(d => (d.id == this.session.id)?this.colors.sessionNode:d.color)
 			.nodeLabel(node => `${node.title}`)
-			//.nodeRelSize(NODE_R)
 			.dagMode(this.orientation)
 			.d3Force('link', d3.forceLink().id(d => d.id).distance(100).strength(1))
-			//.d3Force('charge', d3.forceManyBody().strength(-100))
 			.width(this.$refs.conti.clientWidth)
 			.height(Math.max(this.$refs.conti.clientHeight,800))
-			.nodeCanvasObjectMode(node => (node.isNew)?'before':undefined)
-			.nodeCanvasObject((node, ctx) => {
-				ctx.beginPath();
-				ctx.arc(node.x, node.y, node.val +10, 0, 2 * Math.PI, false); // ???
-				ctx.fillStyle = 'orange';
-				ctx.fill();
-			})
 			.onNodeDragEnd(node => {
 				node.fx = node.x;
 				node.fy = node.y;
@@ -276,12 +253,44 @@
 			;
 			// ms to cool down
 			this.Graph.cooldownTime(2000);
-			if (this.currentNode) {
-				
-				let nb=this.neighbourhood;
-				
-				this.Graph.graphData(nb);
-			}  else this.Graph.graphData(this.cmap);
+			
+			if (this.session.nodeForm == 'Symbols') {
+				this.Graph.nodeCanvasObjectMode(node => (node.isNew)?'before':undefined)
+				.nodeCanvasObject((node,ctx) => {
+					let r = node.val + 10;
+					let x = node.x;
+					let y = node.y;
+					ctx.beginPath();
+					ctx.arc(x, y, r, 0, 2 * Math.PI, false);
+					ctx.fillStyle = 'orange';
+					ctx.fill();
+				});
+			} else {
+				this.Graph
+				.nodeCanvasObject((node, ctx, globalScale) => {
+					const label = node.title;
+					const fontSize = 12/globalScale;
+					ctx.font = `${fontSize}px Sans-Serif`;
+					const textWidth = ctx.measureText(label).width;
+					const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2); // some padding
+
+					ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+					ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions);
+
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'middle';
+					ctx.fillStyle = node.color;
+					ctx.fillText(label, node.x, node.y);
+
+					node.__bckgDimensions = bckgDimensions; // to re-use in nodePointerAreaPaint
+				})
+				.nodePointerAreaPaint((node, color, ctx) => {
+					ctx.fillStyle = color;
+					const bckgDimensions = node.__bckgDimensions;
+					bckgDimensions && ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions);
+				});
+			}
+			this.Graph.graphData(this.cmap);
 			// Zoom to fit
 			this.Graph.d3Force('center', null);
 
@@ -311,7 +320,7 @@
 			.dagMode(this.orientation)
 			.onNodeClick(node => this.nodeClicked(node))
 			.cooldownTime(2000);
-		  if (this.session.nodeForm == 'symbol') {
+		  if (this.session.nodeForm == 'Symbols') {
 			  this.Graph.nodeLabel(node => `${node.title}`)
 			  			.nodeThreeObjectExtend(true)
 						.nodeThreeObject(node => {
@@ -354,22 +363,12 @@
 		},
 		saveGraph () {
 			let graphData=this.Graph.graphData();
-			let g={nodes: [], links: []};
-			graphData.nodes.forEach(n => {g.nodes.push({id: n.id, title: n.title, isNew: n.isNew, color: n.color, type: n.type, x: n.x, y: n.y, z: n.z, fx: n.x, fy: n.y, fz: n.z})});
-			graphData.links.forEach(l => {g.links.push({source: l.source.id, target: l.target.id})});
-			
-			console.log(graphData);
-			//this.Graph.graphData(g);
-			console.log('reloaded');
-			
+			let coords={};
+			graphData.nodes.forEach(n => {coords[n.id] = {x: n.x, y: n.y, z: n.z, fx: n.x, fy: n.y, fz: n.z}});
 			let gData= {
 				session: this.session,
-				graph: g,
-				currentId: this.currentId,
-				currentColor: this.currentColor,
+				coords: coords,
 			}
-			console.log(gData);
-			
 			let gs=JSON.stringify(gData);
 			var FileSaver=require('file-saver');
             var blob=new Blob([gs], {type: "text/plain;charset=utf-8"})
@@ -382,11 +381,11 @@
 		};
 	  },
 	  mounted() {
+		  console.log('Mounted Map',this.cmap)
 		if (this.session.id) {
 			//this.currentNode = this.cmap.nodes.find(d => d.id == this.session.id);
 			this.currentColor = this.currentNode.color;
 			this.currentNode.color=this.colors.sessionNode;
-			this.showOne = true;
 		}
 		
 		if (this.session.view == '3D') {

@@ -63,8 +63,7 @@ export default {
         UpdateNode
     },
     created () {
-        this.$root.$data.session.set('relation',this.initialRelation);
-        this.$root.$data.session.set('id','')
+        console.log('Any create with mode', this.session.mode)
     },
     watch: {
         
@@ -127,14 +126,6 @@ export default {
         currentRelation () {
             return this.session.relation;
         },
-        sessionInit () {
-            return {
-                type: this.type,
-                relation: this.relations[0].id,
-                id: '',
-                newNodes: 7
-            };
-        }
     },
     meteor: {
         isEditor() {

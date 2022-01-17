@@ -37,6 +37,7 @@
     data() {
         return {
           page: 'home',
+          coords: null,
           session: {
             type: defaultType,
             relation: defaultRelation[defaultType],
@@ -44,12 +45,12 @@
             id: '',
             view: '2D',
             neighbourhood: 2,
-            nodeForm: 'symbol',
+            nodeForm: 'Symbols',
             direction: 'both',
             newNodes: 7,
             debug: true,
-            set (item,newValue) {
-              if (this.debug) console.log('Session setting', item,'to',newValue)
+            set (item,newValue,by='anonymous') {
+              if (this.debug) console.log('Session setting', item,'to',newValue,'by',by);
               this[item] = newValue;
             },
             mode: 'all',
@@ -78,7 +79,8 @@
       },
       restoreSession () {
         //alert('Session restored')
-        this.launchAny(this.session.type);
+        //this.session.mode='all';
+        this.page=this.session.type;
       }
     },
     meteor: {

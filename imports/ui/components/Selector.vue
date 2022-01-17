@@ -35,7 +35,8 @@ export default {
         selectedId: function (newId,oldId) {
             if (newId == oldId) return;
             this.session.set('id',newId);
-            if (newId) this.session.set('mode','single'); else this.session.set('mode','all');
+            console.log('Selector found coords',this.$root.$data.coords)
+            if (newId && !this.$root.$data.coords) this.session.set('mode','single','Selector watcher'); else this.session.set('mode','all','Selector watcher');
             //if (this.selectedId) this.$emit('selected',this.selectedId);
             //else this.$emit('selected','')
         }
