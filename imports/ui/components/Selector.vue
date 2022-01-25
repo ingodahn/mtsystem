@@ -5,9 +5,9 @@
                 :label="selectLabel"
                 v-model="session.id"
                 hide-details="auto"
-                :items="all"
+                :items="items"
                 item-text="title"
-                item-value="_id"
+                item-value="id"
                 clearable
             ></v-autocomplete>
         </div>
@@ -21,11 +21,10 @@ export default {
     data () {
         return {
             session: this.$root.$data.session,
-            items: [],
             selectedId: ''
         }
     },
-    props: ['type'],
+    props: ['items'],
 
     mounted () {
         this.selectedId=this.session.id;
@@ -36,7 +35,7 @@ export default {
             if (newId == oldId) return;
             this.session.set('id',newId);
             console.log('Selector found coords',this.$root.$data.coords)
-            if (newId && !this.$root.$data.coords) this.session.set('mode','single','Selector watcher'); else this.session.set('mode','all','Selector watcher');
+            if (newId && !this.$root.$data.coords) this.session.set('mode','text','Selector watcher'); else this.session.set('mode','graph','Selector watcher');
             //if (this.selectedId) this.$emit('selected',this.selectedId);
             //else this.$emit('selected','')
         }
@@ -44,7 +43,8 @@ export default {
 
     computed: {
         selectLabel () {
-            return "Select "+this.type+':';
+            const label=(this.session.mode == 'text')?this.session.type:'node';
+            return "Select "+label+':';
         },
     },
 

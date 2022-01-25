@@ -98,6 +98,7 @@ export default {
             this.session.set('neighbourhood', dataSession.neighbourhood);
             this.session.set('direction', dataSession.direction);
             this.session.set('newNodes', dataSession.newNodes);
+            this.session.set('orientation', dataSession.orientation);
             this.$root.$data.coords=sessionData.coords;
             this.$emit('sessionReloaded')
         }

@@ -1,152 +1,330 @@
 <template>
-    
-        <v-container>
-            
-                <v-row>
-                <v-col xs="12" md="8">
-                    <h1>MathTrek {{ type }}s:</h1>
-                </v-col>
-                <v-col xs="12" md="4">
-                    <selector :key="session.id" :type="type"></selector>
-                    
-                </v-col>
-                <v-col xs="12" md="8" name="editorMenu" v-if="isEditor">
-                        <v-btn v-if="session.mode=='all'" color="success" id="btnNew" @click="session.mode='new'">New {{ type }}</v-btn>
-                        <span v-if="session.mode == 'single'">
-                            <v-btn color="warning" id="btnUpdate" @click="session.mode = 'update'">Update {{ type }}</v-btn>
-                            <v-btn color="error" id="btnDelete" @click="deleteNode">Delete {{ type }}</v-btn>
-                        </span>
-                </v-col>
-                </v-row>
-            
-                <v-row v-if="session.type">
-                <v-col xs="12">
-                    <show-all :key="type" v-if="session.mode=='all'" :relations="relations"></show-all>
-                    <show-one :key="session.id" v-if="session.mode=='single'" :relations="relations" v-on:setNode="nodeSelected" v-on:relationselected="relationSelected"></show-one>
-                    <new-node v-if="session.mode=='new'" :relations="relations" v-on:new="setNode"></new-node>
-                    <update-node v-if="session.mode=='update'" :relations="relations"></update-node>
-                </v-col>
-                </v-row>
-            
-        </v-container>       
-    
+  <v-container>
+    <v-row>
+      <v-col xs="12" md="4">
+        <h1>MathTrek {{ type }}{{ topicPlural }}:</h1>
+      </v-col>
+      <v-col xs="12" md="4">
+        <div class="select" data-app>
+          <v-autocomplete
+            :label="selectLabel"
+            v-model="session.id"
+            hide-details="auto"
+            :items="allNodesOfType"
+            item-text="title"
+            item-value="_id"
+            clearable
+          ></v-autocomplete>
+        </div>
+      </v-col>
+      <v-col xs="12" md="4">
+        <div v-if="relations.length > 1">
+          <v-row>
+            <v-col md="10">
+              <div data-app>
+                <v-select
+                  :items="typedRelations"
+                  label="Select relation:"
+                  item-text="text"
+                  item-value="value"
+                  v-model="session.relation"
+                >
+                </v-select>
+              </div>
+            </v-col>
+            <v-col md="2">
+              <v-tooltip bottom color="primary">
+                <template v-slot:activator="{ on, attrs }">
+                  <span class="infoSymbol" v-bind="attrs" v-on="on"
+                    ><img src="/information_info_1565.png"
+                  /></span>
+                </template>
+                <span v-html="getRelationDescription"></span>
+              </v-tooltip>
+            </v-col>
+          </v-row>
+        </div>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col md="4">
+        <h1 v-if="session.edit != 'new'">{{ current.title }}</h1>
+      </v-col>
+      <v-col xs="12" md="4" name="editorMenu">
+        <div v-if="!session.edit">
+          <v-btn
+            v-if="session.mode == 'text' && session.id"
+            color="primary"
+            id="btnRelated"
+            @click="session.set('mode', 'graph')"
+            >Related {{ relatedType }}s</v-btn
+          >
+          <v-btn
+            v-if="isEditor"
+            color="success"
+            id="btnNew"
+            @click="session.edit = 'new'"
+            >New {{ type }}</v-btn
+          >
+          <v-btn
+            v-if="isEditor && session.mode == 'text' && session.id"
+            color="warning"
+            id="btnUpdate"
+            @click="session.edit = 'update'"
+            >Update {{ type }}</v-btn
+          >
+          <v-btn
+            v-if="isEditor && session.mode == 'text' && session.id"
+            color="error"
+            id="btnDelete"
+            @click="deleteNode"
+            >Delete {{ type }}</v-btn
+          >
+        </div>
+      </v-col>
+      <v-col md="4">
+        <GraphControl />
+      </v-col>
+    </v-row>
+
+    <v-row v-if="session.type">
+      <v-col xs="12" v-if="!session.edit">
+        <show-all
+          :key="type"
+          v-if="session.mode == 'graph'"
+          :relations="relations"
+          :allTyped="allNodesOfType"
+        ></show-all>
+        <show-one
+          :key="session.id"
+          v-if="session.mode == 'text'"
+          :relations="relations"
+        ></show-one>
+      </v-col>
+      <v-col v-else>
+        <new-node
+          v-if="session.edit == 'new'"
+          :relations="relations"
+          id=""
+        ></new-node>
+        <new-node
+          v-if="session.edit == 'update'"
+          :relations="relations"
+          :id="session.id"
+        ></new-node>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
-import {relations} from '/imports/config.js'
+import { relations } from "/imports/config.js";
 import Selector from "../components/Selector.vue";
+import GraphControl from "../components/GraphControl.vue";
 import ShowAll from "../components/ShowAll.vue";
 import ShowOne from "../components/ShowOne.vue";
 import NewNode from "../components/NewNode.vue";
 import UpdateNode from "../components/UpdateNode.vue";
+import { UnitsCollection } from "../../api/UnitsCollection";
 export default {
-    data () {
-        return {
-            mode: "all",
-            /*
-            session: {
-                type: this.type,
-                relation: this.initialRelation,
-                id: '',
-                newNodes: 7
-            },
-            */
-           session: this.$root.$data.session
-        }
+  data() {
+    return {
+      mode: "graph",
+      session: this.$root.$data.session,
+    };
+  },
+  props: [],
+  components: {
+    Selector,
+    ShowAll,
+    ShowOne,
+    NewNode,
+    UpdateNode,
+    GraphControl,
+  },
+  created() {
+    this.$root.$data.session.set("relation", this.initialRelation);
+    this.$root.$data.session.set("id", this.initialId);
+  },
+  watch: {},
+  methods: {
+    nodeSelected(id) {
+      this.session.set("id", id);
+      if (!id) {
+        this.mode = "graph";
+      } else {
+        this.mode = "text";
+      }
     },
-    props: [],
-    components: {
-        Selector,
-        ShowAll,
-        ShowOne,
-        NewNode,
-        UpdateNode
+    relationSelected(rid) {
+      this.currentRelation = rid;
     },
-    created () {
-        console.log('Any create with mode', this.session.mode)
+    deleteNode() {
+      if (!this.session.id) {
+        alert("No node selected");
+        return;
+      }
+      const node = UnitsCollection.findOne({ _id: this.session.id });
+      if (
+        confirm(
+          "Do you REALLY want to delete " +
+            this.type +
+            " " +
+            node.title +
+            " on " +
+            window.location.href +
+            "?"
+        )
+      ) {
+        Meteor.call("deleteItem", {
+          _id: this.session.id,
+        });
+        Meteor.call("deleteItem", {
+          type: "relation",
+          source: this.session.id,
+        });
+        Meteor.call("deleteItem", {
+          type: "relation",
+          target: this.session.id,
+        });
+        this.session.set("id", "");
+      }
     },
-    watch: {
-        
+
+    id2relation(id) {
+      return this.relations.find((e) => e.id == id);
     },
-    methods: {
-        nodeSelected (id) {
-            this.session.set('id',id);
-            if (!id) {
-                this.mode="all";
-            } else {
-                this.mode="single";
-            }            
-        },
-        relationSelected (rid) {
-            this.currentRelation = rid;
-        },
-        newNode () {
-            this.session.set('id','');
-            this.mode="new";
-        },
-        setNode (id) {
-            if (id) {
-                this.session.set('id',id);
-                this.mode="single";
-            } else {
-                this.session.set('id','');
-                this.mode="all";
-            }
-        },
-        
-        deleteNode () {
-            if (confirm("Do you REALLY want to delete this "+this.type+" on "+window.location.href+'?')) {
-                Meteor.call('deleteItem',{
-                _id: this.session.id
-                });
-                Meteor.call('deleteItem',{
-                    type: 'relation',
-                    source: this.session.id
-                });
-                Meteor.call('deleteItem',{
-                    type: 'relation',
-                    target: this.session.id
-                });
-                this.session.set('id','');
-                this.session.mode="all";
-            }
-        }
+  },
+  computed: {
+    type() {
+      return this.session.type;
     },
-    computed: {
-        type () {
-            return this.session.type;
-        },
-        relations () {
-            let t=this.type;
-            return relations.filter(e => (e.sourceType == t || e.targetType == t));
-        },
-        initialRelation () {
-            return this.relations[0].id;
-        },
-        currentRelation () {
-            return this.session.relation;
-        },
+    relatedType() {
+      const cr = this.relations.find((r) => r.id == this.session.relation);
+      return cr.sourceType == this.session.type ? cr.targetType : cr.sourceType;
     },
-    meteor: {
-        isEditor() {
-            if (Meteor.user()) {
-                const name=Meteor.user().username;
-                return ( name == 'editor' || name == 'dahn');
-            }
-            return false;
-            
-        }
-    }
-}
+    relations() {
+      let t = this.type;
+      return relations.filter((e) => e.sourceType == t || e.targetType == t);
+    },
+    getRelationDescription() {
+      let relation = this.id2relation(this.session.relation);
+      let stype = relation.sourceType;
+      let sString = stype.charAt(0).toUpperCase() + stype.substring(1);
+      let ttype = relation.targetType;
+      let tString = ttype.charAt(0).toUpperCase() + ttype.substring(1);
+      let source = "";
+      let target = "";
+      let desc = "<b>Relation</b> ";
+      if (relation.sourceType == this.session.type) {
+        source = this.current.title.length
+          ? this.current.title
+          : sString + " 1";
+        target = tString + " 2";
+        desc +=
+          "<em>" +
+          source +
+          "</em> <b>" +
+          relation.name +
+          "</b> <em>" +
+          target +
+          "</em></p><p><b>Means:</b> " +
+          relation.description
+            .replaceAll("SOURCE", "<em>" + source + "</em>")
+            .replaceAll("TARGET", "<em>" + target + "</em>") +
+          "</p>";
+        if (relation.targetType == this.session.type)
+          desc +=
+            "<p><b>Inverse:</b> <em>" +
+            target +
+            "</em> <b>" +
+            relation.inverse +
+            "</b> <em>" +
+            source +
+            "</em>";
+      } else {
+        target = this.current.title.length
+          ? this.current.title
+          : tString + " 2";
+        source = sString + " 1";
+        desc +=
+          target +
+          " <b>" +
+          relation.inverse +
+          "</b> " +
+          source +
+          "</p><p><b>Means:</b> " +
+          relation.description
+            .replaceAll("SOURCE", "<em>" + source + "</em>")
+            .replaceAll("TARGET", "<em>" + target + "</em>") +
+          "</p>";
+      }
+      return desc;
+    },
+    typedRelations() {
+      let tr = [];
+      this.relations.forEach((r) => {
+        tr.push({
+          text:
+            r.sourceType == this.session.type
+              ? r.name + " " + r.targetType
+              : r.inverse + " " + r.sourceType,
+          value: r.id,
+        });
+      });
+      return tr;
+    },
+    initialId() {
+      if (!this.session.id) return "";
+      const node = UnitsCollection.findOne({ _id: this.session.id });
+      return node.type == this.session.type ? node._id : "";
+    },
+    initialRelation() {
+      return this.relations[0].id;
+    },
+    currentRelation() {
+      return this.session.relation;
+    },
+    current() {
+      if (!this.session.id) {
+        return { title: "" };
+      }
+
+      return UnitsCollection.findOne({ _id: this.session.id });
+    },
+    selectLabel() {
+      return "Select " + this.session.type + ":";
+    },
+    topicPlural() {
+      return this.session.id ? "" : "s";
+    },
+  },
+  meteor: {
+    isEditor() {
+      if (Meteor.user()) {
+        const name = Meteor.user().username;
+        return name == "editor" || name == "dahn";
+      }
+      return false;
+    },
+    allNodesOfType() {
+      return UnitsCollection.find({ type: this.session.type })
+        .fetch()
+        .sort((a, b) => {
+          return a.title < b.title ? -1 : 1;
+        });
+    },
+  },
+};
 </script>
 
 <style scoped>
 .v-select {
-  width: auto; 
+  width: auto;
   min-width: 10em;
 }
 
 p {
-    margin-top: 5px;
+  margin-top: 5px;
 }
 </style>

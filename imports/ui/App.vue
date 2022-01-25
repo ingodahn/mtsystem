@@ -47,13 +47,14 @@
             neighbourhood: 2,
             nodeForm: 'Symbols',
             direction: 'both',
+            orientation: '',
             newNodes: 7,
             debug: true,
             set (item,newValue,by='anonymous') {
               if (this.debug) console.log('Session setting', item,'to',newValue,'by',by);
               this[item] = newValue;
             },
-            mode: 'all',
+            mode: 'graph',
             
             clear () {
               this.type = defaultType;
@@ -73,13 +74,13 @@
     methods: {
       launchAny(t) {
         this.session.type=t;
-        this.session.mode='all';
+        this.session.mode='text';
         this.session.id='';
         this.page=t;
       },
       restoreSession () {
         //alert('Session restored')
-        //this.session.mode='all';
+        //this.session.mode='graph';
         this.page=this.session.type;
       }
     },

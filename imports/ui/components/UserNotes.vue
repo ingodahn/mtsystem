@@ -8,7 +8,7 @@
         <v-radio name="currentNote.status" label="Other" value="0"></v-radio>
     </v-radio-group>
     <quill-doc v-if="mode == 'quill'" ref="quillDoc" :content="currentNote.note" v-on:content="updateNote"></quill-doc>
-    <div v-if="mode == 'text'">
+    <div v-if="mode == 'graph'">
         <v-textarea
             outlined
             label="Notes:"

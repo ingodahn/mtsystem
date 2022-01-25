@@ -1,125 +1,21 @@
 <template>
  <v-container>
-    <v-row>
-        <v-col xs="12" md="8">
-           
-            <v-row xs="12" md="8" align="center">
-                <v-col
-                    class="d-flex"
-                    md="3"
-                    cols="12"
-                    sm="6"
-                >
-                    <v-select
-                    :items="orientations"
-                    label="Orientation"
-                    v-model="orientation"
-                    ></v-select>
-                </v-col>
-                <v-col
-                    class="d-flex"
-                    md="3"
-                    cols="12"
-                    sm="6"
-                >
-                    <v-select
-                    :items="views"
-                    label="View"
-                    v-model="session.view"
-                    ></v-select>
-                </v-col>
-                <v-col
-                    class="d-flex"
-                    md="3"
-                    cols="12"
-                    sm="6"
-                >
-                    <v-select
-                    :items="distance"
-                    label="Distance"
-                    v-model="session.neighbourhood"
-                    ></v-select>
-                </v-col>
-                <v-col
-                    class="d-flex"
-                    md="3"
-                    cols="12"
-                    sm="6"
-                >
-                    <v-select
-                    :items="newItems"
-                    label="New since..."
-                    v-model="session.newNodes"
-                    ></v-select>
-                </v-col>
-                <v-col
-                    class="d-flex"
-                    md="3"
-                    cols="12"
-                    sm="6"
-                >
-                    <v-select
-                    :items="nodeForms"
-                    label="Nodes as..."
-                    v-model="session.nodeForm"
-                    ></v-select>
-                </v-col>
-                <v-col
-                    class="d-flex"
-                    md="3"
-                    cols="12"
-                    sm="6"
-                >
-                    <v-select
-                    :items="directions"
-                    label="Follow links..."
-                    v-model="session.direction"
-                    ></v-select>
-                </v-col>
-            </v-row>
-            <v-card class="mx-auto">
-               <v-card-actions>
-                   <v-btn text color="blue" @click="reveal = !reveal">Graph Legend</v-btn>
-               </v-card-actions>
-               <v-expand-transition>
-                   <v-card v-if="reveal" class="transition-fast-in-fast-out v-card--reveal" style="height: 100%;">
-                       <v-card-text>
-            <p>Click node for details. Drag nodes to pin. For node symbols, size indicates weight w.r.t. all relations.</p>
-            <p v-if="currentUser">Color distinguishes 
-                <span style="background-color:green; color: white;">{{ session.type }}s I know</span> from 
-                <span style="background-color:yellow">{{ session.type }}s I am exploring</span> and
-                <span style="background-color:red; color: white;">{{ session.type }}s I find interesting</span>. 
-            </p>
-            <!-- This bypasses session.set: !? -->
-            <p>The symbols for {{ session.type }}s, that have been updated in the last {{ session.newNodes }} days, <span v-html="markNew"></span>.
-            </p>
-            <p>The last selected {{ session.type }} is shown in <span style="background-color:pink; color: black;">pink</span>. The last {{ session.type }} selected in the graph is shown in <span style="background-color:brown; color: white;">brown</span>.</p>
-                       </v-card-text>
-                   </v-card>
-               </v-expand-transition>
-           </v-card>
-        </v-col>
-        <v-col xs="12" md="4">
-            <sidebar :relations="relations" title='' mode="list"></sidebar>
-        </v-col>
-    </v-row>
-    <Maps :key="mapKey" :cmap="mapNodes" :orientation="orientation"></Maps>
+      <Maps :key="mapKey" :cmap="mapNodes"></Maps>
  </v-container>
 </template>
 
 <script>
 import { UnitsCollection } from "../../api/UnitsCollection";
 import Maps from "./Maps.vue";
-import Sidebar from "./Sidebar.vue";
 
 
 export default {
-    props: ['relations'],
+    props: ['relations','allTyped'],
     data () {
         return {
             session: this.$root.$data.session,
             orientations: [
-                {text: 'None', value: null},
+                {text: 'None', value: ''},
 			  	{text: 'Bottom up', value: 'bu'} ,
                 {text: 'Top down', value: 'td'},
 				{text: 'Left-right', value: 'lr'},
@@ -127,7 +23,6 @@ export default {
 				{text: 'Out', value: 'radialout'} ,
 				{text: 'In', value: 'radialin'} 
 			],
-            orientation: null,
             newItems: [
                 {text: '1 day', value: 1},
                 {text: '2 days', value: 2},
@@ -149,8 +44,7 @@ export default {
         }
     },
     components: {
-        Maps,
-        Sidebar
+        Maps
     },
     created () {
     },
@@ -217,14 +111,14 @@ export default {
 ;            }
         },
         mapKey () {
-            return this.session.relation+this.session.newNodes+this.orientation+this.session.view+this.session.neighbourhood+this.session.nodeForm+this.session.direction+this.session.id;
+            return this.session.relation+this.session.newNodes+this.session.orientation+this.session.view+this.session.neighbourhood+this.session.nodeForm+this.session.direction+this.session.id;
         },
         mapNodes() {
             //if (this.$root.$data.coords) return coordMap(this.$root.$data.coords);
             return JSON.parse(JSON.stringify((this.session.id)?this.neighbourhood:this.allNodes)) ;
         },
         allNodes () {
-            let myNodes=UnitsCollection.find({type: this.session.type}).fetch();
+            let myNodes=this.allTyped;
             let linkRels=UnitsCollection.find({
                     type: 'relation', 
                     name: this.session.relation, 

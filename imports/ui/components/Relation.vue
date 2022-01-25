@@ -8,38 +8,13 @@
                 </v-expansion-panel-content>
             </v-expansion-panel>
         </v-expansion-panels>
-        <div v-if="mode == 'list' && session.mode != 'all' && current.title">
+        <div v-if="mode == 'list' && session.mode != 'graph' && current.title">
             <div v-if="relation.sourceType == session.type">
                 <v-select v-if="getCurrentNodeIsSource(relation.id).length" :items="getCurrentNodeIsSource(relation.id)" :label="current.title+' '+relation.name" item-text="title" item-value="_id" v-model="selectedTarget" return-object hide-details="auto"></v-select>
-                <!-- Change to select
-                <v-list v-if="getCurrentNodeIsSource(relation.id).length">
-                    <v-subheader>{{ current.title }} {{ relation.name }}:</v-subheader>
-                    <v-list-item-group>
-                        <v-list-item v-for="item in getCurrentNodeIsSource(relation.id)" :key="item._id" @click="selected(item)">                           
-                            <v-list-item-content>
-                                <v-list-item-title v-text="item.title"></v-list-item-title>
-                            </v-list-item-content>                               
-                        </v-list-item>
-                    </v-list-item-group>
-                </v-list>
-                -->
                 <p v-else>{{ current.title }} {{ relation.name }} no {{ relation.targetType }} in this system.</p>
             </div>
             <div v-if="relation.targetType == session.type">
                 <v-select v-if="getCurrentNodeIsTarget(relation.id).length" :items="getCurrentNodeIsTarget(relation.id)" :label="current.title+' '+relation.inverse" item-text="title" item-value="_id" v-model="selectedSource" return-object hide-details="auto"></v-select>
-                <!--
-                <v-list v-if="getCurrentNodeIsTarget(relation.id).length">
-                    <v-subheader>{{ current.title }} {{ relation.inverse }}:</v-subheader>
-                    <v-list-item-group>
-                        <v-list-item v-for="item in getCurrentNodeIsTarget(relation.id)" 
-                        :key="item._id" @click="selected(item)">                           
-                            <v-list-item-content>
-                                <v-list-item-title v-text="item.title"></v-list-item-title>
-                            </v-list-item-content>                               
-                        </v-list-item>
-                    </v-list-item-group>
-                </v-list>
-                -->
                 <p v-else>{{ current.title }} {{ relation.inverse }} no {{ relation.sourceType }} in this system.</p>
             </div>
         </div>
@@ -49,7 +24,7 @@
                     label="Targets:"
                     v-model="targets"
                     hide-details="auto"
-                    :items="all"
+                    :items="graph"
                     item-text="title"
                     item-value="_id"
                     clearable

@@ -11,7 +11,7 @@
                     
                 </v-col>
                 <v-col xs="12" md="8" name="editorMenu" v-if="isEditor">
-                        <v-btn v-if="mode=='all'" color="success" id="btnNew" @click="newNode">New {{ type }}</v-btn>
+                        <v-btn v-if="mode=='graph'" color="success" id="btnNew" @click="newNode">New {{ type }}</v-btn>
                         <span v-if="currentId && mode != 'update'">
                             <v-btn color="warning" id="btnUpdate" @click="updateNode">Update {{ type }}</v-btn>
                             <v-btn color="error" id="btnUpdate" @click="deleteNode">Delete {{ type }}</v-btn>
@@ -21,8 +21,8 @@
             
                 <v-row>
                 <v-col xs="12">
-                    <show-all :key="changed" v-if="mode=='all'" :type="type" :relations="relations" v-on:nodeselected="nodeSelected" v-on:relationselected="relationSelected" :session="session"></show-all>
-                    <show-one :key="currentId" v-if="mode=='single'" :currentId="currentId" :type="type" :relations="relations" v-on:setNode="nodeSelected" v-on:relationselected="relationSelected" :session="session"></show-one>
+                    <show-all :key="changed" v-if="mode=='graph'" :type="type" :relations="relations" v-on:nodeselected="nodeSelected" v-on:relationselected="relationSelected" :session="session"></show-all>
+                    <show-one :key="currentId" v-if="mode=='text'" :currentId="currentId" :type="type" :relations="relations" v-on:setNode="nodeSelected" v-on:relationselected="relationSelected" :session="session"></show-one>
                     <new-node v-if="mode=='new'" :type="type" :relations="relations" v-on:new="setNode" :session="session"></new-node>
                     <update-node v-if="mode=='update'" :currentId="currentId" v-on:update="updatedNode" :relations="relations" :type="type" :session="session"></update-node>
                 </v-col>
@@ -42,7 +42,7 @@ export default {
     data () {
         return {
             currentId: '',
-            mode: "all",
+            mode: "graph",
             //TODO: Do we need changed?
             changed: 0,
             session: {
@@ -70,9 +70,9 @@ export default {
         nodeSelected (id) {
             this.currentId=id;
             if (!id) {
-                this.mode="all";
+                this.mode="graph";
             } else {
-                this.mode="single";
+                this.mode="text";
             }            
         },
         relationSelected (rid) {
@@ -85,10 +85,10 @@ export default {
         setNode (id) {
             if (id) {
                 this.currentId=id;
-                this.mode="single";
+                this.mode="text";
             } else {
                 this.currentId='';
-                this.mode="all";
+                this.mode="graph";
             }
         },
         updateNode () {
@@ -97,10 +97,10 @@ export default {
         updatedNode (id) {
             if (id) {
                 this.currentId=id;
-                this.mode="single";
+                this.mode="text";
             } else {
                 this.currentId='';
-                this.mode="all";
+                this.mode="graph";
             }
         },
         deleteNode () {
@@ -117,7 +117,7 @@ export default {
                     target: this.currentId
                 });
                 this.currentId = '';
-                this.mode="all";
+                this.mode="graph";
             }
         }
     },

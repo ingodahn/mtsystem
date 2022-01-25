@@ -4,7 +4,7 @@
                 <v-col>
                     <v-btn-toggle v-model="sidebar">
                         <v-btn color="primary">Relation</v-btn>
-                        <v-btn color="primary" v-if="currentUser && session.id && session.mode == 'single'">Note</v-btn>
+                        <v-btn color="primary" v-if="currentUser && session.id && session.mode == 'text'">Note</v-btn>
                     </v-btn-toggle>
                     <div v-if="sidebar==0">
                         <div v-if="relations.length > 1">
