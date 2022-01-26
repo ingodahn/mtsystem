@@ -86,7 +86,7 @@
 import { UnitsCollection } from "../../api/UnitsCollection";
 import ShowMathDoc from "./ShowMathDoc.vue";
 //import UserNotes from "./UserNotes.vue";
-import Sidebar from "./Sidebar1.vue";
+import Sidebar from "./Sidebar.vue";
 
 export default {
   props: ["relations"],

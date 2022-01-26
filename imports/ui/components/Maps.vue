@@ -41,6 +41,12 @@
         >
           Save Graph</v-btn
         >
+        <v-btn
+          color="primary"
+          class="mx-1 my-1"
+          @click="resetGraph()"
+        >
+          Reset Graph</v-btn>
       </v-row>
 
       <v-row v-if="session.view == '3D'"><h3>Camera control</h3></v-row>
@@ -98,7 +104,8 @@ export default {
     };
   },
   components: { NodeInfo },
-  watch: {},
+  watch: {
+  },
 
   computed: {
     mapId() {
@@ -167,6 +174,9 @@ export default {
     },
   },
   methods: {
+    resetGraph () {
+      this.Graph.dagMode(null);
+    },
     nodeClicked(node0) {
       let node =
         typeof node0 == "object"
@@ -257,7 +267,6 @@ export default {
     },
 
     graph2d() {
-      const NODE_R = 8;
       this.Graph = ForceGraph()(document.getElementById(this.mapId));
       this.Graph.linkWidth(5)
         .linkDirectionalParticles(10)
@@ -425,6 +434,9 @@ export default {
       this.currentNode.color = this.currentColor;
     }
   },
+  crated () {
+
+  },
   mounted() {
     if (this.session.id) {
       //this.currentNode = this.cmap.nodes.find(d => d.id == this.session.id);
@@ -437,6 +449,7 @@ export default {
     } else {
       this.graph2d();
     }
+    if (!this.session.orientation) this.Graph.dagMode(null);
   },
 };
 </script>

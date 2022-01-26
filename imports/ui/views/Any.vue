@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col xs="12" md="4">
-        <h1>MathTrek {{ type }}{{ topicPlural }}:</h1>
+        <h1>MathTrek {{ session.type }}{{ topicPlural }}:</h1>
       </v-col>
       <v-col xs="12" md="4">
         <div class="select" data-app>
@@ -64,21 +64,21 @@
             color="success"
             id="btnNew"
             @click="session.edit = 'new'"
-            >New {{ type }}</v-btn
+            >New {{ session.type }}</v-btn
           >
           <v-btn
             v-if="isEditor && session.mode == 'text' && session.id"
             color="warning"
             id="btnUpdate"
             @click="session.edit = 'update'"
-            >Update {{ type }}</v-btn
+            >Update {{ session.type }}</v-btn
           >
           <v-btn
             v-if="isEditor && session.mode == 'text' && session.id"
             color="error"
             id="btnDelete"
             @click="deleteNode"
-            >Delete {{ type }}</v-btn
+            >Delete {{ session.type }}</v-btn
           >
         </div>
       </v-col>
@@ -90,7 +90,7 @@
     <v-row v-if="session.type">
       <v-col xs="12" v-if="!session.edit">
         <show-all
-          :key="type"
+          :key="session.type"
           v-if="session.mode == 'graph'"
           :relations="relations"
           :allTyped="allNodesOfType"
@@ -119,12 +119,10 @@
 
 <script>
 import { relations } from "/imports/config.js";
-import Selector from "../components/Selector.vue";
 import GraphControl from "../components/GraphControl.vue";
-import ShowAll from "../components/ShowAll.vue";
-import ShowOne from "../components/ShowOne.vue";
+import ShowAll from "../components/GraphicsMode.vue";
+import ShowOne from "../components/TextMode.vue";
 import NewNode from "../components/NewNode.vue";
-import UpdateNode from "../components/UpdateNode.vue";
 import { UnitsCollection } from "../../api/UnitsCollection";
 export default {
   data() {
@@ -135,11 +133,9 @@ export default {
   },
   props: [],
   components: {
-    Selector,
     ShowAll,
     ShowOne,
     NewNode,
-    UpdateNode,
     GraphControl,
   },
   created() {
@@ -148,6 +144,7 @@ export default {
   },
   watch: {},
   methods: {
+    /*
     nodeSelected(id) {
       this.session.set("id", id);
       if (!id) {
@@ -156,9 +153,11 @@ export default {
         this.mode = "text";
       }
     },
+    
     relationSelected(rid) {
       this.currentRelation = rid;
     },
+    */
     deleteNode() {
       if (!this.session.id) {
         alert("No node selected");
@@ -168,7 +167,7 @@ export default {
       if (
         confirm(
           "Do you REALLY want to delete " +
-            this.type +
+            this.session.type +
             " " +
             node.title +
             " on " +
@@ -196,15 +195,17 @@ export default {
     },
   },
   computed: {
+    /*
     type() {
       return this.session.type;
     },
+    */
     relatedType() {
       const cr = this.relations.find((r) => r.id == this.session.relation);
       return cr.sourceType == this.session.type ? cr.targetType : cr.sourceType;
     },
     relations() {
-      let t = this.type;
+      let t = this.session.type;
       return relations.filter((e) => e.sourceType == t || e.targetType == t);
     },
     getRelationDescription() {
