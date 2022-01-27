@@ -196,28 +196,34 @@ export default {
 			*/
     },
     setCurrentNode(node) {
-      if (node.id == this.currentId) return;
+      if (node.id == this.currentId) {
+
+      }
       //Now new node selected:
-      if (!this.currentNode) {
+      else if (!this.currentNode) {
         this.currentColor = node.color;
         this.currentId = node.id;
         node.color = this.colors.selectedNode;
-        return;
+        this.Graph.nodeColor('color');
       }
       //Now CurrentNode exists
-      if (this.currentId != this.session.id) {
+      else if (this.currentId != this.session.id) {
         this.currentNode.color = this.currentColor;
         this.currentColor = node.color;
         this.currentId = node.id;
         if (node.id != this.session.id) node.color = this.colors.selectedNode;
+        this.Graph.nodeColor('color');
         return;
-      }
-      //Now CurrentNode equals SessionNode
+      } else {
+        //Now CurrentNode equals SessionNode
       //Now not SessionNode selected
       this.currentColor = node.color;
       this.currentId = node.id;
       node.color = this.colors.selectedNode;
+      }
+      if (this.session.view == '3D') this.Graph.nodeColor('color');
     },
+    /*
     alignCurrentNode() {
       if (!this.currentId) {
         console.log("No currentId");
@@ -230,7 +236,7 @@ export default {
       }
       this.nodeClicked(node);
     },
-
+    */
     showAll() {
       this.session.id = "";
     },
