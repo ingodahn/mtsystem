@@ -115,7 +115,8 @@ export default {
         },
         mapNodes() {
             //if (this.$root.$data.coords) return coordMap(this.$root.$data.coords);
-            return JSON.parse(JSON.stringify((this.session.id)?this.neighbourhood:this.allNodes)) ;
+            //return JSON.parse(JSON.stringify((this.session.id)?this.neighbourhood1:this.allNodes)) ;
+            return (this.session.id)?this.neighbourhood1:this.allNodes;
         },
         allNodes () {
             let myNodes=this.allTyped;
@@ -174,9 +175,68 @@ export default {
             
             return {"nodes": nodes, "links": links};
         },
+        neighbourhood1 () {
+            console.log("GraphicsMode-178 called");
+            let node=UnitsCollection.findOne({_id: this.session.id}), d=this.session.neighbourhood;
+            if (! node && this.session.debug) console.log('GraphicsMode:178 node', session.id,'not found');
+            const cid=node._id;
+			
+            let id=0, newNodeIds=[cid],nodeIds=[cid];
+            while (id < d) {
+                let  nextNodeIds=[];
+                if (this.session.direction != 'in') {
+                    UnitsCollection.find({type: 'relation', name: this.session.relation, source: {$in: newNodeIds}}).fetch().forEach(lf => nextNodeIds.push(lf.target));
+                }
+                if (this.session.direction != 'out') {
+                    UnitsCollection.find({type: 'relation', name: this.session.relation, target: {$in: newNodeIds}}).fetch().forEach(lf => nextNodeIds.push(lf.source));
+                }
+                let nextNodeReduced=[...new Set(nextNodeIds)].filter(item => (! nodeIds.includes(item)));
+                nodeIds=nodeIds.concat(nextNodeReduced);
+                newNodeIds=[...nextNodeReduced];
+                id++;
+            }
+            console.log('nodeIds',nodeIds);
+            let nodeStatus={};
+            if (this.currentUser) {
+                UnitsCollection.find({type: 'note',
+                    item: {$in: nodeIds},
+                    userId: this.currentUser._id
+                }).fetch().forEach(n => {
+                    nodeStatus[n.item]=n.status;
+                });
+            }
+            const back = new Date().getTime()-parseInt(this.session.newNodes)*24*60*60*1000;
+            let nodes = [];
+            UnitsCollection.find({_id: {$in: nodeIds}}).fetch().forEach(n => {
+                let updated=new Date(n.updatedAt).getTime();
+                let isNew = (updated && updated > back)?true:false;
+                let color="blue";
+                let nid=n._id;
+                switch (nodeStatus[nid]) {
+                    case "100": color="green"; break;
+                    case "2": color="yellow"; break;
+                    case "150": color="red"; break;
+                    default: color="blue";
+                }
+                let nodeval=UnitsCollection.find({$or: [{target: nid, type: 'relation'},{source: nid, type: 'relation'}]}).fetch().length/3; // Denominator 
+                nodes.push({"id": n._id, "title": n.title, "type": n.type, "color": color, "isNew": isNew, "val": nodeval})
+            });
+            let rels=[]
+            if (this.session.otherRelations) {
+                rels=UnitsCollection.find({type: 'relation', source: {$in: nodeIds}, target: {$in: nodeIds}});
+            } else {
+                rels=UnitsCollection.find({type: 'relation', name: this.session.relation, source: {$in: nodeIds}, target: {$in: nodeIds}});
+            }
+            let links=[];
+            rels.forEach(r => {
+                links.push({source: r.source, target: r.target, name: r.name});
+            });
+            console.log("Maps-230",{nodes: nodes, links: links});
+            return {nodes: nodes, links: links};
+        },
         neighbourhood() {
 			let node=this.allNodes.nodes.find(n => (n.id==this.session.id)), d=this.session.neighbourhood;
-			if (! node) console.log('ShowAll:178 node', session.id,'not found');
+			if (! node && this.session.debug) console.log('GraphicsMode:178 node', session.id,'not found');
             const cid=node.id;
 			function linkSourceId(link) {
 				return ((typeof link.source) == 'object')?link.source.id:link.source;

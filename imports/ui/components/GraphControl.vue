@@ -51,6 +51,7 @@
                     label="Follow links..."
                     v-model="session.direction"
                   ></v-select>
+                  <v-switch v-model="session.otherRelations" label="Show other relations too?"></v-switch>
                 </v-row>
               </v-card-text>
             </v-card>
