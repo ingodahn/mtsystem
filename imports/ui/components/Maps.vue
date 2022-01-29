@@ -221,7 +221,6 @@ export default {
       this.currentId = node.id;
       node.color = this.colors.selectedNode;
       }
-      if (this.session.view == '3D') this.Graph.nodeColor('color');
     },
     /*
     alignCurrentNode() {
@@ -376,7 +375,20 @@ export default {
           node.fy = node.y;
           node.fz = node.z;
         })
-        .onNodeClick((node) => this.nodeClicked(node))
+        .onNodeClick((node) => {
+          this.nodeClicked(node);
+          if (this.session.nodeForm == 'Symbols') {
+            this.Graph.nodeColor('color');
+          } else {
+            this.Graph.nodeThreeObject((nn) => {
+              const sprite = new SpriteText(nn.title);
+              sprite.material.depthWrite = false; // make sprite background transparent
+              sprite.color = nn.color;
+              sprite.textHeight = 20;
+              return sprite;
+            })
+          }
+        })
         .cooldownTime(2000);
       if (this.session.orientation)
         this.Graph.dagMode(this.session.orientation);
