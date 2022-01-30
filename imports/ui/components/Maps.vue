@@ -97,8 +97,9 @@ export default {
       currentColor: "blue",
       colors: {
         default: "blue",
-        sessionNode: "pink",
+        sessionNode: "deeppink",
         selectedNode: "brown",
+        primaryRelation: 'red'
       },
       view: this.$root.$data.session.view,
     };
@@ -110,52 +111,6 @@ export default {
   computed: {
     mapId() {
       return "graph" + Math.random().toString();
-    },
-    neighbourhood() {
-      let node = this.cmap.nodes.find((n) => n.id == this.session.id),
-        d = this.session.neighbourhood;
-      if (!node) node = this.currentNode;
-      const cid = node.id;
-      function linkSourceId(link) {
-        return typeof link.source == "object" ? link.source.id : link.source;
-      }
-      function linkTargetId(link) {
-        return typeof link.target == "object" ? link.target.id : link.target;
-      }
-
-      let id = 0,
-        newNodeIds = [cid],
-        nodeIds = [cid];
-      while (id < d) {
-        let nextNodeIds = [];
-
-        this.cmap.links
-          .filter((ll) => newNodeIds.includes(linkSourceId(ll)))
-          .forEach((lf) => {
-            nextNodeIds.push(linkTargetId(lf));
-          });
-        this.cmap.links
-          .filter((ll) => newNodeIds.includes(linkTargetId(ll)))
-          .forEach((lf) => {
-            nextNodeIds.push(linkSourceId(lf));
-          });
-
-        let nextNodeReduced = [...new Set(nextNodeIds)].filter(
-          (item) => !nodeIds.includes(item)
-        );
-        nodeIds = nodeIds.concat(nextNodeReduced);
-        newNodeIds = [...nextNodeReduced];
-        id++;
-      }
-
-      let nodes = this.cmap.nodes.filter((nn) => nodeIds.includes(nn.id));
-      let links = this.cmap.links.filter(
-        (nn) =>
-          nodeIds.includes(linkSourceId(nn)) &&
-          nodeIds.includes(linkTargetId(nn))
-      );
-
-      return { nodes: nodes, links: links };
     },
 
     currentNode() {
@@ -222,20 +177,7 @@ export default {
       node.color = this.colors.selectedNode;
       }
     },
-    /*
-    alignCurrentNode() {
-      if (!this.currentId) {
-        console.log("No currentId");
-        return;
-      }
-      let node = this.cmap.nodes.find((n) => n.id == this.currentId);
-      if (!node) {
-        console.log("Node not found");
-        return;
-      }
-      this.nodeClicked(node);
-    },
-    */
+    
     showAll() {
       this.session.id = "";
     },
@@ -273,16 +215,19 @@ export default {
 
     graph2d() {
       this.Graph = ForceGraph()(document.getElementById(this.mapId));
-      this.Graph.linkWidth(5)
+      this.Graph
+        .linkWidth(5)
         .linkDirectionalParticles(10)
         .linkDirectionalParticleWidth(2.5)
         .linkDirectionalParticleSpeed((d) => 0.005)
+        .linkDirectionalParticleColor(() => {return 'white';})
         .nodeRelSize(6)
         .nodeId("id")
         .nodeColor((d) =>
           d.id == this.session.id ? this.colors.sessionNode : d.color
         )
         .nodeLabel((node) => `${node.title}`)
+        .linkColor((r) => {return (r.relation == this.session.relation)?this.colors.primaryRelation:'blue'})
         .d3Force(
           "link",
           d3
@@ -369,7 +314,8 @@ export default {
         .linkDirectionalParticles(10)
         .linkDirectionalParticleWidth(2.5)
         .linkDirectionalParticleSpeed((d) => 0.005)
-        .nodeAutoColorBy("group")
+        .linkDirectionalParticleColor(() => {return 'white';})
+        .linkColor((r) => {return (r.relation == this.session.relation)?this.colors.primaryRelation:'blue'})
         .onNodeDragEnd((node) => {
           node.fx = node.x;
           node.fy = node.y;

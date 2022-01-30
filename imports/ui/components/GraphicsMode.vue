@@ -116,7 +116,7 @@ export default {
         mapNodes() {
             //if (this.$root.$data.coords) return coordMap(this.$root.$data.coords);
             //return JSON.parse(JSON.stringify((this.session.id)?this.neighbourhood1:this.allNodes)) ;
-            return (this.session.id)?this.neighbourhood1:this.allNodes;
+            return (this.session.id)?this.neighbourhood:this.allNodes;
         },
         allNodes () {
             let myNodes=this.allTyped;
@@ -175,7 +175,7 @@ export default {
             
             return {"nodes": nodes, "links": links};
         },
-        neighbourhood1 () {
+        neighbourhood () {
             console.log("GraphicsMode-178 called");
             let node=UnitsCollection.findOne({_id: this.session.id}), d=this.session.neighbourhood;
             if (! node && this.session.debug) console.log('GraphicsMode:178 node', session.id,'not found');
@@ -206,12 +206,13 @@ export default {
                 });
             }
             const back = new Date().getTime()-parseInt(this.session.newNodes)*24*60*60*1000;
-            let nodes = [];
+            let nodes = [], nodeTitle = {};
             UnitsCollection.find({_id: {$in: nodeIds}}).fetch().forEach(n => {
                 let updated=new Date(n.updatedAt).getTime();
                 let isNew = (updated && updated > back)?true:false;
                 let color="blue";
                 let nid=n._id;
+                nodeTitle[nid]=n.title;
                 switch (nodeStatus[nid]) {
                     case "100": color="green"; break;
                     case "2": color="yellow"; break;
@@ -229,65 +230,12 @@ export default {
             }
             let links=[];
             rels.forEach(r => {
-                links.push({source: r.source, target: r.target, name: r.name});
+                links.push({source: r.source, target: r.target, relation: r.name, name: nodeTitle[r.source]+' '+this.ids2RelationNames[r.name]+' '+nodeTitle[r.target]});
             });
             console.log("Maps-230",{nodes: nodes, links: links});
             return {nodes: nodes, links: links};
         },
-        neighbourhood() {
-			let node=this.allNodes.nodes.find(n => (n.id==this.session.id)), d=this.session.neighbourhood;
-			if (! node && this.session.debug) console.log('GraphicsMode:178 node', session.id,'not found');
-            const cid=node.id;
-			function linkSourceId(link) {
-				return ((typeof link.source) == 'object')?link.source.id:link.source;
-			}
-			function linkTargetId(link) {
-				return ((typeof link.target) == 'object')?link.target.id:link.target;
-			}
-			
-            let id=0, newNodeIds=[cid],nodeIds=[cid];
-            while (id < d) {
-                let  nextNodeIds=[];
-
-                if (this.session.direction != 'in') {
-                    this.allNodes.links.filter(ll => newNodeIds.includes(linkSourceId(ll))).forEach(lf => {
-					nextNodeIds.push(linkTargetId(lf))
-				    });
-                }
-				if (this.session.direction != 'out') {
-                    this.allNodes.links.filter(ll => newNodeIds.includes(linkTargetId(ll))).forEach(lf => {
-					nextNodeIds.push(linkSourceId(lf))
-				    });
-                }
-				
-				
-                let nextNodeReduced=[...new Set(nextNodeIds)].filter(item => (! nodeIds.includes(item)));
-                nodeIds=nodeIds.concat(nextNodeReduced);
-                newNodeIds=[...nextNodeReduced];
-                id++;
-            }
-			
-			let nodes=this.allNodes.nodes.filter(nn => nodeIds.includes(nn.id));
-            let coords=this.$root.$data.coords;
-            if (coords) {
-                nodes.forEach(n => {
-                    if (coords[n.id]) {
-                        let c=coords[n.id];
-                        n.x=c.x;
-                        n.fx=c.fx;
-                        n.y=c.y;
-                        n.fy=c.fy;
-                        if (this.session.view=='3D') {
-                            n.z=c.z;
-                            n.fz=c.fz;
-                        }
-                    }
-                });
-                this.$root.$data.coords=null;
-            }
-            let links=this.allNodes.links.filter(nn => (nodeIds.includes(linkSourceId(nn)) && nodeIds.includes(linkTargetId(nn))));
-            return {nodes: nodes, links: links};
-        },
+        
         sameType () {
             const r=this.id2relation(this.session.relation);
             return (r.sourceType == r.targetType);
@@ -295,6 +243,11 @@ export default {
         
         markNew () {
             return (this.session.view == '2D')?"are marked with an <span style='border:solid orange; border-radius: 10px; padding: 1px;'>orange ring</span>":"are shown surrounded by an <span style='border:solid orange; padding: 1px;'>orange polygon</span>";
+        },
+        ids2RelationNames () {
+            let ir={};
+            this.relations.forEach(r => {ir[r.id]=r.name;});
+            return ir;
         }
     },
 
