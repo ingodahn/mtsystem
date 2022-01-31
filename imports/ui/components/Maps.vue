@@ -35,6 +35,12 @@
         <v-btn
           color="primary"
           class="mx-1 my-1"
+          @click="expand(currentId)"
+          >Expand</v-btn
+        >
+        <v-btn
+          color="primary"
+          class="mx-1 my-1"
           @click="showAll"
           :disabled="!session.id"
           >Show all</v-btn
@@ -47,14 +53,6 @@
         >
           Save Graph</v-btn
         >
-        <!--
-        <v-btn
-          color="primary"
-          class="mx-1 my-1"
-          @click="resetGraph()"
-        >
-          Reset Graph</v-btn>
-          -->
       </v-row>
 
       <v-row v-if="session.view == '3D'"><h3>Camera control</h3></v-row>
@@ -385,6 +383,9 @@ export default {
         .width(this.$refs[this.mapId].clientWidth)
         .height(Math.max(this.$refs[this.mapId].clientHeight, 800))
         .zoomToFit(500);
+    },
+    expand (nodeId) {
+      this.$emit('expand',nodeId);
     }
   },
   beforeDestroy() {
@@ -392,6 +393,7 @@ export default {
       this.currentNode.color = this.currentColor;
     }
   },
+
   crated () {
 
   },
