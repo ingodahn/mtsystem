@@ -29,6 +29,12 @@
         <v-btn
           color="primary"
           class="mx-1 my-1"
+          @click="zoomToFit"
+          >Zoom</v-btn
+        >
+        <v-btn
+          color="primary"
+          class="mx-1 my-1"
           @click="showAll"
           :disabled="!session.id"
           >Show all</v-btn
@@ -41,12 +47,14 @@
         >
           Save Graph</v-btn
         >
+        <!--
         <v-btn
           color="primary"
           class="mx-1 my-1"
           @click="resetGraph()"
         >
           Reset Graph</v-btn>
+          -->
       </v-row>
 
       <v-row v-if="session.view == '3D'"><h3>Camera control</h3></v-row>
@@ -129,9 +137,11 @@ export default {
     },
   },
   methods: {
+    /*
     resetGraph () {
       this.Graph.dagMode(null);
     },
+    */
     nodeClicked(node0) {
       let node =
         typeof node0 == "object"
@@ -139,16 +149,6 @@ export default {
           : this.cmap.nodes.find((n) => n.id == node0);
       this.setCurrentNode(node);
       this.selectedId = node.id;
-      /*
-			this.Graph.d3Force('center', null);
-			if (this.session.view == '3D') {
-				this.Graph.cameraPosition({},node);
-			} else {
-				this.Graph.centerAt(node.x,node.y);
-			}
-			this.selectedId=node.id;
-			this.Graph.zoomToFit(500,10);
-			*/
     },
     setCurrentNode(node) {
       if (node.id == this.currentId) {
@@ -236,8 +236,8 @@ export default {
             .distance(100)
             .strength(1)
         )
-        .width(this.$refs.conti.clientWidth)
-        .height(Math.max(this.$refs.conti.clientHeight, 800))
+        .width(this.$refs[this.mapId].clientWidth)
+        .height(Math.max(this.$refs[this.mapId].clientHeight, 800))
         .onNodeDragEnd((node) => {
           node.fx = node.x;
           node.fy = node.y;
@@ -295,12 +295,6 @@ export default {
         });
       }
       this.Graph.graphData(this.cmap);
-      // Zoom to fit
-      this.Graph.d3Force("center", null);
-
-      // fit to canvas when engine stops
-      this.Graph.width(this.$refs[this.mapId].clientWidth);
-      this.Graph.onEngineStop(() => this.Graph.zoomToFit(500));
     },
 
     graph3d() {
@@ -308,6 +302,7 @@ export default {
         document.getElementById(this.mapId)
       );
       this.Graph.width(this.$refs[this.mapId].clientWidth)
+        .height(Math.max(this.$refs[this.mapId].clientHeight, 800))
         .nodeId("id")
         .nodeRelSize(6)
         .linkWidth(5)
@@ -368,14 +363,7 @@ export default {
           .d3Force("charge")
           .strength(-120);
       }
-
       this.Graph.graphData(this.cmap);
-      // Zoom to fit
-      this.Graph.d3Force("center", null);
-
-      // fit to canvas when engine stops
-      //Graph.onEngineStop(() => Graph.zoomToFit(500));
-      this.Graph.zoomToFit(500);
     },
     saveGraph() {
       let graphData = this.Graph.graphData();
@@ -392,6 +380,12 @@ export default {
       var blob = new Blob([gs], { type: "text/plain;charset=utf-8" });
       FileSaver.saveAs(blob, "graph.json");
     },
+    zoomToFit () {
+      this.Graph
+        .width(this.$refs[this.mapId].clientWidth)
+        .height(Math.max(this.$refs[this.mapId].clientHeight, 800))
+        .zoomToFit(500);
+    }
   },
   beforeDestroy() {
     if (this.currentNode && this.currentNode != this.session.id) {
