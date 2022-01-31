@@ -95,7 +95,7 @@ import NodeInfo from "./NodeInfo.vue";
 import { relations } from "/imports/config.js";
 
 export default {
-  props: ["cmap"],
+  props: ["cmap","cooldownTicks"],
   data() {
     return {
       session: this.$root.$data.session,
@@ -182,11 +182,6 @@ export default {
     },
   },
   methods: {
-    /*
-    resetGraph () {
-      this.Graph.dagMode(null);
-    },
-    */
     nodeClicked(node0) {
       let node =
         typeof node0 == "object"
@@ -298,7 +293,7 @@ export default {
           node.fy = node.y;
         })
         .onNodeClick((node) => this.nodeClicked(node))
-        .cooldownTime(2000);
+        .cooldownTicks(this.cooldownTicks);
 
       if (this.session.orientation) 
 	  	this.Graph.dagMode(this.session.orientation);
@@ -384,7 +379,7 @@ export default {
             })
           }
         })
-        .cooldownTime(2000);
+        .cooldownTicks(this.cooldownTicks)
       if (this.session.orientation)
         this.Graph.dagMode(this.session.orientation);
       if (this.session.nodeForm == "Symbols") {

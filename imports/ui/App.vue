@@ -49,7 +49,7 @@
             direction: 'both',
             orientation: '',
             newNodes: 7,
-            debug: true,
+            debug: false,
             set (item,newValue,by='anonymous') {
               if (this.debug) console.log('Session setting', item,'to',newValue,'by',by);
               this[item] = newValue;

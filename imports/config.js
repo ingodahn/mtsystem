@@ -93,7 +93,7 @@ const defaultRelation = {
     subject: 'SisBelowS',
     concept: 'CisBelowC',
     theorem: 'TisBelowT',
-    person: 'PinspredP',
+    person: 'PinspiredP',
 };
 const defaultNode = {
     subject: 'Mathematics',

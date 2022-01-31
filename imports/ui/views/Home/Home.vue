@@ -37,14 +37,6 @@
               </v-card-actions>
             </v-card>
           </v-col>
-          <!--
-          <v-col cols="auto">
-            <v-card width="600" height="300" raised>
-              <v-card-title>File contents:</v-card-title>
-              <v-card-text><p>{{ data }}</p></v-card-text>
-            </v-card>
-          </v-col>
-          -->
         </v-row>
         </div>
     </div>
@@ -90,15 +82,16 @@ export default {
             if (!dataSession) {
                 alert('No Session Found in File')
             }
-            this.session.set('type', dataSession.type);
-            this.session.set('relation', dataSession.relation);
-            this.session.set('id', dataSession.id);
-            this.session.set('view', dataSession.view);
-            this.session.set('mode', dataSession.mode);
-            this.session.set('neighbourhood', dataSession.neighbourhood);
-            this.session.set('direction', dataSession.direction);
-            this.session.set('newNodes', dataSession.newNodes);
-            this.session.set('orientation', dataSession.orientation);
+            this.session.set('type', dataSession.type,'saved session');
+            this.session.set('relation', dataSession.relation,'saved session');
+            this.session.set('id', dataSession.id,'saved session');
+            this.session.set('view', dataSession.view,'saved session');
+            this.session.set('mode', dataSession.mode,'saved session');
+            this.session.set('neighbourhood', dataSession.neighbourhood,'saved session');
+            this.session.set('nodeForm', dataSession.nodeForm,'saved session');
+            this.session.set('direction', dataSession.direction,'saved session');
+            this.session.set('newNodes', dataSession.newNodes,'saved session');
+            this.session.set('orientation', dataSession.orientation,'saved session');
             this.$root.$data.coords=sessionData.coords;
             this.$emit('sessionReloaded')
         }

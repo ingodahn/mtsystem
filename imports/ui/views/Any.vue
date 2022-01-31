@@ -118,7 +118,7 @@
 </template>
 
 <script>
-import { relations } from "/imports/config.js";
+import { relations, defaultRelation } from "/imports/config.js";
 import GraphControl from "../components/GraphControl.vue";
 import ShowAll from "../components/GraphicsMode.vue";
 import ShowOne from "../components/TextMode.vue";
@@ -139,8 +139,13 @@ export default {
     GraphControl,
   },
   created() {
-    this.$root.$data.session.set("relation", this.initialRelation);
-    this.$root.$data.session.set("id", this.initialId);
+    let ts=this.session.type, rs=this.session.relation;
+    let ra=relations.find(r => (r.id==rs));
+    if (ra.sourceType != ts && ra.targetType != ts) this.session.set('relation',defaultRelation[ts],'Any creation');
+    if (this.session.id) {
+      let ns=UnitsCollection.findOne({_id: this.session.id});
+      if (ns.type != this.session.type) this.session.set('id','','Any creation');
+    }
   },
   watch: {},
   methods: {
@@ -274,14 +279,6 @@ export default {
         });
       });
       return tr;
-    },
-    initialId() {
-      if (!this.session.id) return "";
-      const node = UnitsCollection.findOne({ _id: this.session.id });
-      return node.type == this.session.type ? node._id : "";
-    },
-    initialRelation() {
-      return this.relations[0].id;
     },
     currentRelation() {
       return this.session.relation;
