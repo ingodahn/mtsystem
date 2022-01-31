@@ -1,6 +1,6 @@
 <template>
  <v-container>
-      <Maps :key="mapKey" :cmap="mapNodes"></Maps>
+      <Maps :key="mapKey" :cmap="mapNodes" v-on:expand="expand"></Maps>
  </v-container>
 </template>
 
@@ -99,6 +99,10 @@ export default {
                 let nodeval=UnitsCollection.find({$or: [{target: nid, type: 'relation'},{source: nid, type: 'relation'}]}).fetch().length/3; // Denominator may be varied for readability
                 n.val=nodeval;
             });
+        },
+        expand (nodeId) {
+            console.log('expanding',nodeId);
+            //let dbNodes=UnitsCollection.find({type: 'relation', source: nodeId})
         }
     },
     computed: {
