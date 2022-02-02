@@ -1,6 +1,6 @@
 <template>
  <v-container>
-      <Maps :key="mapKey" :cmap="mapNodes" v-on:expand="expand"></Maps>
+      <Maps :key="mapKey" :cmap="mapNodes" :cooldownTicks="cooldownTicks" v-on:expand="expand"></Maps>
  </v-container>
 </template>
 
@@ -40,7 +40,8 @@ export default {
             view: '2D',
             distance: [1,2,3,4,5],
             nodeForms: ['Symbols','Text'],
-            reveal: false
+            reveal: false,
+            cooldownTicks: 2000
         }
     },
     components: {
@@ -54,66 +55,13 @@ export default {
         id2relation (id) {
             return this.relations.find(e => e.id == id);
         },
-        coordMap(coords) {
-            let nodes=UnitsCollection.find({_id: {$in: Object.keys(coords)}}).fetch().map(n => {return {id: n._id, title: n.title, type: n.type, updatedAt: n.updatedAt}});
-            nodes.forEach(n => {
-                let c=coords[n.id];
-                n.x=c.x;
-                n.fx=c.fx;
-                n.y=c.y;
-                n.fy=c.fy;
-                if (this.session.view=='3D') {
-                    n.z=c.z;
-                    n.fz=c.fz;
-                }
-            });
-            let nodeIds=nodes.map(n => n.id);
-            let links=UnitsCollection.find({type: 'relation', name: this.session.relation, source: {$in: nodeIds}, target: {$in: nodeIds}}).fetch().map(ll =>{return {source: ll.source, target: ll.target}});
-            return {nodes: nodes, links: links};
-        },
-        decorate(graph) {
-            const nodeIds=graph.map(n => n.id);
-            let nodeStatus={};
-            if (this.currentUser) {
-                UnitsCollection.find({type: 'note',
-                    item: {$in: nodeIds},
-                    userId: this.currentUser._id
-                }).fetch().forEach(n => {
-                    nodeStatus[n.item]=n.status;
-                });
-            }
-            graph.nodes.forEach(n => {
-                let nid=n._id;
-                let color="blue";
-                const back = new Date().getTime()-parseInt(this.session.newNodes)*24*60*60*1000;
-                switch (nodeStatus[nid]) {
-                    case "100": color="green"; break;
-                    case "2": color="yellow"; break;
-                    case "150": color="red"; break;
-                    default: color="blue";
-                }
-                n.color=color;
-                let updated=new Date(n.updatedAt).getTime();
-                n.isNew = (updated && updated > back)?true:false;
-                if (nodeStatus[nid]) group=nodeStatus[nid];
-                let nodeval=UnitsCollection.find({$or: [{target: nid, type: 'relation'},{source: nid, type: 'relation'}]}).fetch().length/3; // Denominator may be varied for readability
-                n.val=nodeval;
-            });
-        },
+        
         expand (nodeId) {
             console.log('expanding',nodeId);
             //let dbNodes=UnitsCollection.find({type: 'relation', source: nodeId})
         }
     },
     computed: {
-        subject () {
-            if (this.session.id) {
-                let name=UnitsCollection.findOne({_id: this.session.id}).title;
-                return "The "+this.session.type+" "+name;
-            } else {
-                return "All "+this.session.type+"s"
-;            }
-        },
         mapKey () {
             return this.session.relation+this.session.newNodes+this.session.orientation+this.session.view+this.session.neighbourhood+this.session.nodeForm+this.session.direction+this.session.id;
         },
@@ -225,7 +173,27 @@ export default {
                 }
                 let nodeval=UnitsCollection.find({$or: [{target: nid, type: 'relation'},{source: nid, type: 'relation'}]}).fetch().length/3; // Denominator 
                 nodes.push({"id": n._id, "title": n.title, "type": n.type, "color": color, "isNew": isNew, "val": nodeval})
+                let coords=this.$root.$data.coords;
+                console.log('GraphicsMode-177 coords',coords,nodes);
+                if (coords) {
+                    nodes.forEach(nn => {
+                        if (coords[nn.id]) {
+                            let c=coords[nn.id];
+                            nn.x=c.x;
+                            nn.fx=c.fx;
+                            nn.y=c.y;
+                            nn.fy=c.fy;
+                            if (this.session.view=='3D') {
+                                nn.z=c.z;
+                                nn.fz=c.fz;
+                            }
+                        }
+                        console.log('GM-191',nn.id);
+                    });
+                }
             });
+            this.cooldownTicks=0;
+            this.$root.$data.coords=null;
             let rels=[]
             if (this.session.otherRelations) {
                 rels=UnitsCollection.find({type: 'relation', source: {$in: nodeIds}, target: {$in: nodeIds}});
@@ -236,7 +204,7 @@ export default {
             rels.forEach(r => {
                 links.push({source: r.source, target: r.target, relation: r.name, name: nodeTitle[r.source]+' '+this.ids2RelationNames[r.name]+' '+nodeTitle[r.target]});
             });
-            console.log("Maps-230",{nodes: nodes, links: links});
+            console.log("GM-207",{nodes: nodes, links: links});
             return {nodes: nodes, links: links};
         },
         
