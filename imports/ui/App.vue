@@ -41,7 +41,7 @@
           session: {
             type: defaultType,
             relation: defaultRelation[defaultType],
-            otherRelations: false,
+            freeze: false,
             edit: false,
             id: '',
             view: '2D',

@@ -71,7 +71,6 @@ export default {
                 this.restoreSession(reader.result);
             }
         },
-        // TODO: Handle Graph
         restoreSession (sessionString) {
             const sessionData=JSON.parse(sessionString);
             if (!sessionData) {
@@ -92,6 +91,7 @@ export default {
             this.session.set('direction', dataSession.direction,'saved session');
             this.session.set('newNodes', dataSession.newNodes,'saved session');
             this.session.set('orientation', dataSession.orientation,'saved session');
+            this.session.set('freeze', true,'saved session');
             this.$root.$data.coords=sessionData.coords;
             this.$emit('sessionReloaded')
         }
