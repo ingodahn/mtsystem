@@ -114,6 +114,7 @@ export default {
         sessionNode: "deeppink",
         selectedNode: "brown",
         primaryRelation: "red",
+        otherRelation: "green"
       },
       view: this.$root.$data.session.view,
       expandBy: null,
@@ -265,7 +266,7 @@ export default {
         .linkColor((r) => {
           return r.relation == this.session.relation
             ? this.colors.primaryRelation
-            : "blue";
+            : this.colors.otherRelation;
         })
         .d3Force(
           "link",
@@ -354,7 +355,7 @@ export default {
         .linkColor((r) => {
           return r.relation == this.session.relation
             ? this.colors.primaryRelation
-            : "blue";
+            : this.colors.otherRelation;
         })
         .onNodeDragEnd((node) => {
           node.fx = node.x;
@@ -444,14 +445,15 @@ export default {
     expandGraph(newGraph) {
       if (!newGraph.nodes.length) {
         alert("No new nodes added");
+        return;
       }
       const graph = this.Graph.graphData();
-      //this.Graph.cooldownTicks(0)
+      const graphNodeIds=graph.nodes.map(n => n.id);
+      const newNodes=newGraph.nodes.filter(nn => (!graphNodeIds.includes(nn.id)));
       this.Graph.graphData({
-        nodes: graph.nodes.concat(newGraph.nodes),
+        nodes: graph.nodes.concat(newNodes),
         links: graph.links.concat(newGraph.links),
       });
-      //this.Graph.cooldownTicks(2000);
     },
   },
   beforeDestroy() {

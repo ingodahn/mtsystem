@@ -172,9 +172,9 @@ export default {
       let rname=this.id2relation(relationId).name;
       nodes.forEach(n => {
         if (is == 'source') 
-          links.push({source: nodeId, target: n.id, name: ctitle+' '+rname+' '+n.title});
+          links.push({source: nodeId, target: n.id, name: ctitle+' '+rname+' '+n.title, relation: relationId});
         else
-          links.push({source: n.id, target: nodeId, name: n.title+' '+rname+' '+ctitle});
+          links.push({source: n.id, target: nodeId, name: n.title+' '+rname+' '+ctitle, relation: relationId});
       });
       this.$refs.graph.expandGraph({ nodes: nodes, links: links });
     },
