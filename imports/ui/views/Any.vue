@@ -200,11 +200,6 @@ export default {
     },
   },
   computed: {
-    /*
-    type() {
-      return this.session.type;
-    },
-    */
     relatedType() {
       const cr = this.relations.find((r) => r.id == this.session.relation);
       return cr.sourceType == this.session.type ? cr.targetType : cr.sourceType;

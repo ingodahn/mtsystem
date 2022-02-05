@@ -162,8 +162,6 @@ export default {
       let coords = graph.coords,
         links = graph.links;
       let nodeIds = Object.keys(coords);
-      console.log("GM-144: nodeIds", nodeIds);
-      console.log("GM-146: details", this.nodeDetails(nodeIds));
       let nodes = this.nodeDetails(nodeIds);
       nodes.forEach((n) => {
         n.x = coords[n.id].x;
@@ -343,65 +341,6 @@ export default {
         id++;
       }
       let nodes = this.nodeDetails(nodeIds);
-      /*
-      // Begin nodeDetails
-      let nodeStatus = {};
-      if (this.currentUser) {
-        UnitsCollection.find({
-          type: "note",
-          item: { $in: nodeIds },
-          userId: this.currentUser._id,
-        })
-          .fetch()
-          .forEach((n) => {
-            nodeStatus[n.item] = n.status;
-          });
-      }
-      const back =
-        new Date().getTime() -
-        parseInt(this.session.newNodes) * 24 * 60 * 60 * 1000;
-      let nodes = [],
-        nodeTitle = {};
-      UnitsCollection.find({ _id: { $in: nodeIds } })
-        .fetch()
-        .forEach((n) => {
-          let updated = new Date(n.updatedAt).getTime();
-          let isNew = updated && updated > back ? true : false;
-          let color = "blue";
-          let nid = n._id;
-          nodeTitle[nid] = n.title;
-          switch (nodeStatus[nid]) {
-            case "100":
-              color = "green";
-              break;
-            case "2":
-              color = "yellow";
-              break;
-            case "150":
-              color = "red";
-              break;
-            default:
-              color = "blue";
-          }
-          let nodeval =
-            UnitsCollection.find({
-              $or: [
-                { target: nid, type: "relation" },
-                { source: nid, type: "relation" },
-              ],
-            }).fetch().length / 13; // Denominator
-          nodes.push({
-            id: n._id,
-            title: n.title,
-            type: n.type,
-            color: color,
-            isNew: isNew,
-            val: nodeval,
-          });
-          // End nodeDetails
-          
-        });
-        */
       // Begin linkDetails
       let nodeTitle = {};
       nodes.forEach((n) => {

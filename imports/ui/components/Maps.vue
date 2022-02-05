@@ -98,7 +98,7 @@
 
   <script>
 import NodeInfo from "./NodeInfo.vue";
-import { relations } from "/imports/config.js";
+import { relations, defaultRelation } from "/imports/config.js";
 
 export default {
   props: ["cmap"],
@@ -221,6 +221,9 @@ export default {
       this.session.id = this.currentNode.id;
       if (this.session.type != this.currentNode.type)
         this.session.set("type", this.currentNode.type);
+      // TODO: What if session.type is neither source nor target of session.relation s.a. Any:218
+      const cr=relations.find(r => r.id == this.session.relation)
+      if (this.session.type != cr.sourceType && this.session.type != cr.targetType) this.session.set('relation',defaultRelation[this.session.type], 'Maps - explore')
       this.session.mode = "text";
     },
     cameraControl(dir) {
