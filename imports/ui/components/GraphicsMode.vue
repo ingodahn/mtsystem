@@ -114,51 +114,20 @@ export default {
         });
       return nodes;
     },
-    /*
-    linkDetails(nodeIds,nodeTitles) {
-        //TODO: get nodeTitles
-      let rels = [];
-      if (this.session.otherRelations) {
-        rels = UnitsCollection.find({
+    expandBy(nodeId, relationId, is) {
+      let dbRel = [];
+      if (is == "source")
+        dbRel = UnitsCollection.find({
           type: "relation",
-          source: { $in: nodeIds },
-          target: { $in: nodeIds },
-        });
-      } else {
-        rels = UnitsCollection.find({
+          name: relationId,
+          source: nodeId,
+        }).fetch();
+      else
+        dbRel = UnitsCollection.find({
           type: "relation",
-          name: this.session.relation,
-          source: { $in: nodeIds },
-          target: { $in: nodeIds },
-        });
-      }
-      let links = [];
-      rels.forEach((r) => {
-        let srcTitle = nodeTitles[r.source];
-        if (!srcTitle) srcTitle=UnitsCollection.findOne({_id: r.source}).title;
-        let tgtTitle = nodeTitles[r.target];
-        if (!tgtTitle) tgtTitle=UnitsCollection.findOne({_id: r.target}).title;
-        links.push({
-          source: r.source,
-          target: r.target,
-          relation: r.name,
-          name:
-            srcTitle +
-            " " +
-            this.ids2RelationNames[r.name] +
-            " " +
-            tgtTitle,
-        });
-      });
-      return links;
-    },
-    */
-    expandBy(nodeId,relationId,is) {
-      let dbRel=[];
-      if (is == 'source') 
-        dbRel = UnitsCollection.find({ type: "relation", name: relationId,  source: nodeId }).fetch();
-      else 
-        dbRel = UnitsCollection.find({ type: "relation", name: relationId, target: nodeId }).fetch();
+          name: relationId,
+          target: nodeId,
+        }).fetch();
       let dbNodeIds = dbRel.map((e) =>
         e.target == nodeId ? e.source : e.target
       );
@@ -166,17 +135,72 @@ export default {
         alert("No new nodes found");
         return;
       }
-      let nodes=this.nodeDetails(dbNodeIds);
-      let ctitle=UnitsCollection.findOne({_id: nodeId}).title;
-      let links=[];
-      let rname=this.id2relation(relationId).name;
-      nodes.forEach(n => {
-        if (is == 'source') 
-          links.push({source: nodeId, target: n.id, name: ctitle+' '+rname+' '+n.title, relation: relationId});
+      let nodes = this.nodeDetails(dbNodeIds);
+      let ctitle = UnitsCollection.findOne({ _id: nodeId }).title;
+      let links = [];
+      let rname = this.id2relation(relationId).name;
+      nodes.forEach((n) => {
+        if (is == "source")
+          links.push({
+            source: nodeId,
+            target: n.id,
+            name: ctitle + " " + rname + " " + n.title,
+            relation: relationId,
+          });
         else
-          links.push({source: n.id, target: nodeId, name: n.title+' '+rname+' '+ctitle, relation: relationId});
+          links.push({
+            source: n.id,
+            target: nodeId,
+            name: n.title + " " + rname + " " + ctitle,
+            relation: relationId,
+          });
       });
       this.$refs.graph.expandGraph({ nodes: nodes, links: links });
+    },
+    restoreGraph() {
+      let graph = JSON.parse(JSON.stringify(this.$root.$data.graph));
+      let coords = graph.coords,
+        links = graph.links;
+      let nodeIds = Object.keys(coords);
+      console.log("GM-144: nodeIds", nodeIds);
+      console.log("GM-146: details", this.nodeDetails(nodeIds));
+      let nodes = this.nodeDetails(nodeIds);
+      nodes.forEach((n) => {
+        n.x = coords[n.id].x;
+        n.y = coords[n.id].y;
+        if ((this.session.view = "3D")) {
+          n.z = coords[n.id].z;
+        }
+      });
+      // Graphs without saved links - these have only primary relatio
+      if (!links.length) {
+        let nodeTitle = {};
+        nodes.forEach((n) => {
+          nodeTitle[n.id] = n.title;
+        });
+        links = UnitsCollection.find({
+          type: "relation",
+          name: this.session.relation,
+          source: { $in: nodeIds },
+          target: { $in: nodeIds },
+        })
+          .fetch()
+          .map((e) => {
+            return {
+              source: e.source,
+              target: e.target,
+              relation: e.name,
+              name:
+                nodeTitle[e.source] +
+                " " +
+                this.ids2RelationNames[e.name] +
+                " " +
+                nodeTitle[e.target],
+            };
+          });
+      }
+      this.$root.$data.graph = null;
+      return { nodes: nodes, links: links };
     },
   },
   computed: {
@@ -193,8 +217,6 @@ export default {
       );
     },
     mapNodes() {
-      //if (this.$root.$data.coords) return coordMap(this.$root.$data.coords);
-      //return JSON.parse(JSON.stringify((this.session.id)?this.neighbourhood1:this.allNodes)) ;
       return this.session.id ? this.neighbourhood : this.allNodes;
     },
     allNodes() {
@@ -281,6 +303,9 @@ export default {
       return { nodes: nodes, links: links };
     },
     neighbourhood() {
+      if (this.$root.$data.graph) {
+        return this.restoreGraph();
+      }
       let node = UnitsCollection.findOne({ _id: this.session.id }),
         d = this.session.neighbourhood;
       if (!node && this.session.debug)
@@ -317,6 +342,8 @@ export default {
         newNodeIds = [...nextNodeReduced];
         id++;
       }
+      let nodes = this.nodeDetails(nodeIds);
+      /*
       // Begin nodeDetails
       let nodeStatus = {};
       if (this.currentUser) {
@@ -372,34 +399,23 @@ export default {
             val: nodeval,
           });
           // End nodeDetails
-          let coords = this.$root.$data.coords;
-          if (coords) {
-            nodes.forEach((nn) => {
-              if (coords[nn.id]) {
-                let c = coords[nn.id];
-                nn.x = c.x;
-                nn.fx = c.fx;
-                nn.y = c.y;
-                nn.fy = c.fy;
-                if (this.session.view == "3D") {
-                  nn.z = c.z;
-                  nn.fz = c.fz;
-                }
-              }
-            });
-          }
+          
         });
-      this.$root.$data.coords = null;
+        */
       // Begin linkDetails
+      let nodeTitle = {};
+      nodes.forEach((n) => {
+        nodeTitle[n.id] = n.title;
+      });
       let rels = [];
-      
-        rels = UnitsCollection.find({
-          type: "relation",
-          name: this.session.relation,
-          source: { $in: nodeIds },
-          target: { $in: nodeIds },
-        });
-      
+
+      rels = UnitsCollection.find({
+        type: "relation",
+        name: this.session.relation,
+        source: { $in: nodeIds },
+        target: { $in: nodeIds },
+      });
+
       let links = [];
       rels.forEach((r) => {
         links.push({

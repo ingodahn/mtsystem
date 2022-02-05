@@ -18,7 +18,7 @@ export default {
     },
 
     computed: {
-       currentNode () {
+        currentNode () {
             const node=UnitsCollection.findOne({_id: this.nodeId})
             if (node) {
                 desc = node.description
@@ -52,6 +52,9 @@ export default {
                 this.reRender();
             }) 
         }
+    },
+    meteor: {
+        
     }
 }
 </script>

@@ -36,7 +36,7 @@
 
                   <v-select
                     :items="newItems"
-                    label="New since..."
+                    label="Mark symbols of nodes new since..."
                     v-model="session.newNodes"
                   ></v-select>
 
@@ -116,6 +116,7 @@ export default {
         { text: "In", value: "radialin" },
       ],
       newItems: [
+        { text: "(Ignore)", value: 0},
         { text: "1 day", value: 1 },
         { text: "2 days", value: 2 },
         { text: "3 days", value: 3 },

@@ -92,7 +92,7 @@ export default {
             this.session.set('newNodes', dataSession.newNodes,'saved session');
             this.session.set('orientation', dataSession.orientation,'saved session');
             this.session.set('freeze', true,'saved session');
-            this.$root.$data.coords=sessionData.coords;
+            this.$root.$data.graph=(sessionData.graph)?sessionData.graph:{coords: sessionData.coords, links: []};
             this.$emit('sessionReloaded')
         }
     },

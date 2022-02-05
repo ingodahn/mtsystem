@@ -413,13 +413,16 @@ export default {
     },
     saveGraph() {
       let graphData = this.Graph.graphData();
-      let coords = {};
+      let graph= {coords : {}, links: []};
       graphData.nodes.forEach((n) => {
-        coords[n.id] = { x: n.x, y: n.y, z: n.z, fx: n.x, fy: n.y, fz: n.z };
+        graph.coords[n.id] = { x: n.x, y: n.y, z: n.z, fx: n.x, fy: n.y, fz: n.z };
+      });
+      graphData.links.forEach((l) => {
+        graph.links.push({ source: l.source, target: l.target, relation: l.relation, name: l.name});
       });
       let gData = {
         session: this.session,
-        coords: coords,
+        graph: graph,
       };
       let gs = JSON.stringify(gData);
       var FileSaver = require("file-saver");
