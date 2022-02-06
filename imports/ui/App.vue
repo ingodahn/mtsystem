@@ -37,7 +37,7 @@
     data() {
         return {
           page: 'home',
-          coords: null,
+          graph: null,
           session: {
             type: defaultType,
             relation: defaultRelation[defaultType],
