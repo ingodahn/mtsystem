@@ -61,7 +61,7 @@
             >Expand</v-btn
           >
           <v-btn
-            color="primary"
+            color="warning"
             class="mx-1 my-1"
             @click="deleteNode"
             >Delete</v-btn
@@ -474,7 +474,7 @@ export default {
         alert("Cannot delete root node");
         return;
       }
-      if (confirm(`Delete node ${node.title}?`)) {
+      if (confirm(`Delete node ${node.title}?\nThis will delete the node and all of its links from the graph only.\nThis does not affect the node in the database.`)) {
          console.log(graph.links);
         this.Graph.graphData({
           nodes: graph.nodes.filter(n => n.id!=this.currentId),
