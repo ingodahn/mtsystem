@@ -60,6 +60,12 @@
             @click="expandByRelation(expandBy)"
             >Expand</v-btn
           >
+          <v-btn
+            color="primary"
+            class="mx-1 my-1"
+            @click="deleteNode"
+            >Delete</v-btn
+          >
         </div>
       </v-row>
 
@@ -421,7 +427,7 @@ export default {
         graph.coords[n.id] = { x: n.x, y: n.y, z: n.z, fx: n.x, fy: n.y, fz: n.z };
       });
       graphData.links.forEach((l) => {
-        graph.links.push({ source: l.source, target: l.target, relation: l.relation, name: l.name});
+        graph.links.push({ source: l.source.id, target: l.target.id, relation: l.relation, name: l.name});
       });
       let gData = {
         session: this.session,
@@ -461,6 +467,22 @@ export default {
         links: graph.links.concat(newGraph.links),
       });
     },
+    deleteNode () {
+      let graph=this.Graph.graphData();
+      let node=graph.nodes.find(n => n.id==this.currentId);
+      if (node.id == this.session.id) {
+        alert("Cannot delete root node");
+        return;
+      }
+      if (confirm(`Delete node ${node.title}?`)) {
+         console.log(graph.links);
+        this.Graph.graphData({
+          nodes: graph.nodes.filter(n => n.id!=this.currentId),
+          links: graph.links.filter(l => l.source.id!=this.currentId && l.target.id!=this.currentId),
+        });
+        this.currentId=this.session.id;
+      }
+    }
   },
   beforeDestroy() {
     if (this.currentNode && this.currentNode.id != this.session.id) {

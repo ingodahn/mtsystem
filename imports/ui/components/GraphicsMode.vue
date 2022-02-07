@@ -166,7 +166,7 @@ export default {
       nodes.forEach((n) => {
         n.x = coords[n.id].x;
         n.y = coords[n.id].y;
-        if ((this.session.view = "3D")) {
+        if ((this.session.view == "3D")) {
           n.z = coords[n.id].z;
         }
       });
