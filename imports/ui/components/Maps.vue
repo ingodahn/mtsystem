@@ -86,6 +86,7 @@
           >-</v-btn
         >
       </v-row>
+      <save-html :graph="graphString"></save-html>
 
       <NodeInfo
         :key="currentId"
@@ -98,6 +99,7 @@
 
   <script>
 import NodeInfo from "./NodeInfo.vue";
+import SaveHtml from "./SaveHtml.vue";
 import { relations, defaultRelation } from "/imports/config.js";
 
 export default {
@@ -120,7 +122,7 @@ export default {
       expandBy: null,
     };
   },
-  components: { NodeInfo },
+  components: { NodeInfo, SaveHtml },
   watch: {
     currentTicks(newTicks){
       this.Graph.cooldownTicks(newTicks)}
@@ -414,7 +416,7 @@ export default {
       }
       this.Graph.graphData(this.cmap);
     },
-    saveGraph() {
+    graphString () {
       let graphData = this.Graph.graphData();
       let graph= {coords : {}, links: []};
       graphData.nodes.forEach((n) => {
@@ -427,9 +429,12 @@ export default {
         session: this.session,
         graph: graph,
       };
-      let gs = JSON.stringify(gData);
+      return JSON.stringify(gData);
+    },
+    saveGraph() {
+      
       var FileSaver = require("file-saver");
-      var blob = new Blob([gs], { type: "text/plain;charset=utf-8" });
+      var blob = new Blob([this.graphString], { type: "text/plain;charset=utf-8" });
       FileSaver.saveAs(blob, "graph.json");
     },
     zoomToFit() {
