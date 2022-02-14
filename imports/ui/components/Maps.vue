@@ -43,6 +43,7 @@
         >
           Save Graph</v-btn
         >
+        <save-html></save-html>
       </v-row>
       <v-row>
           <v-autocomplete
@@ -92,7 +93,7 @@
           >-</v-btn
         >
       </v-row>
-      <save-html :graph="graphString"></save-html>
+      
 
       <NodeInfo
         :key="currentId"
@@ -437,10 +438,22 @@ export default {
       };
       return JSON.stringify(gData);
     },
+    graphForHtml () {
+      let graphData = this.Graph.graphData();
+      let graph= {nodes: [], links: []};
+      graphData.nodes.forEach((n) => {
+        let myColor =(n.Id != this.session.id)?this.colors.default:this.colors.sessionNode;
+        graph.nodes.push({id: n.id, title: n.title, type: n.type, color: myColor, x: n.x, y: n.y, z: n.z, fx: n.x, fy: n.y, fz: n.z });
+      });
+      graphData.links.forEach((l) => {
+        graph.links.push({ source: l.source.id, target: l.target.id, relation: l.relation, name: l.name});
+      });
+      return graph;
+    },
     saveGraph() {
-      
+      console.log('Maps-442 saveGraph called')
       var FileSaver = require("file-saver");
-      var blob = new Blob([this.graphString], { type: "text/plain;charset=utf-8" });
+      var blob = new Blob([this.graphString()], { type: "text/plain;charset=utf-8" });
       FileSaver.saveAs(blob, "graph.json");
     },
     zoomToFit() {
