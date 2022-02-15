@@ -1,6 +1,8 @@
 <template>
   <v-container>
-    <v-btn color="primary" class="mx-1 my-1" @click="saveHtml">Save as HTML</v-btn>
+    <v-btn color="primary" class="mx-1 my-1" @click="saveHtml"
+      >Save as HTML</v-btn
+    >
   </v-container>
 </template>
 
@@ -8,22 +10,22 @@
 import { UnitsCollection } from "../../api/UnitsCollection";
 
 export default {
-    props: [],
-    data () {
-        return {
-            session: this.$root.$data.session,
-            colors: {
-                default: "blue",
-                sessionNode: "deeppink",
-                selectedNode: "brown",
-                primaryRelation: "red",
-                otherRelation: "green"
-            },
-        }
-    },
-    computed: {
-        head () {
-            let head=`<!DOCTYPE html>
+  props: [],
+  data() {
+    return {
+      session: this.$root.$data.session,
+      colors: {
+        default: "blue",
+        sessionNode: "deeppink",
+        selectedNode: "brown",
+        primaryRelation: "red",
+        otherRelation: "green",
+      },
+    };
+  },
+  computed: {
+    head() {
+      let head = `<!DOCTYPE html>
             <html lang='en'>
             <head>
             <title>mathtrek</title>
@@ -38,12 +40,14 @@ export default {
             <script src='https://unpkg.com/d3-quadtree'><\/script>
             <script src='https://unpkg.com/d3-force'><\/script>
             `;
-            if (this.session.view=='3D') {
-                head += '<script src="https://unpkg.com/3d-force-graph"><\/script>';
-            }  else {
-                head += '<script src="https://unpkg.com/force-graph"><\/script>';
-            }
-            head += `
+      if (this.session.view == "3D") {
+          if (this.session.nodeForm == 'Text') head+=   '<script src="https://unpkg.com/three"><\/script>\
+          <script src="https://unpkg.com/three-spritetext"><\/script>';
+        head += '<script src="https://unpkg.com/3d-force-graph"><\/script>';
+      } else {
+        head += '<script src="https://unpkg.com/force-graph"><\/script>';
+      }
+      head += `
             <style>
               #mapContainer {
                 float:left;
@@ -53,28 +57,40 @@ export default {
                 float:right;
                 width: 34%;
               }
+              #mapId {
+				margin: 1em;
+			  }
             </style>
             `;
-            head += '</head>';
-            return head;
-        },
-        body () {
-            const graph=this.$parent.graphForHtml ();
-            graph.nodes.forEach(node => {
-                const dbNode=UnitsCollection.findOne({_id: node.id});
-                if (dbNode) {
-                    node.see=dbNode.see;
-                    const desc = dbNode.description;
-                    const regex = /(<p>[\s\S]*?<\/p>)/gm;
-                    const corresp = regex.exec(desc);
-                    const firstParagraph = (corresp) ? corresp[0] : "No description available";
-                    node.firstParagraph = (firstParagraph)?firstParagraph:"No description available"; 
-                }
-            });
-            let nodeTitle=graph.nodes.find(n => {return (n.id == this.session.id)}).title;
-            let body = "<body>\
+      head += "</head>";
+      return head;
+    },
+    body() {
+      const graph = this.$parent.graphForHtml();
+      graph.nodes.forEach((node) => {
+        const dbNode = UnitsCollection.findOne({ _id: node.id });
+        if (dbNode) {
+          node.see = dbNode.see;
+          const desc = dbNode.description;
+          const regex = /(<p>[\s\S]*?<\/p>)/gm;
+          const corresp = regex.exec(desc);
+          const firstParagraph = corresp
+            ? corresp[0]
+            : "No description available";
+          node.firstParagraph = firstParagraph
+            ? firstParagraph
+            : "No description available";
+        }
+      });
+      let nodeTitle = graph.nodes.find((n) => {
+        return n.id == this.session.id;
+      }).title;
+      let body =
+        "<body>\
             <div class='container'>\
-                <h1 class='heading'>MathTrek environment of "+nodeTitle+"</h1>\
+                <h1 class='heading'>MathTrek environment of " +
+        nodeTitle +
+        "</h1>\
             <div id='mapContainer'>\
                 <div id='mapId'></div>\
             </div>\
@@ -84,8 +100,8 @@ export default {
             </div>\
             </div>\
             <script>";
-            body +="let currentId = '', sessionId = '"+this.session.id+"';";
-            body += `
+      body += "let currentId = '', sessionId = '" + this.session.id + "';";
+      body += `
             let currentColor='deeppink';
             function nodeClicked(node)
             {
@@ -106,20 +122,22 @@ export default {
                     delimiters: [
                         {left: '$$', right: '$$', display: true},
                         {left: '$', right: '$', display: false},
-                        {left: '\\(', right: '\\)', display: false},
-                        {left: '\\[', right: '\\]', display: true}
+                        {left: '\\\\(', right: '\\\\)', display: false},
+                        {left: '\\\\[', right: '\\\\]', display: true}
                     ],
                     throwOnError : false
                 });
             }            
             `;
-            body += 'let graphData = '+JSON.stringify(graph)+";";
-            if (this.session.view=='3D') {
-                body += "const Graph = ForceGraph3D({ controlType: 'orbit' })(document.getElementById('mapId'));"
-            } else {
-                body += "const Graph = ForceGraph()(document.getElementById('mapId'));"
-            }
-            body += `
+      body += "let graphData = " + JSON.stringify(graph) + ";";
+      if (this.session.view == "3D") {
+        body +=
+          "const Graph = ForceGraph3D({ controlType: 'orbit' })(document.getElementById('mapId'));";
+      } else {
+        body += "const Graph = ForceGraph()(document.getElementById('mapId'));";
+      }
+      body +=
+        `
             Graph.linkWidth(5)
             .linkDirectionalParticles(10)
             .linkDirectionalParticleWidth(2.5)
@@ -130,12 +148,22 @@ export default {
             .nodeRelSize(6)
             .nodeId("id")
             .nodeColor((d) =>
-                d.id == '`+this.session.id+"'? '"+this.colors.sessionNode+"':d.color)"+
-            `
+                d.id == '` +
+        this.session.id +
+        "'? '" +
+        this.colors.sessionNode +
+        "':d.color)" +
+        `
             .nodeLabel((node) => \`\${node.title}\`)
             .linkColor((r) => {
-            return r.relation == '`+this.session.relation+"'? '"+this.colors.primaryRelation+"':'"+this.colors.otherRelation+"';"+
-            `
+            return r.relation == '` +
+        this.session.relation +
+        "'? '" +
+        this.colors.primaryRelation +
+        "':'" +
+        this.colors.otherRelation +
+        "';" +
+        `
             })
             .d3Force(
                 "link",
@@ -145,31 +173,81 @@ export default {
                     .distance(100)
                     .strength(1)
             )
-            .width(document.querySelector('#mapContainer').clientWidth)
-            .height(Math.max(document.querySelector('#mapContainer').clientHeight,800))
+            .width(document.querySelector('#mapId').clientWidth)
+            .height(Math.max(document.querySelector('#mapId').clientHeight,800))
             .onNodeDragEnd((node) => {
                 node.fx = node.x;
                 node.fy = node.y;
             })
-            .onNodeClick((node) => nodeClicked(node))
-            .cooldownTicks(0);
-            Graph.graphData(graphData);
+            .onNodeClick((node) => nodeClicked(node));`;
+      if (this.session.nodeForm != "Symbols") {
+        if (this.session.view == "3D") {
+          body += `
+                    Graph.nodeThreeObject((node) => {
+          const sprite = new SpriteText(node.title);
+          sprite.material.depthWrite = false;
+          sprite.color = node.color;
+          sprite.textHeight = 20;
+          return sprite;
+        });
+                    `;
+        } else {
+          body += `
+                    Graph.nodeCanvasObject((node, ctx, globalScale) => {
+          const label = node.title;
+          const fontSize = 12 / globalScale;
+          ctx.font = \`\${fontSize}px Sans-Serif\`;
+          const textWidth = ctx.measureText(label).width;
+          const bckgDimensions = [textWidth, fontSize].map(
+            (n) => n + fontSize * 0.2
+          ); // some padding
+
+          ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+          ctx.fillRect(
+            node.x - bckgDimensions[0] / 2,
+            node.y - bckgDimensions[1] / 2,
+            ...bckgDimensions
+          );
+
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillStyle = node.color;
+          ctx.fillText(label, node.x, node.y);
+
+          node.__bckgDimensions = bckgDimensions; // to re-use in nodePointerAreaPaint
+        }).nodePointerAreaPaint((node, color, ctx) => {
+          ctx.fillStyle = color;
+          const bckgDimensions = node.__bckgDimensions;
+          bckgDimensions &&
+            ctx.fillRect(
+              node.x - bckgDimensions[0] / 2,
+              node.y - bckgDimensions[1] / 2,
+              ...bckgDimensions
+            );
+        });
+                    `;
+        }
+      }
+
+      body += `
+            Graph.cooldownTicks(0)
+            .graphData(graphData);
             nodeClicked(graphData.nodes.find(n => {return (n.id==sessionId)}));
-            `
-            
-            body += `<\/script>\
+            `;
+
+      body += `<\/script>\
             </body>\
             `;
-            return body;
-        }
+      return body;
     },
-    methods: {
-        saveHtml () {
-            let html=this.head + this.body+'</html>';
-            var FileSaver = require("file-saver");
-            var blob = new Blob([html], { type: "text/html;charset=utf-8" });
-            FileSaver.saveAs(blob, "graph.html");
-        }
-    }
-}
+  },
+  methods: {
+    saveHtml() {
+      let html = this.head + this.body + "</html>";
+      var FileSaver = require("file-saver");
+      var blob = new Blob([html], { type: "text/html;charset=utf-8" });
+      FileSaver.saveAs(blob, "graph.html");
+    },
+  },
+};
 </script>
