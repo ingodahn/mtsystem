@@ -108,23 +108,18 @@
 import NodeInfo from "./NodeInfo.vue";
 import SaveHtml from "./SaveHtml.vue";
 import { relations, defaultRelation } from "/imports/config.js";
+import colorMixin from '../mixins/colorMixin.js';
 
 export default {
   props: ["cmap"],
+  mixins: [colorMixin],
   data() {
     return {
       session: this.$root.$data.session,
       Graph: null,
       currentId: this.$root.$data.session.id,
       selectedId: this.$root.$data.session.id,
-      currentColor: "blue",
-      colors: {
-        default: "blue",
-        sessionNode: "deeppink",
-        selectedNode: "brown",
-        primaryRelation: "red",
-        otherRelation: "green"
-      },
+      currentColor: 'blue',
       view: this.$root.$data.session.view,
       expandBy: null,
     };

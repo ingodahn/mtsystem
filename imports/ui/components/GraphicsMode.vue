@@ -13,9 +13,12 @@
 import { UnitsCollection } from "../../api/UnitsCollection";
 import { relations } from "/imports/config.js";
 import Maps from "./Maps.vue";
+import colorMixin from '../mixins/colorMixin.js';
+
 
 export default {
   props: ["allTyped"],
+  mixins: [colorMixin],
   data() {
     return {
       session: this.$root.$data.session,
@@ -85,16 +88,16 @@ export default {
           nodeTitle[nid] = n.title;
           switch (nodeStatus[nid]) {
             case "100":
-              color = "green";
+              color = this.colors.knowing;
               break;
             case "2":
-              color = "yellow";
+              color = this.colors.learning;
               break;
             case "150":
-              color = "red";
+              color = this.colors.interesting;
               break;
             default:
-              color = "blue";
+              color = this.colors.default;
           }
           let nodeval =
             UnitsCollection.find({
@@ -257,22 +260,22 @@ export default {
         nodes = [];
       myNodes.forEach((n) => {
         let nid = n._id;
-        let color = "blue";
+        let color = this.colors.default;
         const back =
           new Date().getTime() -
           parseInt(this.session.newNodes) * 24 * 60 * 60 * 1000;
         switch (nodeStatus[nid]) {
           case "100":
-            color = "green";
+            color = this.colors.knowing;
             break;
           case "2":
-            color = "yellow";
+            color = this.colors.learning;
             break;
           case "150":
-            color = "red";
+            color = this.colors.interesting;
             break;
           default:
-            color = "blue";
+            color = this.colors.default;
         }
         let updated = new Date(n.updatedAt).getTime();
         let isNew = updated && updated > back ? true : false;
