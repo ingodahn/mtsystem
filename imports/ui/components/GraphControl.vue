@@ -1,8 +1,8 @@
 <template>
   <v-container>
-    <v-row>
-      <v-col md="10">
-        <v-card class="mx-auto">
+    <v-row >
+      <v-col md="10" >
+        <v-card class="mx-auto" v-if="session.ui">
           <v-card-actions>
             <v-btn text color="blue" @click="reveal = !reveal"
               >Graph Control</v-btn
@@ -65,7 +65,7 @@
               ><img src="/information_info_1565.png"
             /></span>
           </template>
-          <span>
+          <span v-html="graphInfo">
             <p>
               Click node for details. Drag nodes to pin. For node symbols, size
               indicates weight w.r.t. all relations.
@@ -142,6 +142,41 @@ export default {
         ? "are marked with an <span style='border:solid orange; border-radius: 10px; padding: 1px;'>orange ring</span>"
         : "are shown surrounded by an <span style='border:solid orange; padding: 1px;'>orange polygon</span>";
     },
+    graphInfo () {
+      return `
+      <span>
+            <p>
+              Click node for details. Drag nodes to pin. For node symbols, size
+              indicates weight w.r.t. all relations.
+            </p>
+            <p v-if="currentUser">
+              Color distinguishes
+              <span style="background-color: green; color: white"
+                >nodes I know</span
+              >
+              from
+              <span style="background-color: yellow; color: black"
+                >nodes I am exploring</span
+              >
+              and
+              <span style="background-color: red; color: white"
+                >nodes I find interesting</span
+              >.
+            </p>
+
+            <p>
+              The symbols for nodes, that have been updated in the last
+              `+this.session.newNodes+` days, <span v-html="markNew"></span>.
+            </p>
+            <p>
+              The last selected `+this.session.type+` is shown in
+              <span style="background-color: pink; color: black">pink</span>.
+              The last node selected in the graph is shown in
+              <span style="background-color: brown; color: white">brown</span>.
+            </p>
+          </span>
+      `;
+    }
   },
   meteor: {
     currentUser() {

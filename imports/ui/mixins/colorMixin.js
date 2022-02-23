@@ -1,7 +1,6 @@
 export default {
     computed: {
         colors() {
-            console.log('computing colors');
             let colors = {
                 default: "blue",
                 sessionNode: "deeppink",

@@ -112,7 +112,9 @@ export default {
                 }                
                 currentColor = node.color;
                 currentId = node.id;
-                node.color='brown';
+                node.color='brown';`;
+      if (this.session.view == '3D') body += "Graph.nodeColor('color');"
+      body += `          
                 let infoHead = document.getElementById('infoHead');
                 let infoBody = document.getElementById('infoBody');
                 let myColor=node.id == sessionId?'background-color: pink;color: black;':'background-color: brown;color: white;'

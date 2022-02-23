@@ -36,6 +36,7 @@
           >Show all</v-btn
         >
         <v-btn
+          v-if="session.ui"
           color="primary"
           class="mx-1 my-1"
           @click="saveGraph()"
@@ -43,28 +44,40 @@
         >
           Save Graph</v-btn
         >
-        <save-html></save-html>
+        <save-html v-if="session.ui"></save-html>
+        <div v-else>
+          <v-btn
+            class="mx-1 my-1"
+            color="primary"
+            :disabled="!session.neighbourhood"
+            @click="session.neighbourhood--"
+            >Less</v-btn
+          >
+          <v-btn
+            class="mx-1 my-1"
+            color="primary"
+            @click="session.neighbourhood++"
+            >More</v-btn
+          >
+        </div>
       </v-row>
-      <v-row>
-          <v-autocomplete
-            label="Expand selected node by"
-            v-model="expandBy"
-            hide-details="auto"
-            :items="relationItems"
-            item-text="title"
-            item-value="value"
-          ></v-autocomplete>
-          <div class="select" data-app>
+      <v-row v-if="session.ui">
+        <v-autocomplete
+          label="Expand selected node by"
+          v-model="expandBy"
+          hide-details="auto"
+          :items="relationItems"
+          item-text="title"
+          item-value="value"
+        ></v-autocomplete>
+        <div class="select" data-app>
           <v-btn
             color="primary"
             class="mx-1 my-1"
             @click="expandByRelation(expandBy)"
             >Expand</v-btn
           >
-          <v-btn
-            color="warning"
-            class="mx-1 my-1"
-            @click="deleteNode"
+          <v-btn color="warning" class="mx-1 my-1" @click="deleteNode"
             >Delete</v-btn
           >
         </div>
@@ -93,7 +106,6 @@
           >-</v-btn
         >
       </v-row>
-      
 
       <NodeInfo
         :key="currentId"
@@ -108,7 +120,7 @@
 import NodeInfo from "./NodeInfo.vue";
 import SaveHtml from "./SaveHtml.vue";
 import { relations, defaultRelation } from "/imports/config.js";
-import colorMixin from '../mixins/colorMixin.js';
+import colorMixin from "../mixins/colorMixin.js";
 
 export default {
   props: ["cmap"],
@@ -119,15 +131,16 @@ export default {
       Graph: null,
       currentId: this.$root.$data.session.id,
       selectedId: this.$root.$data.session.id,
-      currentColor: 'blue',
+      currentColor: "blue",
       view: this.$root.$data.session.view,
       expandBy: null,
     };
   },
   components: { NodeInfo, SaveHtml },
   watch: {
-    currentTicks(newTicks){
-      this.Graph.cooldownTicks(newTicks)}
+    currentTicks(newTicks) {
+      this.Graph.cooldownTicks(newTicks);
+    },
   },
 
   computed: {
@@ -177,8 +190,8 @@ export default {
       });
       return items;
     },
-    currentTicks () {
-      return (this.session.freeze)?0:2000;
+    currentTicks() {
+      return this.session.freeze ? 0 : 2000;
     },
   },
   methods: {
@@ -226,8 +239,16 @@ export default {
       if (this.session.type != this.currentNode.type)
         this.session.set("type", this.currentNode.type);
       // TODO: What if session.type is neither source nor target of session.relation s.a. Any:218
-      const cr=relations.find(r => r.id == this.session.relation)
-      if (this.session.type != cr.sourceType && this.session.type != cr.targetType) this.session.set('relation',defaultRelation[this.session.type], 'Maps - explore')
+      const cr = relations.find((r) => r.id == this.session.relation);
+      if (
+        this.session.type != cr.sourceType &&
+        this.session.type != cr.targetType
+      )
+        this.session.set(
+          "relation",
+          defaultRelation[this.session.type],
+          "Maps - explore"
+        );
       this.session.mode = "text";
     },
     cameraControl(dir) {
@@ -418,14 +439,26 @@ export default {
       }
       this.Graph.graphData(this.cmap);
     },
-    graphString () {
+    graphString() {
       let graphData = this.Graph.graphData();
-      let graph= {coords : {}, links: []};
+      let graph = { coords: {}, links: [] };
       graphData.nodes.forEach((n) => {
-        graph.coords[n.id] = { x: n.x, y: n.y, z: n.z, fx: n.x, fy: n.y, fz: n.z };
+        graph.coords[n.id] = {
+          x: n.x,
+          y: n.y,
+          z: n.z,
+          fx: n.x,
+          fy: n.y,
+          fz: n.z,
+        };
       });
       graphData.links.forEach((l) => {
-        graph.links.push({ source: l.source.id, target: l.target.id, relation: l.relation, name: l.name});
+        graph.links.push({
+          source: l.source.id,
+          target: l.target.id,
+          relation: l.relation,
+          name: l.name,
+        });
       });
       let gData = {
         session: this.session,
@@ -433,22 +466,42 @@ export default {
       };
       return JSON.stringify(gData);
     },
-    graphForHtml () {
+    graphForHtml() {
       let graphData = this.Graph.graphData();
-      let graph= {nodes: [], links: []};
+      let graph = { nodes: [], links: [] };
       graphData.nodes.forEach((n) => {
-        let myColor =(n.Id != this.session.id)?this.colors.default:this.colors.sessionNode;
-        graph.nodes.push({id: n.id, title: n.title, type: n.type, color: myColor, x: n.x, y: n.y, z: n.z, fx: n.x, fy: n.y, fz: n.z });
+        let myColor =
+          n.Id != this.session.id
+            ? this.colors.default
+            : this.colors.sessionNode;
+        graph.nodes.push({
+          id: n.id,
+          title: n.title,
+          type: n.type,
+          color: myColor,
+          x: n.x,
+          y: n.y,
+          z: n.z,
+          fx: n.x,
+          fy: n.y,
+          fz: n.z,
+        });
       });
       graphData.links.forEach((l) => {
-        graph.links.push({ source: l.source.id, target: l.target.id, relation: l.relation, name: l.name});
+        graph.links.push({
+          source: l.source.id,
+          target: l.target.id,
+          relation: l.relation,
+          name: l.name,
+        });
       });
       return graph;
     },
     saveGraph() {
-      console.log('Maps-442 saveGraph called')
       var FileSaver = require("file-saver");
-      var blob = new Blob([this.graphString()], { type: "text/plain;charset=utf-8" });
+      var blob = new Blob([this.graphString()], {
+        type: "text/plain;charset=utf-8",
+      });
       FileSaver.saveAs(blob, "graph.json");
     },
     zoomToFit() {
@@ -473,29 +526,37 @@ export default {
         return;
       }
       const graph = this.Graph.graphData();
-      const graphNodeIds=graph.nodes.map(n => n.id);
-      const newNodes=newGraph.nodes.filter(nn => (!graphNodeIds.includes(nn.id)));
+      const graphNodeIds = graph.nodes.map((n) => n.id);
+      const newNodes = newGraph.nodes.filter(
+        (nn) => !graphNodeIds.includes(nn.id)
+      );
       this.Graph.graphData({
         nodes: graph.nodes.concat(newNodes),
         links: graph.links.concat(newGraph.links),
       });
     },
-    deleteNode () {
-      let graph=this.Graph.graphData();
-      let node=graph.nodes.find(n => n.id==this.currentId);
+    deleteNode() {
+      let graph = this.Graph.graphData();
+      let node = graph.nodes.find((n) => n.id == this.currentId);
       if (node.id == this.session.id) {
         alert("Cannot delete root node");
         return;
       }
-      if (confirm(`Delete node ${node.title}?\nThis will delete the node and all of its links from the graph only.\nThis does not affect the node in the database.`)) {
-         console.log(graph.links);
+      if (
+        confirm(
+          `Delete node ${node.title}?\nThis will delete the node and all of its links from the graph only.\nThis does not affect the node in the database.`
+        )
+      ) {
         this.Graph.graphData({
-          nodes: graph.nodes.filter(n => n.id!=this.currentId),
-          links: graph.links.filter(l => l.source.id!=this.currentId && l.target.id!=this.currentId),
+          nodes: graph.nodes.filter((n) => n.id != this.currentId),
+          links: graph.links.filter(
+            (l) =>
+              l.source.id != this.currentId && l.target.id != this.currentId
+          ),
         });
-        this.currentId=this.session.id;
+        this.currentId = this.session.id;
       }
-    }
+    },
   },
   beforeDestroy() {
     if (this.currentNode && this.currentNode.id != this.session.id) {

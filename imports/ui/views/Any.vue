@@ -68,6 +68,7 @@
           >
           <v-btn
             v-if="isEditor && session.mode == 'text' && session.id"
+            class="mx-1 my-1"
             color="warning"
             id="btnUpdate"
             @click="session.edit = 'update'"
@@ -75,6 +76,7 @@
           >
           <v-btn
             v-if="isEditor && session.mode == 'text' && session.id"
+            class="mx-1 my-1"
             color="error"
             id="btnDelete"
             @click="deleteNode"
@@ -83,7 +85,7 @@
         </div>
       </v-col>
       <v-col md="4">
-        <GraphControl />
+        <GraphControl v-if="session.mode == 'graph'"/>
       </v-col>
     </v-row>
 
@@ -139,12 +141,15 @@ export default {
     GraphControl,
   },
   created() {
-    let ts=this.session.type, rs=this.session.relation;
-    let ra=relations.find(r => (r.id==rs));
-    if (ra.sourceType != ts && ra.targetType != ts) this.session.set('relation',defaultRelation[ts],'Any creation');
+    let ts = this.session.type,
+      rs = this.session.relation;
+    let ra = relations.find((r) => r.id == rs);
+    if (ra.sourceType != ts && ra.targetType != ts)
+      this.session.set("relation", defaultRelation[ts], "Any creation");
     if (this.session.id) {
-      let ns=UnitsCollection.findOne({_id: this.session.id});
-      if (ns.type != this.session.type) this.session.set('id','','Any creation');
+      let ns = UnitsCollection.findOne({ _id: this.session.id });
+      if (ns.type != this.session.type)
+        this.session.set("id", "", "Any creation");
     }
   },
   watch: {},
@@ -292,6 +297,8 @@ export default {
       return this.session.id ? "" : "s";
     },
   },
+  mounted() {},
+  beforeDestroy() {},
   meteor: {
     isEditor() {
       if (Meteor.user()) {

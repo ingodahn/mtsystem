@@ -1,6 +1,6 @@
 <template>
 <div class="container">
-    <h2>My Notes on <em>{{title}}</em><v-btn @click="saveNote">Save</v-btn></h2>
+    <h2>My Notes on <em>{{title}}</em> <v-btn color= "primary" @click="saveNote">Save</v-btn></h2>
     <v-radio-group v-model="currentNote.status" row>
         <v-radio name="currentNote.status" label="Known" value="100"></v-radio>
         <v-radio name="currentNote.status" label="Exploring" value="2"></v-radio>

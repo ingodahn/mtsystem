@@ -10,7 +10,7 @@
           ></show-math-doc>
         </v-row>
         <v-row v-if="current.readMore">
-          <v-btn v-if="!showMore" @click="showMore = true">Show more...</v-btn>
+          <v-btn color= "primary" v-if="!showMore" @click="showMore = true">Show more...</v-btn>
           <show-math-doc
             :key="current.readMore"
             v-if="showMore"
@@ -18,7 +18,7 @@
           ></show-math-doc>
         </v-row>
         <v-row v-if="showMore">
-          <v-btn @click="showMore = false">Show less</v-btn>
+          <v-btn color= "primary" @click="showMore = false">Show less</v-btn>
         </v-row>
         <v-row v-if="current.see" class="wiki">
           <a :href="current.see" target="_blank">See also</a>
