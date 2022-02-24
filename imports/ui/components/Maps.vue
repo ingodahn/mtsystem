@@ -211,7 +211,6 @@ export default {
         this.currentColor = node.color;
         this.currentId = node.id;
         node.color = this.colors.selectedNode;
-        this.Graph.nodeColor("color");
       }
       //Now CurrentNode exists
       else if (this.currentId != this.session.id) {
@@ -219,7 +218,6 @@ export default {
         this.currentColor = node.color;
         this.currentId = node.id;
         if (node.id != this.session.id) node.color = this.colors.selectedNode;
-        this.Graph.nodeColor("color");
         return;
       } else {
         //Now CurrentNode equals SessionNode

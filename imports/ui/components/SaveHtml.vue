@@ -112,9 +112,8 @@ export default {
                 }                
                 currentColor = node.color;
                 currentId = node.id;
-                node.color='brown';`;
-      if (this.session.view == '3D') body += "Graph.nodeColor('color');"
-      body += `          
+                if (currentId != sessionId) node.color='`+this.colors.selectedNode+`'; 
+                updateColors();
                 let infoHead = document.getElementById('infoHead');
                 let infoBody = document.getElementById('infoBody');
                 let myColor=node.id == sessionId?'background-color: pink;color: black;':'background-color: brown;color: white;'
@@ -185,56 +184,79 @@ export default {
       if (this.session.nodeForm != "Symbols") {
         if (this.session.view == "3D") {
           body += `
-                    Graph.nodeThreeObject((node) => {
-          const sprite = new SpriteText(node.title);
-          sprite.material.depthWrite = false;
-          sprite.color = node.color;
-          sprite.textHeight = 20;
-          return sprite;
-        });
-                    `;
+          function updateColors (){
+            Graph.nodeThreeObject((node) => {
+              const sprite = new SpriteText(node.title);
+              sprite.material.depthWrite = false;
+              sprite.color = node.color;
+              sprite.textHeight = 20;
+              return sprite;
+            });
+          }
+          `;
         } else {
           body += `
-                    Graph.nodeCanvasObject((node, ctx, globalScale) => {
-          const label = node.title;
-          const fontSize = 12 / globalScale;
-          ctx.font = \`\${fontSize}px Sans-Serif\`;
-          const textWidth = ctx.measureText(label).width;
-          const bckgDimensions = [textWidth, fontSize].map(
-            (n) => n + fontSize * 0.2
-          ); // some padding
+          function updateColors () {
+            Graph.nodeCanvasObject((node, ctx, globalScale) => {
+              const label = node.title;
+              const fontSize = 12 / globalScale;
+              ctx.font = \`\${fontSize}px Sans-Serif\`;
+              const textWidth = ctx.measureText(label).width;
+              const bckgDimensions = [textWidth, fontSize].map(
+                (n) => n + fontSize * 0.2
+              ); 
 
-          ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
-          ctx.fillRect(
-            node.x - bckgDimensions[0] / 2,
-            node.y - bckgDimensions[1] / 2,
-            ...bckgDimensions
-          );
+              ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+              ctx.fillRect(
+                node.x - bckgDimensions[0] / 2,
+                node.y - bckgDimensions[1] / 2,
+                ...bckgDimensions
+              );
 
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillStyle = node.color;
-          ctx.fillText(label, node.x, node.y);
-
-          node.__bckgDimensions = bckgDimensions; // to re-use in nodePointerAreaPaint
-        }).nodePointerAreaPaint((node, color, ctx) => {
-          ctx.fillStyle = color;
-          const bckgDimensions = node.__bckgDimensions;
-          bckgDimensions &&
-            ctx.fillRect(
-              node.x - bckgDimensions[0] / 2,
-              node.y - bckgDimensions[1] / 2,
-              ...bckgDimensions
-            );
-        });
-                    `;
+              ctx.textAlign = "center";
+              ctx.textBaseline = "middle";
+              ctx.fillStyle = node.color;
+              ctx.fillText(label, node.x, node.y);
+              node.__bckgDimensions = bckgDimensions;
+            }).nodePointerAreaPaint((node, color, ctx) => {
+              ctx.fillStyle = color;
+              const bckgDimensions = node.__bckgDimensions;
+              bckgDimensions &&
+                ctx.fillRect(
+                  node.x - bckgDimensions[0] / 2,
+                  node.y - bckgDimensions[1] / 2,
+                  ...bckgDimensions
+                );
+            });
+          }
+          `;
         }
+        
+      } else {
+        body += `
+        function updateColors () {
+          Graph.nodeColor('color');
+        }
+        `;
       }
 
       body += `
-            Graph.cooldownTicks(0)
-            .graphData(graphData);
-            nodeClicked(graphData.nodes.find(n => {return (n.id==sessionId)}));
+            updateColors ()
+            Graph
+            .graphData(graphData)
+            .cooldownTicks(0);
+            let startNode =  graphData.nodes.find((n) => {
+              return n.id == sessionId;
+            });
+            startNode.color='` + this.colors.sessionNode+ `';
+            nodeClicked(startNode);
+            function zoomToFit() {
+              let clientNode=document.getElementById('mapId');
+              Graph.width(clientNode.clientWidth)
+                .height(Math.max(clientNode.clientHeight, 800))
+                .zoomToFit(500);
+            };
+            zoomToFit ();
             `;
 
       body += `<\/script>\
