@@ -56,6 +56,10 @@ export default {
               #sidebar {
                 float:right;
                 width: 34%;
+                font-family: sans-serif;
+                font-size: 16px;
+                line-height: 1.5;
+                text-rendering: optimizeLegibility;
               }
               #mapId {
 				margin: 1em;
