@@ -203,7 +203,7 @@ export default {
           function updateColors () {
             Graph.nodeCanvasObject((node, ctx, globalScale) => {
               const label = node.title;
-              const fontSize = 12 / globalScale;
+              const fontSize = 20 / globalScale;
               ctx.font = \`\${fontSize}px Sans-Serif\`;
               const textWidth = ctx.measureText(label).width;
               const bckgDimensions = [textWidth, fontSize].map(
