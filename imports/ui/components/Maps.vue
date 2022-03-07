@@ -236,7 +236,6 @@ export default {
       this.session.id = this.currentNode.id;
       if (this.session.type != this.currentNode.type)
         this.session.set("type", this.currentNode.type);
-      // TODO: What if session.type is neither source nor target of session.relation s.a. Any:218
       const cr = relations.find((r) => r.id == this.session.relation);
       if (
         this.session.type != cr.sourceType &&
@@ -329,7 +328,7 @@ export default {
       } else {
         this.Graph.nodeCanvasObject((node, ctx, globalScale) => {
           const label = node.title;
-          const fontSize = 20 / globalScale;
+          const fontSize =18 / globalScale;
           ctx.font = `${fontSize}px Sans-Serif`;
           const textWidth = ctx.measureText(label).width;
           const bckgDimensions = [textWidth, fontSize].map(
@@ -397,7 +396,7 @@ export default {
               const sprite = new SpriteText(nn.title);
               sprite.material.depthWrite = false; // make sprite background transparent
               sprite.color = nn.color;
-              sprite.textHeight = 20;
+              sprite.textHeight = 18;
               return sprite;
             });
           }
@@ -428,7 +427,7 @@ export default {
           const sprite = new SpriteText(node.title);
           sprite.material.depthWrite = false; // make sprite background transparent
           sprite.color = node.color;
-          sprite.textHeight = 20;
+          sprite.textHeight = 18;
           return sprite;
         })
           // Spread nodes a little wider
