@@ -61,7 +61,7 @@
           >
         </div>
       </v-row>
-      <v-row v-if="session.ui">
+      <v-row v-if="session.ui && session.id">
         <v-autocomplete
           label="Expand selected node by"
           v-model="expandBy"
