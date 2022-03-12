@@ -273,7 +273,7 @@ export default {
               const sprite = new SpriteText(node.title);
               sprite.material.depthWrite = false;
               sprite.color = node.color;
-              sprite.textHeight = 20;
+              sprite.textHeight = 18;
               return sprite;
             });
           }
@@ -283,7 +283,7 @@ export default {
           function updateColors () {
             Graph.nodeCanvasObject((node, ctx, globalScale) => {
               const label = node.title;
-              const fontSize = 12 / globalScale;
+              const fontSize = 18 / globalScale;
               ctx.font = \`\${fontSize}px Sans-Serif\`;
               const textWidth = ctx.measureText(label).width;
               const bckgDimensions = [textWidth, fontSize].map(

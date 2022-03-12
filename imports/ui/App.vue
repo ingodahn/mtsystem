@@ -73,7 +73,7 @@ export default {
         direction: "both",
         orientation: "",
         newNodes: 7,
-        debug: true,
+        debug: false,
         ui: 0,
         saveSession: true,
         mode: "graph",
