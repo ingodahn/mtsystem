@@ -21,14 +21,15 @@ export default {
         primaryRelation: "red",
         otherRelation: "green",
       },
+      base: 'https://mathtrek.eu/',
     };
   },
-  computed: {
+  computed: { 
     head() {
       let head = `<!DOCTYPE html>
             <html lang='en'>
             <head>
-            <title>mathtrek</title>
+            <title>MathTrek</title>
             <meta charset="utf-8"/>
             <!-- KaTeX dependency -->
             <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css'  integrity='sha256-V8SV2MO1FUb63Bwht5Wx9x6PVHNa02gv8BgH/uH3ung=' crossorigin='anonymous'>
@@ -47,25 +48,7 @@ export default {
       } else {
         head += '<script src="https://unpkg.com/force-graph"><\/script>';
       }
-      head += `
-            <style>
-              #mapContainer {
-                float:left;
-                width: 66%
-              }
-              #sidebar {
-                float:right;
-                width: 34%;
-                font-family: sans-serif;
-                font-size: 16px;
-                line-height: 1.5;
-                text-rendering: optimizeLegibility;
-              }
-              #mapId {
-				margin: 1em;
-			  }
-            </style>
-            `;
+      head += "<link rel='stylesheet' type='text/css' href='"+this.base+"css/enterprise.css' />";
       head += "</head>";
       return head;
     },
@@ -89,182 +72,31 @@ export default {
       let nodeTitle = graph.nodes.find((n) => {
         return n.id == this.session.id;
       }).title;
-      let body =
-        "<body>\
-            <div class='container'>\
-                <h1 class='heading'>MathTrek environment of " +
+      let body =`
+        <body>
+            <div class='container'>
+                <h1 class='heading'>MathTrek environment of ` +
         nodeTitle +
-        "</h1>\
-            <div id='mapContainer'>\
-                <div id='mapId'></div>\
-            </div>\
-            <div id='sidebar'>\
-                <div id='infoHead'>Info</div>\
-                <div id='infoBody'>InfoBody</div>\
-            </div>\
-            </div>\
-            <script>";
-      body += "let currentId = '', sessionId = '" + this.session.id + "';";
-      body += `
-            let currentColor='deeppink';
-            function nodeClicked(node)
-            {
-                if (node.id == currentId) return;
-                if (currentId) {
-                    let oldNode = graphData.nodes.find(n => { return (n.id == currentId);});
-                    oldNode.color=currentColor;
-                }                
-                currentColor = node.color;
-                currentId = node.id;
-                if (currentId != sessionId) node.color='`+this.colors.selectedNode+`'; 
-                updateColors();
-                let infoHead = document.getElementById('infoHead');
-                let infoBody = document.getElementById('infoBody');
-                let myColor=node.id == sessionId?'background-color: pink;color: black;':'background-color: brown;color: white;'
-                infoHead.innerHTML = '<a href="'+node.see+'" target="_blank"><h3 style="'+myColor+'text-align: center;">'+node.title+'</h3></a>';
-                infoBody.innerHTML = '<p>'+node.firstParagraph+'</p>';
-                renderMathInElement(infoBody,{
-                    delimiters: [
-                        {left: '$$', right: '$$', display: true},
-                        {left: '$', right: '$', display: false},
-                        {left: '\\\\(', right: '\\\\)', display: false},
-                        {left: '\\\\[', right: '\\\\]', display: true}
-                    ],
-                    throwOnError : false
-                });
-            }            
-            `;
-      body += "let graphData = " + JSON.stringify(graph) + ";";
-      if (this.session.view == "3D") {
-        body +=
-          "const Graph = ForceGraph3D({ controlType: 'orbit' })(document.getElementById('mapId'));";
-      } else {
-        body += "const Graph = ForceGraph()(document.getElementById('mapId'));";
-      }
-      body +=
-        `
-            Graph.linkWidth(5)
-            .linkDirectionalParticles(10)
-            .linkDirectionalParticleWidth(2.5)
-            .linkDirectionalParticleSpeed((d) => 0.005)
-            .linkDirectionalParticleColor(() => {
-                return "white";
-                })
-            .nodeRelSize(6)
-            .nodeId("id")
-            .nodeColor((d) =>
-                d.id == '` +
-        this.session.id +
-        "'? '" +
-        this.colors.sessionNode +
-        "':d.color)" +
-        `
-            .nodeLabel((node) => \`\${node.title}\`)
-            .linkColor((r) => {
-            return r.relation == '` +
-        this.session.relation +
-        "'? '" +
-        this.colors.primaryRelation +
-        "':'" +
-        this.colors.otherRelation +
-        "';" +
-        `
-            })
-            .d3Force(
-                "link",
-                d3
-                    .forceLink()
-                    .id((d) => d.id)
-                    .distance(100)
-                    .strength(1)
-            )
-            .width(document.querySelector('#mapId').clientWidth)
-            .height(Math.max(document.querySelector('#mapId').clientHeight,800))
-            .onNodeDragEnd((node) => {
-                node.fx = node.x;
-                node.fy = node.y;
-            })
-            .onNodeClick((node) => nodeClicked(node));`;
-      if (this.session.nodeForm != "Symbols") {
-        if (this.session.view == "3D") {
-          body += `
-          function updateColors (){
-            Graph.nodeThreeObject((node) => {
-              const sprite = new SpriteText(node.title);
-              sprite.material.depthWrite = false;
-              sprite.color = node.color;
-              sprite.textHeight = 18;
-              return sprite;
-            });
-          }
-          `;
-        } else {
-          body += `
-          function updateColors () {
-            Graph.nodeCanvasObject((node, ctx, globalScale) => {
-              const label = node.title;
-              const fontSize = 18 / globalScale;
-              ctx.font = \`\${fontSize}px Sans-Serif\`;
-              const textWidth = ctx.measureText(label).width;
-              const bckgDimensions = [textWidth, fontSize].map(
-                (n) => n + fontSize * 0.2
-              ); 
-
-              ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
-              ctx.fillRect(
-                node.x - bckgDimensions[0] / 2,
-                node.y - bckgDimensions[1] / 2,
-                ...bckgDimensions
-              );
-
-              ctx.textAlign = "center";
-              ctx.textBaseline = "middle";
-              ctx.fillStyle = node.color;
-              ctx.fillText(label, node.x, node.y);
-              node.__bckgDimensions = bckgDimensions;
-            }).nodePointerAreaPaint((node, color, ctx) => {
-              ctx.fillStyle = color;
-              const bckgDimensions = node.__bckgDimensions;
-              bckgDimensions &&
-                ctx.fillRect(
-                  node.x - bckgDimensions[0] / 2,
-                  node.y - bckgDimensions[1] / 2,
-                  ...bckgDimensions
-                );
-            });
-          }
-          `;
-        }
-        
-      } else {
-        body += `
-        function updateColors () {
-          Graph.nodeColor('color');
-        }
+        `</h1>
+          <div include-html='info.html'></div>
+            <div id='mapContainer'>
+                <div id='mapId'></div>
+            </div>
+            <div id='sidebar'>
+                <div id='infoHead'>Info</div>
+                <div id='infoBody'>InfoBody</div>
+            </div>
+          </div>
+        <script>
         `;
-      }
-
+      body += "let sessionId = '" + this.session.id + "', primaryRelation = '"+this.session.relation+"';";
+      body += "let graphData = " + JSON.stringify(graph) + ";";
+     
       body += `
-            updateColors ()
-            Graph
-            .graphData(graphData)
-            .cooldownTicks(0);
-            let startNode =  graphData.nodes.find((n) => {
-              return n.id == sessionId;
-            });
-            startNode.color='` + this.colors.sessionNode+ `';
-            nodeClicked(startNode);
-            function zoomToFit() {
-              let clientNode=document.getElementById('mapId');
-              Graph.width(clientNode.clientWidth)
-                .height(Math.max(clientNode.clientHeight, 800))
-                .zoomToFit(500);
-            };
-            zoomToFit ();
-            `;
-
-      body += `<\/script>\
-            </body>\
+      <\/script>
+      <script src="`+this.base+'js/'+this.session.view+this.session.nodeForm+'.js"><\/script>'+
+      `
+      </body>
             `;
       return body;
     },
@@ -274,7 +106,7 @@ export default {
       let html = this.head + this.body + "</html>";
       var FileSaver = require("file-saver");
       var blob = new Blob([html], { type: "text/html;charset=utf-8" });
-      FileSaver.saveAs(blob, "graph.html");
+      FileSaver.saveAs(blob, "index.html");
     },
   },
 };
