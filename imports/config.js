@@ -30,6 +30,13 @@ const relations = [
         inverse: 'has example',
         description: "The concept SOURCE provides an example for the concept TARGET."
     },
+    {   sourceType: 'concept',
+        targetType: 'subject',
+        id: 'CisBasisForS', 
+        name: 'is fundamental for', 
+        inverse: 'is based on',
+        description: "The concept SOURCE p is fundamental for the subject TARGET."
+    },
     {
         sourceType: 'theorem',
         targetType: 'theorem',
