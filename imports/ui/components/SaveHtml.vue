@@ -3,6 +3,9 @@
     <v-btn color="primary" class="mx-1 my-1" @click="saveHtml"
       >Save as HTML</v-btn
     >
+    <v-btn color="primary" class="mx-1 my-1" @click="saveNewHtml"
+      >Save as NEW HTML</v-btn
+    >
   </v-container>
 </template>
 
@@ -102,6 +105,12 @@ export default {
     },
   },
   methods: {
+    saveNewHtml() {
+      let html = this.newHead + this.newBody + "</html>";
+      var FileSaver = require("file-saver");
+      var blob = new Blob([html], { type: "text/html;charset=utf-8" });
+      FileSaver.saveAs(blob, "index.html");
+    },
     saveHtml() {
       let html = this.head + this.body + "</html>";
       var FileSaver = require("file-saver");
