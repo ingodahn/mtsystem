@@ -9,7 +9,7 @@
     "visualize": "meteor --production --extra-packages bundle-visualizer"
   },
   "dependencies": {
-    "@babel/runtime": "^7.17.2",
+    "@babel/runtime": "^7.17.9",
     "bcrypt": "^5.0.1",
     "file-saver": "^2.0.5",
     "meteor-node-stubs": "^1.1.0",
@@ -19,7 +19,7 @@
     "vue-meteor-tracker": "^2.0.0-beta.5",
     "vue-router": "^3.5.3",
     "vue-session": "^1.0.0",
-    "vuetify": "^2.6.3"
+    "vuetify": "^2.6.4"
   },
   "meteor": {
     "mainModule": {
