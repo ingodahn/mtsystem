@@ -74,17 +74,19 @@ export default {
       }).title;
       let body =`
         <body>
-            <div class='container'>
-                <h1 class='heading'>MathTrek environment of ` +
+          <div class='container'>
+            <h1 class='heading'>MathTrek environment of ` +
         nodeTitle +
-        `</h1>
-          <div include-html='info.html'></div>
-            <div id='mapContainer'>
-                <div id='mapId'></div>
-            </div>
-            <div id='sidebar'>
+            `</h1>
+            <div include-html='info.html'></div>
+            <div id='mainContent' style='display:flex'>
+              <div id='mapContainer'>
+                <div id='mapId' style='position: sticky; top:0;'></div>
+              </div>
+              <div id='sidebar'>
                 <div id='infoHead'>Info</div>
                 <div id='infoBody'>InfoBody</div>
+              </div>
             </div>
           </div>
         <script>
