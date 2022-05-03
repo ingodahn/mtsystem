@@ -54,6 +54,7 @@
         <div v-if="!session.edit">
           <v-btn
             v-if="session.mode == 'text' && session.id"
+            :disabled="relations.length == 0"
             color="primary"
             id="btnRelated"
             @click="session.set('mode', 'graph')"
@@ -85,7 +86,7 @@
         </div>
       </v-col>
       <v-col md="4">
-        <GraphControl v-if="session.mode == 'graph'"/>
+        <GraphControl v-if="session.mode == 'graph'" />
       </v-col>
     </v-row>
 
@@ -106,12 +107,12 @@
       <v-col v-else>
         <new-node
           v-if="session.edit == 'new'"
-          :relations="relations"
+          :relations="typeRelations"
           id=""
         ></new-node>
         <new-node
           v-if="session.edit == 'update'"
-          :relations="relations"
+          :relations="typeRelations"
           :id="session.id"
         ></new-node>
       </v-col>
@@ -206,11 +207,26 @@ export default {
   },
   computed: {
     relatedType() {
-      const cr = this.relations.find((r) => r.id == this.session.relation);
+      if (this.relations.length) {
+        const cr = relations.find((r) => r.id == this.session.relation);
       return cr.sourceType == this.session.type ? cr.targetType : cr.sourceType;
+      } else return "...";
+      
     },
     relations() {
-      let t = this.session.type;
+      if (this.session.id) {
+        return relations.filter((e) => {
+          return UnitsCollection.findOne({
+            type: "relation",
+            name: e.id,
+            $or: [{ source: this.session.id }, { target: this.session.id }],
+          });
+        });
+      }
+      return this.typeRelations;
+    },
+    typeRelations () {
+       let t = this.session.type;
       return relations.filter((e) => e.sourceType == t || e.targetType == t);
     },
     getRelationDescription() {
@@ -268,6 +284,7 @@ export default {
       return desc;
     },
     typedRelations() {
+      // TODO: Only used relations
       let tr = [];
       this.relations.forEach((r) => {
         tr.push({

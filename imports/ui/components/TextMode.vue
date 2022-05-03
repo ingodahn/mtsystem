@@ -29,6 +29,7 @@
         </v-row>
       </v-col>
       <v-col xs="12" md="4">
+        <div v-if="currentRelation">
         <div v-if="currentRelation.sourceType == session.type">
           <v-select
             v-if="getCurrentNodeIsSource(currentRelation.id).length"
@@ -61,6 +62,7 @@
             {{ currentRelation.sourceType }} in this system.
           </p>
         </div>
+        </div><div v-else>{{ current.title }} is unrelated to anything else in the system.</div>
         <Sidebar :title="current.title" :relations="relations" mode="text"/>
       </v-col>
     </v-row>
