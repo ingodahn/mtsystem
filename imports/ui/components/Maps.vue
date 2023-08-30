@@ -45,6 +45,7 @@
           Save Graph</v-btn
         >
         <save-html v-if="session.ui"></save-html>
+        <copy-text v-if="session.ui"></copy-text>
         <div v-else>
           <v-btn
             class="mx-1 my-1"
@@ -119,6 +120,7 @@
   <script>
 import NodeInfo from "./NodeInfo.vue";
 import SaveHtml from "./SaveHtml.vue";
+import CopyText from "./CopyText.vue";
 import { relations, defaultRelation } from "/imports/config.js";
 import colorMixin from "../mixins/colorMixin.js";
 
@@ -136,7 +138,7 @@ export default {
       expandBy: null,
     };
   },
-  components: { NodeInfo, SaveHtml },
+  components: { NodeInfo, SaveHtml, CopyText },
   watch: {
     currentTicks(newTicks) {
       this.Graph.cooldownTicks(newTicks);
