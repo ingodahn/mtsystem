@@ -14,7 +14,7 @@
     "file-saver": "^2.0.5",
     "meteor-node-stubs": "^1.1.0",
     "v-markdown": "^1.0.2",
-    "vue": "^2.6.14",
+    "vue": "^3.0.0",
     "vue-cytoscape": "^1.0.8",
     "vue-meteor-tracker": "^2.0.0-beta.5",
     "vue-router": "^3.5.3",
